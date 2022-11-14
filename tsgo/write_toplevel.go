@@ -194,6 +194,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			}
 			s.WriteString(name.Name)
 		}
+		fmt.Println("name:", name.Name, "vs:", vs, "group:", group, "group.groupType:", group.groupType)
 
 		s.WriteString(" = ")
 
