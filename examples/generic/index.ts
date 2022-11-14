@@ -18,7 +18,7 @@ export type Derived =
 export type Any = 
     string | unknown;
 export type Empty = unknown;
-export type Something = any;
+
 export interface EmptyStruct {
 }
 export interface ValAndPtr<V extends unknown, PT extends (V | undefined), Unused extends number /* uint64 */> {
