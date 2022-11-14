@@ -211,7 +211,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			s.WriteByte('\n')
 		}
 
-		if vs.Type != nil && isLast && group.isGroupedDeclaration {
+		if isLast && group.isGroupedDeclaration {
 			s.WriteString("}\n")
 		}
 	}

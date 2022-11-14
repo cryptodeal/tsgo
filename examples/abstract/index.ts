@@ -4,17 +4,18 @@ export type Something = string | number;
 //////////
 // source: iota.go
 
-export type MyIotaType = number /* int */;
+export enum MyIotaType {
+
 Zero = 0,
-export const One = 1
-export const Two = 2
-export const Four = 4
+One = 1
+Two = 2
+Four = 4
 FourString = "four",
-export const AlsoFourString = "four"
-export const Five = 5
-export const FiveAgain = 5
-export const Sixteen = 16
-export const Seventeen = 17
+AlsoFourString = "four"
+Five = 5
+FiveAgain = 5
+Sixteen = 16
+Seventeen = 17
 
 //////////
 // source: misc.go
@@ -31,11 +32,11 @@ export type FooInt64 = number /* int64 */;
 /**
  * Comment for the const group declaration
  */
-export const ConstNumberValue = 123 // Line comment behind field with value 123
+ConstNumberValue = 123 // Line comment behind field with value 123
 /**
  * Individual comment for field ConstStringValue
  */
-export const ConstStringValue = "abc"
+ConstStringValue = "abc"
 /**
  * Comment for the const group declaration
  */
