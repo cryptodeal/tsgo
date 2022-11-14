@@ -153,7 +153,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 				g.writeCommentGroup(s, vs.Doc, 0)
 			}
 		} else if group.isGroupedDeclaration {
-			g.writeCommentGroupIfNotNil(s, group.doc, 0)
+			g.writeCommentGroupIfNotNil(s, group.doc, 1)
 		}
 
 		hasExplicitValue := len(vs.Values) > i

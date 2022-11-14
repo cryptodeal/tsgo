@@ -35,9 +35,9 @@ export enum MyFooEnumEnum {
  * Comment for the const group declaration
  */
   ConstNumberValue = 123, // Line comment behind field with value 123
-/**
- * Individual comment for field ConstStringValue
- */
+  /**
+   * Individual comment for field ConstStringValue
+   */
   ConstStringValue = "abc",
 /**
  * Comment for the const group declaration
