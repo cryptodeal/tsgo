@@ -184,6 +184,8 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		} else {
 			if !group.isGroupedDeclaration {
 				s.WriteString("export const ")
+			} else {
+				g.writeIndent(s, 1)
 			}
 			s.WriteString(name.Name)
 		}

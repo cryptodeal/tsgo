@@ -6,7 +6,6 @@ export type Something = string | number;
 
 export type MyIotaType = number /* int */;
 export enum MyIotaEnumEnum {
-
   Zero = 0,
 One = 1,
 Two = 2,
@@ -32,7 +31,6 @@ Second line of package level comment.
 export type Foo = string;
 export type FooInt64 = number /* int64 */;
 export enum MyFooEnumEnum {
-
 /**
  * Comment for the const group declaration
  */
