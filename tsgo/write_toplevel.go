@@ -144,11 +144,20 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			group.groupType = ""
 		}
 
-		if vs.Type != nil {
+		if vs.Type != nil && group.isGroupedDeclaration {
 			s.WriteString(name.Name)
 			tempSB := &strings.Builder{}
 			typeString := tempSB.String()
 
+			group.groupType = typeString
+		} else if vs.Type != nil {
+			s.WriteString(": ")
+
+			tempSB := &strings.Builder{}
+			g.writeType(tempSB, vs.Type, 0, true)
+			typeString := tempSB.String()
+
+			s.WriteString(typeString)
 			group.groupType = typeString
 		} else if group.groupType != "" && !hasExplicitValue {
 			s.WriteString("export const ")
