@@ -31,17 +31,17 @@ Second line of package level comment.
 export type Foo = string;
 export type FooInt64 = number /* int64 */;
 export enum MyFooEnumEnum {
-/**
- * Comment for the const group declaration
- */
+  /**
+   * Comment for the const group declaration
+   */
   ConstNumberValue = 123, // Line comment behind field with value 123
   /**
    * Individual comment for field ConstStringValue
    */
   ConstStringValue = "abc",
-/**
- * Comment for the const group declaration
- */
+  /**
+   * Comment for the const group declaration
+   */
   ConstFooValue = "foo_const_value"
 }
 export const Alice = "Alice"
