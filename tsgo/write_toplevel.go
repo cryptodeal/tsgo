@@ -152,6 +152,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		}
 
 		if vs.Type != nil && group.isGroupedDeclaration {
+			g.writeIndent(s, 1)
 			s.WriteString(name.Name)
 			tempSB := &strings.Builder{}
 			typeString := tempSB.String()

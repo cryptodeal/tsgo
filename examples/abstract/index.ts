@@ -4,7 +4,8 @@ export type Something = string | number;
 //////////
 // source: iota.go
 
-export type MyIotaType = number /* int */;export enum MyIotaEnum {
+export type MyIotaType = number /* int */;
+export enum MyIotaEnum {
 Zero = 0,
 One = 1,
 Two = 2,
@@ -28,7 +29,8 @@ Second line of package level comment.
  * Comment belonging to Foo
  */
 export type Foo = string;
-export type FooInt64 = number /* int64 */;export enum MyFooEnum {
+export type FooInt64 = number /* int64 */;
+export enum MyFooEnum {
 /**
  * Comment for the const group declaration
  */
