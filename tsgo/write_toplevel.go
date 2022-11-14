@@ -166,6 +166,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			g.writeIndent(s, 1)
 			s.WriteString(name.Name)
 			tempSB := &strings.Builder{}
+			g.writeType(tempSB, vs.Type, 0, true)
 			typeString := tempSB.String()
 
 			group.groupType = typeString
