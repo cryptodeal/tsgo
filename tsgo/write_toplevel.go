@@ -71,6 +71,8 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // or
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
+	fmt.Println("name:", ts.Name.Name, "ts:", ts, "group:", group)
+
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)
 	} else if group.isGroupedDeclaration {
@@ -134,7 +136,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 // const SomeValue = 3
 func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec, group *groupContext, isLast bool) {
 	for i, name := range vs.Names {
-		fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
+		// fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
 		group.iotaValue = group.iotaValue + 1
 		if name.Name == "_" {
 			continue
