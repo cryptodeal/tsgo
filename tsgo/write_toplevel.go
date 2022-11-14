@@ -151,7 +151,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			typeString := tempSB.String()
 
 			group.groupType = typeString
-		} else if vs.Type != nil {
+		} else if vs.Type == nil {
 			s.WriteString("export const ")
 			s.WriteString(name.Name)
 			s.WriteString(": ")

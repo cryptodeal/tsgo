@@ -19,10 +19,10 @@ packages:
   - path: "github.com/cryptodeal/tsgo/examples/generic"
     fallback_type: unknown
   # Generate the "net/http" output example, note the output is in gitignore as it's pretty big
-  - path: "net/http"
-    output_path: "./examples/http/index.ts"
-    type_mappings:
-      time.Duration: "number /* time in nanoseconds (time.Duration) */"
+  # - path: "net/http"
+  # output_path: "./examples/http/index.ts"
+  # type_mappings:
+  # time.Duration: "number /* time in nanoseconds (time.Duration) */"
   # Generate the "time" output example, note the output is in gitignore as it's pretty big
-  - path: "time"
-    output_path: "./examples/time/index.ts"
+  # - path: "time"
+  # output_path: "./examples/time/index.ts"

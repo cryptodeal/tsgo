@@ -4,8 +4,7 @@ export type Something = string | number;
 //////////
 // source: iota.go
 
-export enum MyIotaType {
-
+export type MyIotaType = number /* int */;
 Zero = 0,
  = 1
  = 2
