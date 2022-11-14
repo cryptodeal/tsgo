@@ -7,7 +7,7 @@
  * Comments are kept :)
  */
 export type ComplexType = { [key: string]: { [key: number /* uint16 */]: number /* uint32 */ | undefined}};
-
+export type UserRole = string;
   UserRoleDefault = "viewer",
   UserRoleEditor = "editor" // Line comments are also kept
 }

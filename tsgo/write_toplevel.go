@@ -111,7 +111,6 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 			s.WriteString(enumName + "Enum")
 			s.WriteString(" {")
 		}
-		s.WriteByte('\n')
 	} else if isIdent {
 		s.WriteString("export type ")
 		s.WriteString(ts.Name.Name)
@@ -138,7 +137,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 // const SomeValue = 3
 func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec, group *groupContext, isLast bool) {
 	for i, name := range vs.Names {
-		// fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
+		fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
 		group.iotaValue = group.iotaValue + 1
 		if name.Name == "_" {
 			continue
