@@ -16,6 +16,7 @@ Five = 5
 FiveAgain = 5
 Sixteen = 16
 Seventeen = 17
+}
 
 //////////
 // source: misc.go

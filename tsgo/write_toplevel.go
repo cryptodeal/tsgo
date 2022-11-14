@@ -199,7 +199,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			}
 			s.WriteString(valueString)
 		}
-		if vs.Type != nil && !isLast {
+		if !isLast && group.isGroupedDeclaration {
 			s.WriteByte(',')
 		} else if group.groupType != "" && !hasExplicitValue {
 			s.WriteByte(';')
