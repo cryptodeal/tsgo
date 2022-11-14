@@ -6,11 +6,11 @@ export type Something = string | number;
 
 export type MyIotaType = number /* int */;
 export enum MyIotaEnum {
-Zero = 0,
+  Zero = 0,
 One = 1,
 Two = 2,
 Four = 4,
-FourString = "four",
+  FourString = "four",
 AlsoFourString = "four",
 Five = 5,
 FiveAgain = 5,
@@ -42,7 +42,7 @@ ConstStringValue = "abc",
 /**
  * Comment for the const group declaration
  */
-ConstFooValue = "foo_const_value"
+  ConstFooValue = "foo_const_value"
 }
 export const Alice = "Alice"
 /**
