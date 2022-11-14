@@ -6,15 +6,15 @@ export type Something = string | number;
 
 export type MyIotaType = number /* int */;
 Zero = 0,
- = 1
- = 2
- = 4
+export const One = 1
+export const Two = 2
+export const Four = 4
 FourString = "four",
- = "four"
- = 5
- = 5
- = 16
- = 17
+export const AlsoFourString = "four"
+export const Five = 5
+export const FiveAgain = 5
+export const Sixteen = 16
+export const Seventeen = 17
 
 //////////
 // source: misc.go
@@ -31,17 +31,17 @@ export type FooInt64 = number /* int64 */;
 /**
  * Comment for the const group declaration
  */
- = 123 // Line comment behind field with value 123
+export const ConstNumberValue = 123 // Line comment behind field with value 123
 /**
  * Individual comment for field ConstStringValue
  */
- = "abc"
+export const ConstStringValue = "abc"
 /**
  * Comment for the const group declaration
  */
 ConstFooValue = "foo_const_value"
 }
- = "Alice"
+export const Alice = "Alice"
 /**
  * Multiline comment for StructBar
  * Some more text

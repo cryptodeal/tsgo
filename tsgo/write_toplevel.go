@@ -169,7 +169,9 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			s.WriteString(": ")
 			s.WriteString(group.groupType)
 		} else {
-			s.WriteString("export const ")
+			if !group.isGroupedDeclaration {
+				s.WriteString("export const ")
+			}
 			s.WriteString(name.Name)
 		}
 
