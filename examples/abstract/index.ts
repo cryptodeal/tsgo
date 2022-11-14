@@ -7,15 +7,15 @@ export type Something = string | number;
 export type MyIotaType = number /* int */;
 export enum MyIotaEnumEnum {
   Zero = 0,
-One = 1,
-Two = 2,
-Four = 4,
+  One = 1,
+  Two = 2,
+  Four = 4,
   FourString = "four",
-AlsoFourString = "four",
-Five = 5,
-FiveAgain = 5,
-Sixteen = 16,
-Seventeen = 17
+  AlsoFourString = "four",
+  Five = 5,
+  FiveAgain = 5,
+  Sixteen = 16,
+  Seventeen = 17
 }
 
 //////////
@@ -34,11 +34,11 @@ export enum MyFooEnumEnum {
 /**
  * Comment for the const group declaration
  */
-ConstNumberValue = 123, // Line comment behind field with value 123
+  ConstNumberValue = 123, // Line comment behind field with value 123
 /**
  * Individual comment for field ConstStringValue
  */
-ConstStringValue = "abc",
+  ConstStringValue = "abc",
 /**
  * Comment for the const group declaration
  */

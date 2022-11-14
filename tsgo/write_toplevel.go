@@ -147,7 +147,11 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		}
 
 		if vs.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
-			g.writeCommentGroup(s, vs.Doc, 0)
+			if group.isGroupedDeclaration {
+				g.writeCommentGroup(s, vs.Doc, 1)
+			} else {
+				g.writeCommentGroup(s, vs.Doc, 0)
+			}
 		} else if group.isGroupedDeclaration {
 			g.writeCommentGroupIfNotNil(s, group.doc, 0)
 		}
