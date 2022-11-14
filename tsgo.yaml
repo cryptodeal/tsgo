@@ -15,7 +15,8 @@ packages:
       | # We can define some additional text to put at the start of the file.
       export type Something = string | number;
     enum_structs:
-      - "MyIotaType"
+      MyIotaType: "MyIotaEnum"
+      FooInt64: "MyFooEnum"
   - path: "github.com/cryptodeal/tsgo/examples/simple"
     fallback_type: unknown
   - path: "github.com/cryptodeal/tsgo/examples/generic"

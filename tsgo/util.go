@@ -3,8 +3,8 @@ package tsgo
 import "strings"
 
 func (g *PackageGenerator) IsEnumStruct(name string) bool {
-	for _, b := range g.conf.EnumStructs {
-		if strings.EqualFold(b, name) {
+	for k, v := range g.conf.EnumStructs {
+		if strings.EqualFold(k, name) || strings.EqualFold(v, name) {
 			return true
 		}
 	}

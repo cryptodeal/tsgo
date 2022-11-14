@@ -7,14 +7,14 @@ export type Something = string | number;
 export enum MyIotaType {
 
 Zero = 0,
-One = 1
-Two = 2
-Four = 4
+One = 1,
+Two = 2,
+Four = 4,
 FourString = "four",
-AlsoFourString = "four"
-Five = 5
-FiveAgain = 5
-Sixteen = 16
+AlsoFourString = "four",
+Five = 5,
+FiveAgain = 5,
+Sixteen = 16,
 Seventeen = 17
 }
 
@@ -30,14 +30,15 @@ Second line of package level comment.
  */
 export type Foo = string;
 export type FooInt64 = number /* int64 */;
+export enum FooEnum {
 /**
  * Comment for the const group declaration
  */
-ConstNumberValue = 123 // Line comment behind field with value 123
+ConstNumberValue: FooInt64 = 123, // Line comment behind field with value 123
 /**
  * Individual comment for field ConstStringValue
  */
-ConstStringValue = "abc"
+ConstStringValue = "abc",
 /**
  * Comment for the const group declaration
  */

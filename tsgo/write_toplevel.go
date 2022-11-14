@@ -93,16 +93,22 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent {
+		// keeps the original type
+		s.WriteString("export type ")
+		s.WriteString(ts.Name.Name)
+		s.WriteString(" = ")
+		s.WriteString(getIdent(id.Name))
+		s.WriteString(";")
+		// if no alternate name for the enum is provided, use the original name
 		if g.IsEnumStruct(ts.Name.Name) {
 			s.WriteString("export enum ")
-			s.WriteString(ts.Name.Name)
-			s.WriteString(" {\n")
-		} else {
-			s.WriteString("export type ")
-			s.WriteString(ts.Name.Name)
-			s.WriteString(" = ")
-			s.WriteString(getIdent(id.Name))
-			s.WriteString(";")
+			enumName := g.conf.EnumStructs[ts.Name.Name]
+			// if names match, append `Enum` to the name
+			if strings.EqualFold(enumName, ts.Name.Name) || g.conf.EnumStructs[ts.Name.Name] == "" {
+				enumName = ts.Name.Name + "Enum"
+			}
+			s.WriteString(enumName)
+			s.WriteString(" {")
 		}
 	}
 
@@ -112,7 +118,6 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(" = ")
 		g.writeType(s, ts.Type, 0, true)
 		s.WriteString(";")
-
 	}
 
 	if ts.Comment != nil {
