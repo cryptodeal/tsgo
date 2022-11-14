@@ -101,6 +101,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(";")
 		// if no alternate name for the enum is provided, use the original name
 		if g.IsEnumStruct(ts.Name.Name) {
+			s.WriteByte('\n')
 			s.WriteString("export enum ")
 			enumName := g.conf.EnumStructs[ts.Name.Name]
 			// if names match, append `Enum` to the name
@@ -130,7 +131,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 // const SomeValue = 3
 func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec, group *groupContext, isLast bool) {
 	for i, name := range vs.Names {
-		fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
+		// fmt.Println("name:", name.Name, "vs:", vs, "group:", group)
 		group.iotaValue = group.iotaValue + 1
 		if name.Name == "_" {
 			continue
