@@ -184,8 +184,10 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			typeString := tempSB.String()
 
 			group.groupType = typeString
+		} else if group.isGroupedDeclaration {
+
 		} else if group.groupType != "" && !hasExplicitValue {
-			if g.IsEnumStruct(group.groupType) {
+			if g.IsEnumStruct(group.groupType) || group.isGroupedDeclaration {
 				s.WriteString(name.Name)
 			} else {
 				s.WriteString("export const ")
