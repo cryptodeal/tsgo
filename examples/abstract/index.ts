@@ -60,11 +60,14 @@ export interface StructBar {
   field_that_should_not_be_optional: string;
   readonly field_that_should_be_readonly: string;
 }
+
+//////////
+// Generated config for Bun FFI
 export const {
   symbols: {
-    testFunc  
-}
+    _testFunc
+  }
 } = dlopen(import.meta.dir + '/_ffi_bindings.dylib', {
   _testFunc: {
-}
+  }
 })

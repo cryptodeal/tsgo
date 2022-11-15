@@ -265,6 +265,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("\n//////////\n")
 	// source: misc.go
 	s.WriteString("// Generated config for Bun FFI\n")
+	s.WriteByte('\n')
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
