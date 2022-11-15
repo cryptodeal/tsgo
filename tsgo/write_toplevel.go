@@ -283,7 +283,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 	s.WriteString("} = dlopen(import.meta.dir/")
 	// fmt.Println(pkgName)
-	s.WriteString("fake_pkg_name")
+	s.WriteString("test_ffi_bindings")
 	s.WriteString(".dylib, {\n")
 
 	for i, f := range fd {
