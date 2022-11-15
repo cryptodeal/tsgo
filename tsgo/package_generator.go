@@ -1,8 +1,10 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,9 +68,9 @@ func (g *PackageGenerator) Generate() (string, error) {
 	}
 
 	if g.conf.FFIBindings {
-		temp_name := g.pkg.Name
-		temp_name = temp_name[:len(temp_name)-1]
-		g.writeFFIConfig(s, func_decl, temp_name)
+		dir := filepath.Dir(g.pkg.PkgPath)
+		fmt.Println(dir)
+		g.writeFFIConfig(s, func_decl)
 	}
 
 	return s.String(), nil
