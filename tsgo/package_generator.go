@@ -64,6 +64,12 @@ func (g *PackageGenerator) Generate() (string, error) {
 			}
 			g.writeGroupDecl(s, gd)
 		}
+
+		if g.conf.FFIBindings {
+			for _, fd := range func_decl[filepaths[i]] {
+				g.writeFuncDecl(s, fd)
+			}
+		}
 	}
 
 	return s.String(), nil
