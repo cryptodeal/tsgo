@@ -267,12 +267,14 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("symbols: {\n")
 	for i, f := range fd {
 		g.writeIndent(s, 2)
+		s.WriteByte('_')
 		s.WriteString(f.Name.Name)
 		if i < len(fd)-1 {
 			s.WriteString(",\n")
 		} else {
+			s.WriteByte('\n')
 			g.writeIndent(s, 1)
-			s.WriteString("\n}\n")
+			s.WriteString("}\n")
 		}
 	}
 	s.WriteString("} = dlopen(import.meta.dir + '/")
@@ -286,6 +288,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(f.Name.Name)
 		s.WriteString(": {\n")
 		// TODO: write `args` & `returns` here
+		g.writeIndent(s, 1)
 		s.WriteByte('}')
 		if i < len(fd)-1 {
 			s.WriteString(",\n")
