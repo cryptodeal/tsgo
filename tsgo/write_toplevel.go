@@ -52,8 +52,19 @@ func (g *PackageGenerator) writeGroupDecl(s *strings.Builder, decl *ast.GenDecl)
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeFuncDecl(s *strings.Builder, fd *ast.FuncDecl) {
-	fmt.Println("typeof x == *ast.FuncDecl", fd)
+	fmt.Println("*ast.FuncDecl:", fd)
 	fmt.Println("fd.Name:", fd.Name.Name, "fd.Body:", fd.Body, "fd.Type:", fd.Type, "fd.Recv", fd.Recv)
+}
+
+func (g *PackageGenerator) writeFuncLit(s *strings.Builder, fl *ast.FuncLit) {
+	fmt.Println("*ast.FuncLit:", fl)
+	fmt.Println("fl.Body:", fl.Body, "fl.Type:", fl.Type)
+}
+
+// TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
+func (g *PackageGenerator) writeFuncType(s *strings.Builder, ft *ast.FuncType) {
+	fmt.Println("*ast.FuncType:", ft)
+	fmt.Println("ft.Func:", ft.Func, "ft.TypeParams:", ft.TypeParams, "ft.Params:", ft.Params, "ft.Results:", ft.Results)
 }
 
 func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *groupContext, isLast bool) {

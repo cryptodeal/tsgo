@@ -45,7 +45,24 @@ func (g *PackageGenerator) Generate() (string, error) {
 				}
 				g.writeFuncDecl(s, x)
 				return false
+
+			case *ast.FuncLit:
+				if first {
+					g.writeFileSourceHeader(s, filepaths[i], file)
+					first = false
+				}
+				g.writeFuncLit(s, x)
+				return false
+
+			case *ast.FuncType:
+				if first {
+					g.writeFileSourceHeader(s, filepaths[i], file)
+					first = false
+				}
+				g.writeFuncType(s, x)
+				return false
 			}
+
 			return true
 
 		})
