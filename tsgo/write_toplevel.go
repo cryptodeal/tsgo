@@ -282,6 +282,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(",\n")
 	}
 	s.WriteString("} = dlopen(import.meta.dir/")
+	fmt.Println(g.pkg.Name)
 	s.WriteString(g.pkg.Name[:len(g.pkg.Name)-1])
 	s.WriteString(".dylib, {\n")
 
