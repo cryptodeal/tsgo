@@ -281,4 +281,24 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(": ")
 		s.WriteString(",\n")
 	}
+	s.WriteString("} = dlopen(import.meta.dir/")
+	s.WriteString(g.pkg.Name[:len(g.pkg.Name)-1])
+	s.WriteString(".dylib, {\n")
+
+	for i, f := range fd {
+		g.writeIndent(s, 1)
+		s.WriteByte('_')
+		s.WriteString(f.Name.Name)
+		s.WriteString(": {\n")
+		// TODO: write `args` & `returns` here
+		s.WriteByte('}')
+		if i < len(fd)-1 {
+			s.WriteString(",\n")
+		} else {
+			s.WriteString("\n")
+		}
+	}
+	s.WriteString(s.String())
+
+	s.WriteString("})\n")
 }

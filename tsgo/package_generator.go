@@ -11,7 +11,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 	filepaths := g.GoFiles
 	has_func := false
 	gen_decl := map[string][]*ast.GenDecl{}
-	func_decl := map[string][]*ast.FuncDecl{}
+	func_decl := []*ast.FuncDecl{}
 
 	// iterate through pkg.Syntax to write collect `*ast.GenDecl` and `*ast.FuncDecl`
 	for i, file := range g.pkg.Syntax {
@@ -19,7 +19,6 @@ func (g *PackageGenerator) Generate() (string, error) {
 			continue
 		}
 		gen_decl[filepaths[i]] = []*ast.GenDecl{}
-		func_decl[filepaths[i]] = []*ast.FuncDecl{}
 
 		ast.Inspect(file, func(n ast.Node) bool {
 			switch x := n.(type) {
@@ -38,7 +37,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 					if !has_func {
 						has_func = true
 					}
-					func_decl[filepaths[i]] = append(func_decl[filepaths[i]], x)
+					func_decl = append(func_decl, x)
 				}
 
 				return false
@@ -66,9 +65,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 		}
 
 		if g.conf.FFIBindings {
-			for _, fd := range func_decl[filepaths[i]] {
-				g.writeFuncDecl(s, fd)
-			}
+			g.writeFFIConfig(s, func_decl)
 		}
 	}
 
