@@ -1,5 +1,9 @@
 package abstract
 
+import (
+	"math/rand"
+)
+
 type MyIotaType int
 
 const (
@@ -17,3 +21,7 @@ const (
 	Sixteen = iota + 6
 	Seventeen
 )
+
+func testFunc() int {
+	return rand.Int()
+}

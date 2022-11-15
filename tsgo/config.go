@@ -39,6 +39,12 @@ type PackageConfig struct {
 
 	// FallbackType defines the Typescript type used as a fallback for unknown Go types.
 	FallbackType string `yaml:"fallback_type"`
+
+	// If true, will also generate Bun FFI Bindings for the package
+	FFIBindings bool `yaml:"ffi_bindings"`
+
+	// WrapFunctions defines the functions that should be wrapped via CGo/FFI
+	WrapFunctions []string `yaml:"wrap_functions"`
 }
 
 type Config struct {

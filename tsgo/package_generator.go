@@ -20,6 +20,10 @@ func (g *PackageGenerator) Generate() (string, error) {
 		}
 
 		first := true
+		has_func := false
+
+		gen_decl := []*ast.GenDecl{}
+		func_decl := []*ast.FuncDecl{}
 
 		ast.Inspect(file, func(n ast.Node) bool {
 			switch x := n.(type) {
@@ -29,44 +33,39 @@ func (g *PackageGenerator) Generate() (string, error) {
 				if x.Tok == token.VAR || x.Tok == token.IMPORT {
 					return false
 				}
+				gen_decl = append(gen_decl, x)
 
-				if first {
-					g.writeFileSourceHeader(s, filepaths[i], file)
-					first = false
-				}
-
-				g.writeGroupDecl(s, x)
 				return false
 
 			case *ast.FuncDecl:
-				if first {
-					g.writeFileSourceHeader(s, filepaths[i], file)
-					first = false
+				if g.conf.FFIBindings {
+					if has_func {
+						has_func = true
+					}
+					func_decl = append(func_decl, x)
 				}
-				g.writeFuncDecl(s, x)
-				return false
 
-			case *ast.FuncLit:
-				if first {
-					g.writeFileSourceHeader(s, filepaths[i], file)
-					first = false
-				}
-				g.writeFuncLit(s, x)
-				return false
-
-			case *ast.FuncType:
-				if first {
-					g.writeFileSourceHeader(s, filepaths[i], file)
-					first = false
-				}
-				g.writeFuncType(s, x)
 				return false
 			}
-
 			return true
-
 		})
 
+		for _, gd := range gen_decl {
+			if first {
+				g.writeFileSourceHeader(s, filepaths[i], file)
+				if has_func && g.conf.FFIBindings {
+					g.writeFFIHeaders(s)
+				}
+				first = false
+			}
+			g.writeGroupDecl(s, gd)
+		}
+
+		if g.conf.FFIBindings && has_func {
+			for _, fd := range func_decl {
+				g.writeFuncDecl(s, fd)
+			}
+		}
 	}
 
 	return s.String(), nil

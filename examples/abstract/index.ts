@@ -7,11 +7,11 @@ export type Something = string | number;
 export type MyIotaType = number /* int */;
 export enum MyEnum {
   Zero = 0,
-  One = 1,
-  Two = 2,
-  Four = 4,
+export const One: MyIotaType = 1,
+export const Two: MyIotaType = 2,
+export const Four: MyIotaType = 4,
   FourString = "four",
-  AlsoFourString = "four",
+export const AlsoFourString: string = "four",
   Five = 5,
   FiveAgain = 5,
   Sixteen = 16,
