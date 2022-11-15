@@ -21,8 +21,6 @@ func (g *PackageGenerator) Generate() (string, error) {
 		gen_decl[filepaths[i]] = []*ast.GenDecl{}
 		func_decl[filepaths[i]] = []*ast.FuncDecl{}
 
-		has_func := false
-
 		ast.Inspect(file, func(n ast.Node) bool {
 			switch x := n.(type) {
 
