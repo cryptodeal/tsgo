@@ -168,6 +168,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			group.groupType = ""
 		}
 
+		// TODO: really need to clean up this logic LOL
 		if vs.Type != nil && group.isGroupedDeclaration {
 			g.writeIndent(s, 1)
 			s.WriteString(name.Name)
@@ -177,6 +178,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 
 			group.groupType = typeString
 		} else if vs.Type != nil {
+			g.writeIndent(s, 1)
 			s.WriteString(name.Name)
 
 			tempSB := &strings.Builder{}
@@ -185,6 +187,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 
 			group.groupType = typeString
 		} else if group.isGroupedDeclaration {
+			g.writeIndent(s, 1)
 			s.WriteString(name.Name)
 		} else if group.groupType != "" && !hasExplicitValue {
 			if g.IsEnumStruct(group.groupType) {
@@ -204,7 +207,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			}
 			s.WriteString(name.Name)
 		}
-		fmt.Println("name:", name.Name, "vs:", vs, "group:", group, "group.groupType:", group.groupType)
+		// fmt.Println("name:", name.Name, "vs:", vs, "group:", group, "group.groupType:", group.groupType)
 
 		s.WriteString(" = ")
 

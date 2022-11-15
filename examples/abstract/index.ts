@@ -4,7 +4,7 @@ export type Something = string | number;
 //////////
 // source: iota.go
 
-export type MyIotaType = number /* int */;
+import { dlopen, FFIType } from 'bun:ffi';export type MyIotaType = number /* int */;
 export enum MyEnum {
   Zero = 0,
 One = 1,

@@ -8,10 +8,6 @@ import (
 
 func (g *PackageGenerator) Generate() (string, error) {
 	s := new(strings.Builder)
-
-	g.writeFileCodegenHeader(s)
-	g.writeFileFrontmatter(s)
-
 	filepaths := g.GoFiles
 
 	for i, file := range g.pkg.Syntax {
@@ -49,13 +45,15 @@ func (g *PackageGenerator) Generate() (string, error) {
 			}
 			return true
 		})
+		g.writeFileCodegenHeader(s)
+		if has_func {
+			g.writeFFIHeaders(s)
+		}
+		g.writeFileFrontmatter(s)
 
 		for _, gd := range gen_decl {
 			if first {
 				g.writeFileSourceHeader(s, filepaths[i], file)
-				if has_func && g.conf.FFIBindings {
-					g.writeFFIHeaders(s)
-				}
 				first = false
 			}
 			g.writeGroupDecl(s, gd)
