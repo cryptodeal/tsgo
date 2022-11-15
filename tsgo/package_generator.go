@@ -1,10 +1,8 @@
 package tsgo
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
-	"path/filepath"
 	"strings"
 )
 
@@ -68,10 +66,8 @@ func (g *PackageGenerator) Generate() (string, error) {
 	}
 
 	if g.conf.FFIBindings {
-		path := g.conf.Path
-		fmt.Println("path =", path)
-		fmt.Println("filepath.Dir(g.conf.Path) =", filepath.Dir(g.conf.Path))
-		g.writeFFIConfig(s, func_decl, filepath.Dir(g.conf.Path))
+		path := strings.Split(g.conf.Path, "/")
+		g.writeFFIConfig(s, func_decl, path[len(path)-1])
 	}
 
 	return s.String(), nil
