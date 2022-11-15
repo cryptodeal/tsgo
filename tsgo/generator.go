@@ -84,10 +84,10 @@ func (g *TSGo) Generate() error {
 			dir := filepath.Dir(outPath)
 			var bindings_out strings.Builder
 			var build_out strings.Builder
-			bindings_out.WriteString(pkg.Name[:len(pkg.Name)-1])
-			bindings_out.WriteString("_ffi_bindings.dylib")
-			build_out.WriteString(pkg.Name[:len(pkg.Name)-1])
-			build_out.WriteString("_ffi_bindings.go")
+			bindings_out.WriteString(pkg.Name)
+			bindings_out.WriteString("/_ffi_bindings.dylib")
+			build_out.WriteString(pkg.Name)
+			build_out.WriteString("/_ffi_bindings.go")
 
 			bindings_out_path := filepath.Join(dir, bindings_out.String())
 			build_out_path := filepath.Join(dir, build_out.String())

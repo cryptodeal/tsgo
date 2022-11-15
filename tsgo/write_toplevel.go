@@ -261,13 +261,12 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl) {
+func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
 	for i, f := range fd {
-		var fn_name strings.Builder
-		g.writeIndent(&fn_name, 2)
+		g.writeIndent(s, 2)
 		s.WriteString(f.Name.Name)
 		if i < len(fd)-1 {
 			s.WriteString(",\n")
@@ -277,14 +276,14 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			temp_str.WriteString("\n}\n")
 			s.WriteString(temp_str.String())
 		}
-		fn_name.WriteByte(',')
+		s.WriteByte(',')
 		s.WriteString(": ")
 		s.WriteString(",\n")
 	}
-	s.WriteString("} = dlopen(import.meta.dir/")
-	// fmt.Println(pkgName)
-	s.WriteString("test_ffi_bindings")
-	s.WriteString(".dylib, {\n")
+	s.WriteString("} = dlopen(import.meta.dir + '/")
+	s.WriteString(path)
+	s.WriteString("_ffi_bindings")
+	s.WriteString(".dylib', {\n")
 
 	for i, f := range fd {
 		g.writeIndent(s, 1)
