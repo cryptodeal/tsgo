@@ -262,6 +262,9 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 }
 
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
+	s.WriteString("\n//////////\n")
+	// source: misc.go
+	s.WriteString("// Generated config for Bun FFI\n")
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
