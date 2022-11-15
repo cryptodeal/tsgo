@@ -1,7 +1,6 @@
 package tsgo
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 	"strings"
@@ -40,8 +39,12 @@ func (g *PackageGenerator) Generate() (string, error) {
 				return false
 
 			case *ast.FuncDecl:
-				// TODO: enable generating Bun FFI wrapper + CGo (and possibly CGo methods w/ callback)
-				fmt.Println("Case: *ast.FuncDecl - ", "x.Name:", x.Name.Name, "x.Body:", x.Body, "x.Type:", x.Type, "x.Recv", x.Recv)
+				if first {
+					g.writeFileSourceHeader(s, filepaths[i], file)
+					first = false
+				}
+				g.writeFuncDecl(s, x)
+				return false
 			}
 			return true
 

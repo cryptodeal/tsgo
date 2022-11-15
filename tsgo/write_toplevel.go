@@ -50,6 +50,12 @@ func (g *PackageGenerator) writeGroupDecl(s *strings.Builder, decl *ast.GenDecl)
 	}
 }
 
+// TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
+func (g *PackageGenerator) writeFuncDecl(s *strings.Builder, fd *ast.FuncDecl) {
+	fmt.Println("typeof x == *ast.FuncDecl", fd)
+	fmt.Println("fd.Name:", fd.Name.Name, "fd.Body:", fd.Body, "fd.Type:", fd.Type, "fd.Recv", fd.Recv)
+}
+
 func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *groupContext, isLast bool) {
 
 	// e.g. "type Foo struct {}" or "type Bar = string"
