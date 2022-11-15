@@ -276,9 +276,6 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			temp_str.WriteString("\n}\n")
 			s.WriteString(temp_str.String())
 		}
-		s.WriteByte(',')
-		s.WriteString(": ")
-		s.WriteString(",\n")
 	}
 	s.WriteString("} = dlopen(import.meta.dir + '/")
 	s.WriteString(path)
