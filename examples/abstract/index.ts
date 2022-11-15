@@ -64,7 +64,6 @@ export const {
   symbols: {
     testFunc  
 }
-,: ,
 } = dlopen(import.meta.dir + '/_ffi_bindings.dylib', {
   _testFunc: {
 }
@@ -134,7 +133,6 @@ export const {
   symbols: {
     testFunc  
 }
-,: ,
 } = dlopen(import.meta.dir + '/_ffi_bindings.dylib', {
   _testFunc: {
 }

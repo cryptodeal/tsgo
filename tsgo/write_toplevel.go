@@ -271,10 +271,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		if i < len(fd)-1 {
 			s.WriteString(",\n")
 		} else {
-			var temp_str strings.Builder
-			g.writeIndent(&temp_str, 1)
-			temp_str.WriteString("\n}\n")
-			s.WriteString(temp_str.String())
+			g.writeIndent(s, 1)
+			s.WriteString("\n}\n")
 		}
 	}
 	s.WriteString("} = dlopen(import.meta.dir + '/")
@@ -295,7 +293,6 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("\n")
 		}
 	}
-	s.WriteString(s.String())
 
 	s.WriteString("})\n")
 }
