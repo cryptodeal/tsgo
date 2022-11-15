@@ -9,17 +9,19 @@ import (
 func (g *PackageGenerator) Generate() (string, error) {
 	s := new(strings.Builder)
 	filepaths := g.GoFiles
+	has_func := false
+	gen_decl := map[string][]*ast.GenDecl{}
+	func_decl := map[string][]*ast.FuncDecl{}
 
+	// iterate through pkg.Syntax to write collect `*ast.GenDecl` and `*ast.FuncDecl`
 	for i, file := range g.pkg.Syntax {
 		if g.conf.IsFileIgnored(filepaths[i]) {
 			continue
 		}
+		gen_decl[filepaths[i]] = []*ast.GenDecl{}
+		func_decl[filepaths[i]] = []*ast.FuncDecl{}
 
-		first := true
 		has_func := false
-
-		gen_decl := []*ast.GenDecl{}
-		func_decl := []*ast.FuncDecl{}
 
 		ast.Inspect(file, func(n ast.Node) bool {
 			switch x := n.(type) {
@@ -29,7 +31,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 				if x.Tok == token.VAR || x.Tok == token.IMPORT {
 					return false
 				}
-				gen_decl = append(gen_decl, x)
+				gen_decl[filepaths[i]] = append(gen_decl[filepaths[i]], x)
 
 				return false
 
@@ -38,31 +40,31 @@ func (g *PackageGenerator) Generate() (string, error) {
 					if !has_func {
 						has_func = true
 					}
-					func_decl = append(func_decl, x)
+					func_decl[filepaths[i]] = append(func_decl[filepaths[i]], x)
 				}
 
 				return false
 			}
 			return true
 		})
-		g.writeFileCodegenHeader(s)
-		if has_func {
-			g.writeFFIHeaders(s)
-		}
-		g.writeFileFrontmatter(s)
+	}
 
-		for _, gd := range gen_decl {
+	// write headers for generated file for specific package
+	g.writeFileCodegenHeader(s)
+	if has_func {
+		g.writeFFIHeaders(s)
+	}
+	g.writeFileFrontmatter(s)
+
+	// iterate through pkg.Syntax to write the file
+	for i, file := range g.pkg.Syntax {
+		first := true
+		for _, gd := range gen_decl[filepaths[i]] {
 			if first {
 				g.writeFileSourceHeader(s, filepaths[i], file)
 				first = false
 			}
 			g.writeGroupDecl(s, gd)
-		}
-
-		if g.conf.FFIBindings && has_func {
-			for _, fd := range func_decl {
-				g.writeFuncDecl(s, fd)
-			}
 		}
 	}
 
