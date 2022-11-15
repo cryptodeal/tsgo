@@ -59,7 +59,11 @@ func (g *PackageGenerator) writeFuncDecl(s *strings.Builder, fd *ast.FuncDecl) {
 	// 4 - generate the CGo code for the function & write to single CGo file
 	fmt.Println("*ast.FuncDecl:", fd)
 	fmt.Println("fd.Name:", fd.Name.Name, "fd.Body:", fd.Body, "fd.Type:", fd.Type, "fd.Recv", fd.Recv)
-
+	for _, param := range fd.Type.Params.List {
+		fmt.Printf("  Name: %s\n", param.Names[0])
+		fmt.Printf("    ast type          : %T\n", param.Type)
+		fmt.Printf("    type desc         : %+v\n", param.Type)
+	}
 }
 
 func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *groupContext, isLast bool) {
