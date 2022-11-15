@@ -68,7 +68,7 @@ export const {
   symbols: {
     _testFunc
   }
-} = dlopen(import.meta.dir + '/github.com/cryptodeal/tsgo/examples_ffi_bindings.dylib', {
+} = dlopen(import.meta.dir + '/abstract/_ffi_bindings.dylib', {
   _testFunc: {
   }
 })

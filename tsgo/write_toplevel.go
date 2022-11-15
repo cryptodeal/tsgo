@@ -292,6 +292,25 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(f.Name.Name)
 		s.WriteString(": {\n")
 		// TODO: write `args` & `returns` here
+		if len(f.Type.Params.List) > 0 {
+			for j, param := range f.Type.Params.List {
+				tempSB := &strings.Builder{}
+				g.writeIndent(tempSB, 2)
+				g.writeType(tempSB, param.Type, 0, true)
+				s.WriteString("args: [")
+				s.WriteString(tempSB.String())
+				if j < len(f.Type.Params.List)-1 {
+					s.WriteByte(',')
+				} else {
+					s.WriteByte(']')
+				}
+
+				fmt.Println("param:", param)
+				fmt.Printf("  Name: %s\n", param.Names[0])
+				fmt.Printf("    ast type          : %T\n", param.Type)
+				fmt.Printf("    type desc         : %+v\n", param.Type)
+			}
+		}
 		g.writeIndent(s, 1)
 		s.WriteByte('}')
 		if i < len(fd)-1 {
