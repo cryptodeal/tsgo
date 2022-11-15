@@ -39,7 +39,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 
 			case *ast.FuncDecl:
 				if g.conf.FFIBindings {
-					if has_func {
+					if !has_func {
 						has_func = true
 					}
 					func_decl = append(func_decl, x)

@@ -8,6 +8,7 @@ packages:
       null.String: "string | null"
       uuid.UUID: "string"
   - path: "github.com/cryptodeal/tsgo/examples/abstract"
+    ffi_bindings: true
     indent: "  "
     exclude_files:
       - "excluded.go"
