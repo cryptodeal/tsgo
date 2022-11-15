@@ -59,11 +59,7 @@ func (g *PackageGenerator) writeFuncDecl(s *strings.Builder, fd *ast.FuncDecl) {
 	// 4 - generate the CGo code for the function & write to single CGo file
 	fmt.Println("*ast.FuncDecl:", fd)
 	fmt.Println("fd.Name:", fd.Name.Name, "fd.Body:", fd.Body, "fd.Type:", fd.Type, "fd.Recv", fd.Recv)
-	for i, rcv := range fd.Recv.List {
-		tempSB := &strings.Builder{}
-		g.writeType(tempSB, rcv.Type, 0, true)
-		fmt.Println("Name:", rcv.Names[i], "Type:", tempSB.String())
-	}
+
 }
 
 func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *groupContext, isLast bool) {

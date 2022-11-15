@@ -1,6 +1,7 @@
 package abstract
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -22,6 +23,7 @@ const (
 	Seventeen
 )
 
-func testFunc() int {
+func testFunc(foo string) int {
+	fmt.Println("foo:", foo)
 	return rand.Int()
 }
