@@ -63,6 +63,7 @@ export interface StructBar {
 
 //////////
 // Generated config for Bun FFI
+
 export const {
   symbols: {
     _testFunc
