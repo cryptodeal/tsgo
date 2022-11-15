@@ -69,8 +69,8 @@ func (g *PackageGenerator) Generate() (string, error) {
 
 	if g.conf.FFIBindings {
 		path := g.conf.Path
-		fmt.Println(path)
-		fmt.Println(g.conf.Path)
+		fmt.Println("path =", path)
+		fmt.Println("filepath.Dir(g.conf.Path) =", filepath.Dir(g.conf.Path))
 		g.writeFFIConfig(s, func_decl, filepath.Dir(g.conf.Path))
 	}
 
