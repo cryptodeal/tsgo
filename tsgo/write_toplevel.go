@@ -294,8 +294,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		// TODO: write `args` & `returns` here
 		if len(f.Type.Params.List) > 0 {
 			for j, param := range f.Type.Params.List {
+				g.writeIndent(s, 2)
 				tempSB := &strings.Builder{}
-				g.writeIndent(tempSB, 2)
 				g.writeType(tempSB, param.Type, 0, true)
 				s.WriteString("args: [")
 				s.WriteString(tempSB.String())
