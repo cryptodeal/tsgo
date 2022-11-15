@@ -261,7 +261,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl) {
+func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
@@ -282,8 +282,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(",\n")
 	}
 	s.WriteString("} = dlopen(import.meta.dir/")
-	fmt.Println(g.pkg.Name)
-	s.WriteString(g.pkg.Name[:len(g.pkg.Name)-1])
+	fmt.Println(pkgName)
+	s.WriteString(pkgName)
 	s.WriteString(".dylib, {\n")
 
 	for i, f := range fd {

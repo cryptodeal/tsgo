@@ -63,10 +63,12 @@ func (g *PackageGenerator) Generate() (string, error) {
 			}
 			g.writeGroupDecl(s, gd)
 		}
+	}
 
-		if g.conf.FFIBindings {
-			g.writeFFIConfig(s, func_decl)
-		}
+	if g.conf.FFIBindings {
+		temp_name := g.pkg.Name
+		temp_name = temp_name[:len(temp_name)-1]
+		g.writeFFIConfig(s, func_decl, temp_name)
 	}
 
 	return s.String(), nil
