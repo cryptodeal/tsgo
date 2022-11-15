@@ -260,3 +260,25 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		}
 	}
 }
+
+func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl) {
+	s.WriteString("export const {\n")
+	g.writeIndent(s, 1)
+	s.WriteString("symbols: {\n")
+	for i, f := range fd {
+		var fn_name strings.Builder
+		g.writeIndent(&fn_name, 2)
+		s.WriteString(f.Name.Name)
+		if i < len(fd)-1 {
+			s.WriteString(",\n")
+		} else {
+			var temp_str strings.Builder
+			g.writeIndent(&temp_str, 1)
+			temp_str.WriteString("\n}\n")
+			s.WriteString(temp_str.String())
+		}
+		fn_name.WriteByte(',')
+		s.WriteString(": ")
+		s.WriteString(",\n")
+	}
+}

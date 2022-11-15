@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -76,6 +77,41 @@ func (g *TSGo) Generate() error {
 		err = ioutil.WriteFile(outPath, []byte(code), os.ModePerm)
 		if err != nil {
 			return nil
+		}
+		if pkgGen.conf.FFIBindings {
+			// used to build the bindings
+			// TODO: clean up logic
+			dir := filepath.Dir(outPath)
+			var bindings_out strings.Builder
+			var build_out strings.Builder
+			bindings_out.WriteString(pkg.Name)
+			bindings_out.WriteString("_ffi_bindings.dylib")
+			build_out.WriteString(pkg.Name)
+			build_out.WriteString("_ffi_bindings_build.go")
+
+			bindings_out_path := filepath.Join(dir, bindings_out.String())
+			build_out_path := filepath.Join(dir, build_out.String())
+			fmt.Println("bindings_out_path:", bindings_out_path)
+			fmt.Println("build_out_path:", build_out_path)
+
+			// TODO: write CGo wrappers to build_out_path
+
+			// builds command string to execute (used to compile bindings)
+			/*
+				var cmd_str strings.Builder
+				cmd_str.WriteString("go build --buildmode c-shared -o ")
+				cmd_str.WriteString(bindings_out_path)
+				cmd_str.WriteByte(' ')
+				cmd_str.WriteString(build_out_path)
+
+				cmd := exec.Command(cmd_str.String())
+				err := cmd.Run()
+
+				if err != nil {
+					log.Fatal(err)
+				}
+			*/
+
 		}
 	}
 	return nil
