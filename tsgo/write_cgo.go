@@ -41,6 +41,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				has_str_param = true
 				g.writeIndent(cg, 1)
 				cg.WriteString("\"unsafe\"\n")
+				cg.WriteString(g.conf.Path)
+
 			}
 			if i < len(f.Type.Params.List)-1 {
 				fn_str.WriteString(", ")
@@ -81,6 +83,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString("_returned_value := ")
 		fn_str.WriteString(res_type)
 		fn_str.WriteByte('(')
+		fn_str.WriteString(pkgName)
+		fn_str.WriteByte('.')
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("(")
 		for i, param := range used_vars {
