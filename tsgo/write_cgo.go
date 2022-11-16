@@ -79,7 +79,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Dir(outPath.String()), []byte(cg.String()), os.ModePerm)
+	err = ioutil.WriteFile(outPath.String(), []byte(cg.String()), os.ModePerm)
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}
