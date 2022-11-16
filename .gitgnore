@@ -18,8 +18,8 @@ _.so
 
 # vendor/
 
-node_modules
-bun.lockb
+node_modules/
+./bun.lockb
 
 examples/time
 examples/tygo
