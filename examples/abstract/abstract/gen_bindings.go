@@ -8,7 +8,8 @@ import "C"
 
 import (
   "unsafe"
-github.com/cryptodeal/tsgo/examples/abstract)
+  "github.com/cryptodeal/tsgo/examples/abstract"
+)
 
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {

@@ -40,8 +40,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			if !has_str_param && type_str == "*C.char" {
 				has_str_param = true
 				g.writeIndent(cg, 1)
-				cg.WriteString("\"unsafe\"\n")
-				g.writeIndent(cg, 1)
 				cg.WriteByte('"')
 				cg.WriteString(g.conf.Path)
 				cg.WriteByte('"')
@@ -73,9 +71,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
 				g.writeIndent(&fn_str, 1)
-				fn_str.WriteString("defer C.free(unsafe.Pointer(")
-				fn_str.WriteString(parsedSB.String())
-				fn_str.WriteString("))\n")
 				used_vars = append(used_vars, parsedSB.String())
 			default:
 				used_vars = append(used_vars, param.Names[0].Name)
@@ -97,8 +92,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		fn_str.WriteString("))\n")
-		g.writeIndent(&fn_str, 1)
-		fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("return _returned_value\n")
 		fn_str.WriteString("}\n\n")
