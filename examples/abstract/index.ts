@@ -68,7 +68,7 @@ export const {
   symbols: {
     _TestFunc
   }
-} = dlopen(import.meta.dir + '/abstract/_ffi_bindings.dylib', {
+} = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
   _TestFunc: {
     args: [FFIType.cstring],
     returns: FFIType.int

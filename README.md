@@ -15,6 +15,35 @@ go install github.com/cryptodeal/tsgo@latest
 go install github.com/cryptodeal/tsgo
 ```
 
+## Generate Bun FFI Wrapper (Golang, C++ coming soon)
+
+**🚀 Not even remotely prod ready, but generate Bun FFI Wrappers for Go libraries using CGo (no code solution)**
+_N.B. This feature is still in development and only handles very basic types at present; give it a few days before expecting to work for more than basic fns_
+
+Check out the `tsgo.yaml` in root of the repo for an example of how to configure this!
+
+First, install `TSGo` CLI tool (assumes you have Golang installed):
+
+```sh
+go install github.com/cryptodeal/tsgo@latest
+```
+
+To run the demo and see exactly how this works/how simple the process of automatically wrapping a Golang library via Bun FFI actually is, clone the repository and run:
+
+```sh
+tsgo generate
+```
+
+And run a test on the generate wrapper to verify the function works!
+
+```sh
+bun wiptest
+```
+
+The magic lies in the configuration files + the simplicity of Bun's FFI API! :) By default, we generate types for everything exported + Bun FFI wrappers for all exported functions. You can configure this to your liking in the `tsgo.yaml` file (see below).
+
+Please submit issues/PRs with any suggestions or request regarding the current `.yaml` config API; hard to config something so complex in a `.yaml` file, but I'd prefer to keep the use of this Go module as simple as possible as it lowers the barrier of entry for developers looking to experiment with Bun FFI.
+
 ## Example
 
 _Golang input file_
