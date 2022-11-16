@@ -24,6 +24,6 @@ const (
 )
 
 func TestFunc(foo string) int {
-	fmt.Println("foo:", foo)
+	fmt.Println("(logged from Golang) foo:", foo)
 	return rand.Int()
 }
