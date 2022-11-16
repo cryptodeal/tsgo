@@ -70,11 +70,16 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	cg.WriteString(fn_str.String())
 
 	var outPath strings.Builder
-	outPath.WriteString(filepath.Dir(g.conf.OutputPath))
+	outPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
 	outPath.WriteByte('/')
 	outPath.WriteString(pkgName)
 	outPath.WriteString("/_ffi_bindings.go")
-	err := ioutil.WriteFile(outPath.String(), []byte(cg.String()), os.ModePerm)
+
+	err := os.MkdirAll(filepath.Dir(outPath.String()), os.ModePerm)
+	if err != nil {
+		log.Fatalf("TSGo failed: %v", err)
+	}
+	err = ioutil.WriteFile(filepath.Dir(outPath.String()), []byte(cg.String()), os.ModePerm)
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}
