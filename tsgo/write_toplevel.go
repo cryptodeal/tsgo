@@ -3,6 +3,7 @@ package tsgo
 import (
 	"fmt"
 	"go/ast"
+	"log"
 	"strings"
 )
 
@@ -291,26 +292,50 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteByte('_')
 		s.WriteString(f.Name.Name)
 		s.WriteString(": {\n")
-		// TODO: write `args` & `returns` here
+		// parse parameters/types
 		if len(f.Type.Params.List) > 0 {
+			g.writeIndent(s, 2)
+			s.WriteString("args: [")
 			for j, param := range f.Type.Params.List {
-				g.writeIndent(s, 2)
 				tempSB := &strings.Builder{}
 				g.writeType(tempSB, param.Type, 0, true)
-				s.WriteString("args: [")
+
 				s.WriteString(tempSB.String())
 				if j < len(f.Type.Params.List)-1 {
 					s.WriteByte(',')
-				} else {
-					s.WriteByte(']')
 				}
-
+				// TODO: removed logged output once working
 				fmt.Println("param:", param)
 				fmt.Printf("  Name: %s\n", param.Names[0])
 				fmt.Printf("    ast type          : %T\n", param.Type)
 				fmt.Printf("    type desc         : %+v\n", param.Type)
 			}
+			s.WriteByte(']')
 		}
+
+		if len(f.Type.Results.List) == 1 {
+			s.WriteString(",\n")
+			g.writeIndent(s, 2)
+			s.WriteString("returns: ")
+			tempSB := &strings.Builder{}
+			res := f.Type.Results.List[0]
+			g.writeType(tempSB, res.Type, 0, true)
+			s.WriteString(tempSB.String())
+			// TODO: removed logged output once working
+			fmt.Println("result:", res)
+			fmt.Printf("  Name: %s\n", res.Names[0])
+			fmt.Printf("    ast type          : %T\n", res.Type)
+			fmt.Printf("    type desc         : %+v\n", res.Type)
+
+		} else if len(f.Type.Results.List) > 1 {
+			var errStr strings.Builder
+			errStr.WriteString("Function `")
+			errStr.WriteString(f.Name.Name)
+			errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
+			errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
+			log.Fatalf("TSGo failed: %v", errStr.String())
+		}
+		s.WriteByte('\n')
 		g.writeIndent(s, 1)
 		s.WriteByte('}')
 		if i < len(fd)-1 {
