@@ -13,7 +13,7 @@ import (
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {
   _foo := C.GoString(foo)
-    _returned_value := C.int(abstract.TestFunc(_foo))
+  _returned_value := C.int(abstract.TestFunc(_foo))
   return _returned_value
 }
 

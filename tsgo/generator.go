@@ -81,35 +81,23 @@ func (g *TSGo) Generate() error {
 			return nil
 		}
 		if pkgGen.conf.FFIBindings {
-			// used to build the bindings
-			// TODO: clean up logic
 			dir := filepath.Dir(outPath)
-			var bindings_out strings.Builder
-			var build_out strings.Builder
-
 			pkg_split := strings.Split(filepath.Dir(pkg.GoFiles[0]), "/")
 			pkg_name := pkg_split[len(pkg_split)-1]
+
+			var bindings_out strings.Builder
 			bindings_out.WriteString(pkg_name)
 			bindings_out.WriteString("/gen_bindings.dylib")
-			build_out.WriteString(pkg_name)
-
-			build_out.WriteString("/gen_bindings.go")
-
 			bindings_out_path := filepath.Join(dir, bindings_out.String())
-			build_out_path := filepath.Join(dir, build_out.String())
-			fmt.Println("bindings_out_path:", bindings_out_path)
-			fmt.Println("build_out_path:", build_out_path)
 
-			// TODO: write CGo wrappers to build_out_path
+			var build_out strings.Builder
+			build_out.WriteString(pkg_name)
+			build_out.WriteString("/gen_bindings.go")
+			build_out_path := filepath.Join(dir, build_out.String())
 
 			// builds command string to execute (used to compile bindings)
-			var cmd_str strings.Builder
-			cmd_str.WriteString("go build --buildmode c-shared -o ")
-			cmd_str.WriteString(bindings_out_path)
-			cmd_str.WriteByte(' ')
-			cmd_str.WriteString(build_out_path)
-
-			cmd := exec.Command(cmd_str.String())
+			cmd_str := []string{"build", "--buildmode", "c-shared", "-o", bindings_out_path, build_out_path}
+			cmd := exec.Command("go", cmd_str...)
 			err := cmd.Run()
 
 			if err != nil {
