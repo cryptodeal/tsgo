@@ -70,7 +70,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				fn_str.WriteString(" := C.GoString(")
 				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
-				g.writeIndent(&fn_str, 1)
 				used_vars = append(used_vars, parsedSB.String())
 			default:
 				used_vars = append(used_vars, param.Names[0].Name)
