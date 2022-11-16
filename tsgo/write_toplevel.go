@@ -300,15 +300,10 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				tempSB := &strings.Builder{}
 				g.writeType(tempSB, param.Type, 0, true)
 
-				s.WriteString(tempSB.String())
+				s.WriteString(g.getFFIIdent(tempSB.String()))
 				if j < len(f.Type.Params.List)-1 {
 					s.WriteByte(',')
 				}
-				// TODO: removed logged output once working
-				fmt.Println("param:", param)
-				fmt.Printf("  Name: %s\n", param.Names[0])
-				fmt.Printf("    ast type          : %T\n", param.Type)
-				fmt.Printf("    type desc         : %+v\n", param.Type)
 			}
 			s.WriteByte(']')
 		}
@@ -320,11 +315,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			tempSB := &strings.Builder{}
 			res := f.Type.Results.List[0]
 			g.writeType(tempSB, res.Type, 0, true)
-			s.WriteString(tempSB.String())
-			// TODO: removed logged output once working
-			fmt.Println("result:", res)
-			fmt.Printf("    ast type          : %T\n", res.Type)
-			fmt.Printf("    type desc         : %+v\n", res.Type)
+			s.WriteString(g.getFFIIdent(tempSB.String()))
 
 		} else if len(f.Type.Results.List) > 1 {
 			var errStr strings.Builder

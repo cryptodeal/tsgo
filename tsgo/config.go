@@ -43,6 +43,9 @@ type PackageConfig struct {
 	// If true, will also generate Bun FFI Bindings for the package
 	FFIBindings bool `yaml:"ffi_bindings"`
 
+	// Specify your own custom type translations, useful for custom FFIType mappings (mostly unnecessary)
+	FFITypeMappings map[string]string `yaml:"ffi_type_mappings"`
+
 	// WrapFunctions defines the functions that should be wrapped via CGo/FFI
 	WrapFunctions []string `yaml:"wrap_functions"`
 }

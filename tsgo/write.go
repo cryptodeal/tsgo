@@ -30,6 +30,41 @@ func getIdent(s string) string {
 	return s
 }
 
+// TODO: see if we can handle `complex64` and `complex128`?
+func (g *PackageGenerator) getFFIIdent(s string) string {
+	switch s {
+	case "bool":
+		return "FFIType.bool"
+	case "int":
+		return "FFIType.int"
+	case "int8":
+		return "FFIType.i8"
+	case "int16":
+		return "FFIType.i16"
+	case "int32":
+		return "FFIType.i32"
+	case "int64":
+		return "FFIType.i64_fast"
+	case "uint":
+		return "FFIType.u64_fast"
+	case "uint8":
+		return "FFIType.u8"
+	case "uint16":
+		return "FFIType.u16"
+	case "uint32":
+		return "FFIType.u32"
+	case "uint64":
+		return "FFIType.u64_fast"
+	case "float32":
+		return "FFIType.f32"
+	case "float64":
+		return "FFIType.f64"
+	case "string":
+		return "FFIType.cstring"
+	}
+	return "FFIType.pointer"
+}
+
 func (g *PackageGenerator) writeIndent(s *strings.Builder, depth int) {
 	for i := 0; i < depth; i++ {
 		s.WriteString(g.conf.Indent)

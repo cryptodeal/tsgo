@@ -70,5 +70,7 @@ export const {
   }
 } = dlopen(import.meta.dir + '/abstract/_ffi_bindings.dylib', {
   _testFunc: {
-    args: [string]  }
+    args: [string],
+    returns: number /* int */
+  }
 })
