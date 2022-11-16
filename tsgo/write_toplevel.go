@@ -51,24 +51,7 @@ func (g *PackageGenerator) writeGroupDecl(s *strings.Builder, decl *ast.GenDecl)
 	}
 }
 
-// TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
-func (g *PackageGenerator) writeFuncDecl(s *strings.Builder, fd *ast.FuncDecl) {
-	// TODO:
-	// 1 - extract the parameter names/types from the function declaration
-	// 2 - extract return value type from the function declaration
-	// 3 - handle throwing errors for functions that cannot be wrapped for Bun FFI (invalid return type, etc)
-	// 4 - generate the CGo code for the function & write to single CGo file
-	fmt.Println("*ast.FuncDecl:", fd)
-	fmt.Println("fd.Name:", fd.Name.Name, "fd.Body:", fd.Body, "fd.Type:", fd.Type, "fd.Recv", fd.Recv)
-	for _, param := range fd.Type.Params.List {
-		fmt.Printf("  Name: %s\n", param.Names[0])
-		fmt.Printf("    ast type          : %T\n", param.Type)
-		fmt.Printf("    type desc         : %+v\n", param.Type)
-	}
-}
-
 func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *groupContext, isLast bool) {
-
 	// e.g. "type Foo struct {}" or "type Bar = string"
 	ts, ok := spec.(*ast.TypeSpec)
 	if ok && ts.Name.IsExported() {
@@ -88,7 +71,7 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // or
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
-	fmt.Println("name:", ts.Name.Name, "ts:", ts, "group:", group)
+	// fmt.Println("name:", ts.Name.Name, "ts:", ts, "group:", group)
 
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)

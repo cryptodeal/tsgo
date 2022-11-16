@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+type UsedParams []string
+
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	cg.WriteString("package ")
@@ -53,12 +55,34 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(res_type)
 		fn_str.WriteString(" {\n")
 		g.writeIndent(&fn_str, 1)
-		fn_str.WriteString("return _")
+		used_vars := UsedParams{}
+		for _, param := range f.Type.Params.List {
+			var tempSB strings.Builder
+			g.writeCGoType(&tempSB, param.Type, 0, true)
+			type_str := tempSB.String()
+			switch type_str {
+			case "*C.char":
+				parsedSB := strings.Builder{}
+				parsedSB.WriteByte('_')
+				parsedSB.WriteString(param.Names[0].Name)
+				cg.WriteString(" = C.GoString(")
+				cg.WriteString(parsedSB.String())
+				cg.WriteString(")\n")
+				cg.WriteString("defer C.free(")
+				cg.WriteString(parsedSB.String())
+				cg.WriteString(")\n")
+				used_vars = append(used_vars, parsedSB.String())
+			default:
+				used_vars = append(used_vars, param.Names[0].Name)
+			}
+
+		}
+		fn_str.WriteString("return ")
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("(")
-		for i, param := range f.Type.Params.List {
-			fn_str.WriteString(param.Names[0].Name)
-			if i < len(f.Type.Params.List)-1 {
+		for i, param := range used_vars {
+			fn_str.WriteString(param)
+			if i < len(used_vars)-1 {
 				fn_str.WriteString(", ")
 			}
 		}
@@ -66,7 +90,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString("}\n\n")
 	}
 
-	cg.WriteString(")\n")
+	cg.WriteString(")\n\n")
 	cg.WriteString(fn_str.String())
 
 	var outPath strings.Builder
