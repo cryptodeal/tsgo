@@ -34,7 +34,7 @@ func getIdent(s string) string {
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)
 func getFFIIdent(s string) string {
-	fmt.Println(s)
+	// fmt.Println(s)
 	switch s {
 	case "bool":
 		return "FFIType.bool"
@@ -72,7 +72,7 @@ func getFFIIdent(s string) string {
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)
 func getCGoIdent(s string) string {
-	fmt.Println(s)
+	// fmt.Println(s)
 	switch s {
 	case "bool":
 		// not valid type

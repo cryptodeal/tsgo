@@ -15,10 +15,13 @@ _.so
 \*.out
 
 # Dependency directories (remove the comment below to include it)
+# vendor/
 
+# FFI Bindings Wrapper Gen Demo
 node_modules/
 bun.lockb
 
+examples/abstract/abstract
 examples/time
 examples/tygo
 examples/http

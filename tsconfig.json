@@ -5,7 +5,10 @@
       "target": "esnext",
       "moduleResolution": "Node",
       // "bun-types" is the important part
-      "types": ["bun-types"]
+      "types": ["bun-types"],
+      "paths": {
+        "@tsgo/abstract": ["./examples/abstract"],
+      }    
     },
-    "include": ["examples/**/*.ts"]
+    "include": ["examples/**/*.ts", "test/**/*.ts"]
 }
