@@ -32,6 +32,7 @@ func getIdent(s string) string {
 
 // TODO: see if we can handle `complex64` and `complex128`?
 func (g *PackageGenerator) getFFIIdent(s string) string {
+	fmt.Println(s)
 	switch s {
 	case "bool":
 		return "FFIType.bool"
