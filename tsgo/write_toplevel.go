@@ -323,7 +323,6 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString(tempSB.String())
 			// TODO: removed logged output once working
 			fmt.Println("result:", res)
-			fmt.Printf("  Name: %s\n", res.Names[0])
 			fmt.Printf("    ast type          : %T\n", res.Type)
 			fmt.Printf("    type desc         : %+v\n", res.Type)
 
