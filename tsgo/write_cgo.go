@@ -41,8 +41,10 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				has_str_param = true
 				g.writeIndent(cg, 1)
 				cg.WriteString("\"unsafe\"\n")
+				cg.WriteByte('"')
 				cg.WriteString(g.conf.Path)
-
+				cg.WriteByte('"')
+				cg.WriteByte('\n')
 			}
 			if i < len(f.Type.Params.List)-1 {
 				fn_str.WriteString(", ")
