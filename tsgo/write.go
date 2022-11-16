@@ -30,8 +30,10 @@ func getIdent(s string) string {
 	return s
 }
 
-// TODO: see if we can handle `complex64` and `complex128`?
-func (g *PackageGenerator) getFFIIdent(s string) string {
+// TODO:
+// * see if we can handle `complex64` and `complex128`?
+// * perhaps do a better job of mapping (no default value??)
+func getFFIIdent(s string) string {
 	fmt.Println(s)
 	switch s {
 	case "bool":
@@ -69,6 +71,102 @@ func (g *PackageGenerator) getFFIIdent(s string) string {
 func (g *PackageGenerator) writeIndent(s *strings.Builder, depth int) {
 	for i := 0; i < depth; i++ {
 		s.WriteString(g.conf.Indent)
+	}
+}
+
+// TODO: `writeFFIType` needs a major overhaul as logic is copied directly from writeType
+func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
+	switch t := t.(type) {
+	case *ast.StarExpr:
+		if optionalParens {
+			s.WriteByte('(')
+		}
+		g.writeType(s, t.X, depth, false)
+		s.WriteString(" | undefined")
+		if optionalParens {
+			s.WriteByte(')')
+		}
+	case *ast.ArrayType:
+		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
+			s.WriteString("string")
+			break
+		}
+		g.writeType(s, t.Elt, depth, true)
+		s.WriteString("[]")
+	case *ast.StructType:
+		s.WriteString("{\n")
+		g.writeStructFields(s, t.Fields.List, depth+1)
+		g.writeIndent(s, depth+1)
+		s.WriteByte('}')
+	case *ast.Ident:
+		if t.String() == "any" {
+			s.WriteString(getFFIIdent(g.conf.FallbackType))
+		} else {
+			s.WriteString(getFFIIdent(t.String()))
+		}
+	case *ast.SelectorExpr:
+		// e.g. `time.Time`
+		longType := fmt.Sprintf("%s.%s", t.X, t.Sel)
+		mappedTsType, ok := g.conf.TypeMappings[longType]
+		if ok {
+			s.WriteString(mappedTsType)
+		} else { // For unknown types we use the fallback type
+			s.WriteString(g.conf.FallbackType)
+			s.WriteString(" /* ")
+			s.WriteString(longType)
+			s.WriteString(" */")
+		}
+	case *ast.MapType:
+		s.WriteString("{ [key: ")
+		g.writeType(s, t.Key, depth, false)
+		s.WriteString("]: ")
+		g.writeType(s, t.Value, depth, false)
+		s.WriteByte('}')
+	case *ast.BasicLit:
+		s.WriteString(t.Value)
+	case *ast.ParenExpr:
+		s.WriteByte('(')
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte(')')
+	case *ast.BinaryExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte(' ')
+		s.WriteString(t.Op.String())
+		s.WriteByte(' ')
+		g.writeType(s, t.Y, depth, false)
+	case *ast.InterfaceType:
+		g.writeInterfaceFields(s, t.Methods.List, depth+1)
+	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
+		s.WriteString(g.conf.FallbackType)
+	case *ast.UnaryExpr:
+		if t.Op == token.TILDE {
+			// We just ignore the tilde token, in Typescript extended types are
+			// put into the generic typing itself, which we can't support yet.
+			g.writeType(s, t.X, depth, false)
+		} else {
+			err := fmt.Errorf("unhandled unary expr: %v\n %T", t, t)
+			fmt.Println(err)
+			panic(err)
+		}
+	case *ast.IndexListExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte('<')
+		for i, index := range t.Indices {
+			g.writeType(s, index, depth, false)
+			if i != len(t.Indices)-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteByte('>')
+	case *ast.IndexExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte('<')
+		g.writeType(s, t.Index, depth, false)
+		s.WriteByte('>')
+	default:
+		err := fmt.Errorf("unhandled: %s\n %T", t, t)
+		fmt.Println(err)
+		panic(err)
 	}
 }
 

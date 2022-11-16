@@ -298,9 +298,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("args: [")
 			for j, param := range f.Type.Params.List {
 				tempSB := &strings.Builder{}
-				g.writeType(tempSB, param.Type, 0, true)
-
-				s.WriteString(g.getFFIIdent(tempSB.String()))
+				g.writeFFIType(tempSB, param.Type, 0, true)
+				s.WriteString(tempSB.String())
 				if j < len(f.Type.Params.List)-1 {
 					s.WriteByte(',')
 				}
@@ -314,8 +313,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("returns: ")
 			tempSB := &strings.Builder{}
 			res := f.Type.Results.List[0]
-			g.writeType(tempSB, res.Type, 0, true)
-			s.WriteString(g.getFFIIdent(tempSB.String()))
+			g.writeFFIType(tempSB, res.Type, 0, true)
+			s.WriteString(tempSB.String())
 
 		} else if len(f.Type.Results.List) > 1 {
 			var errStr strings.Builder
