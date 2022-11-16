@@ -65,10 +65,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				parsedSB := strings.Builder{}
 				parsedSB.WriteByte('_')
 				parsedSB.WriteString(param.Names[0].Name)
-				fn_str.WriteByte('_')
 				fn_str.WriteString(parsedSB.String())
 				fn_str.WriteString(" = C.GoString(")
-				fn_str.WriteString(parsedSB.String())
+				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
 				fn_str.WriteString("defer C.free(")
 				fn_str.WriteString(parsedSB.String())
@@ -94,12 +93,13 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 
 	cg.WriteString(")\n\n")
 	cg.WriteString(fn_str.String())
+	cg.WriteString("func main() {} // Required but ignored")
 
 	var outPath strings.Builder
 	outPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
 	outPath.WriteByte('/')
 	outPath.WriteString(pkgName)
-	outPath.WriteString("/_ffi_bindings.go")
+	outPath.WriteString("/gen_bindings.go")
 
 	err := os.MkdirAll(filepath.Dir(outPath.String()), os.ModePerm)
 	if err != nil {
