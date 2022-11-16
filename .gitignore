@@ -16,10 +16,8 @@ _.so
 
 # Dependency directories (remove the comment below to include it)
 
-# vendor/
-
 node_modules/
-./bun.lockb
+bun.lockb
 
 examples/time
 examples/tygo
