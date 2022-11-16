@@ -14,6 +14,8 @@ type UsedParams []string
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	cg.WriteString("package main\n\n")
+	cg.WriteString("// ")
+	g.writeFileCodegenHeader(cg)
 	cg.WriteString("/*\n")
 	cg.WriteString("#include <stdlib.h>\n")
 	cg.WriteString("#include <string.h>\n")
