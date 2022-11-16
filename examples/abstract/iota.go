@@ -23,7 +23,7 @@ const (
 	Seventeen
 )
 
-func testFunc(foo string) int {
+func TestFunc(foo string) int {
 	fmt.Println("foo:", foo)
 	return rand.Int()
 }

@@ -1,4 +1,4 @@
-package abstract_gen_tsgo
+package main
 
 /*
 #include <stdlib.h>
@@ -8,7 +8,9 @@ import "C"
 
 //export _testFunc
 func _testFunc(foo *C.char) C.int {
-	__foo = C.GoString(_foo)
+	_foo := C.GoString(foo)
 	defer C.free(_foo)
-	return testFunc(_foo)
+	return TestFunc(_foo)
 }
+
+func main() {} // Required but ignored

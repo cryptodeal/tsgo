@@ -13,9 +13,7 @@ type UsedParams []string
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
-	cg.WriteString("package ")
-	cg.WriteString(pkgName)
-	cg.WriteString("_gen_tsgo\n\n")
+	cg.WriteString("package main\n\n")
 	cg.WriteString("/*\n")
 	cg.WriteString("#include <stdlib.h>\n")
 	cg.WriteString("#include <string.h>\n")
@@ -42,7 +40,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			if !has_str_param && type_str == "*C.char" {
 				has_str_param = true
 				g.writeIndent(cg, 1)
-				cg.WriteString("\"encoding/json\"\n")
+				cg.WriteString("\"unsafe\"\n")
 			}
 			if i < len(f.Type.Params.List)-1 {
 				fn_str.WriteString(", ")
@@ -69,9 +67,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				fn_str.WriteString(" = C.GoString(")
 				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
-				fn_str.WriteString("defer C.free(")
+				fn_str.WriteString("defer C.free(unsafe.Pointer(")
 				fn_str.WriteString(parsedSB.String())
-				fn_str.WriteString(")\n")
+				fn_str.WriteString("))\n")
 				used_vars = append(used_vars, parsedSB.String())
 			default:
 				used_vars = append(used_vars, param.Names[0].Name)
