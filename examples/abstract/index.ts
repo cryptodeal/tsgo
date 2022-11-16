@@ -66,10 +66,10 @@ export interface StructBar {
 
 export const {
   symbols: {
-    _testFunc
+    _TestFunc
   }
 } = dlopen(import.meta.dir + '/abstract/_ffi_bindings.dylib', {
-  _testFunc: {
+  _TestFunc: {
     args: [FFIType.cstring],
     returns: FFIType.int
   }

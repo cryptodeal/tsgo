@@ -64,9 +64,10 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				parsedSB.WriteByte('_')
 				parsedSB.WriteString(param.Names[0].Name)
 				fn_str.WriteString(parsedSB.String())
-				fn_str.WriteString(" = C.GoString(")
+				fn_str.WriteString(" := C.GoString(")
 				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
+				g.writeIndent(&fn_str, 1)
 				fn_str.WriteString("defer C.free(unsafe.Pointer(")
 				fn_str.WriteString(parsedSB.String())
 				fn_str.WriteString("))\n")
@@ -76,7 +77,10 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 
 		}
-		fn_str.WriteString("return ")
+		g.writeIndent(&fn_str, 1)
+		fn_str.WriteString("_returned_value := ")
+		fn_str.WriteString(res_type)
+		fn_str.WriteByte('(')
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("(")
 		for i, param := range used_vars {
@@ -85,7 +89,11 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				fn_str.WriteString(", ")
 			}
 		}
-		fn_str.WriteString(");\n")
+		fn_str.WriteString("))\n")
+		g.writeIndent(&fn_str, 1)
+		fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+		g.writeIndent(&fn_str, 1)
+		fn_str.WriteString("return _returned_value\n")
 		fn_str.WriteString("}\n\n")
 	}
 
