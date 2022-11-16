@@ -1,4 +1,4 @@
-package abstract_Gen_TSGo
+package abstract_gen_tsgo
 
 /*
 #include <stdlib.h>
@@ -8,9 +8,12 @@ import "C"
 
 import (
   "encoding/json"
+ = C.GoString(_foo)
+defer C.free(_foo)
 )
+
 //export _testFunc
  func _testFunc (foo *C.char) C.int {
-  return _testFunc(foo);
+  return testFunc(_foo);
 }
 

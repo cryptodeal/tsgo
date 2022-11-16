@@ -86,9 +86,13 @@ func (g *TSGo) Generate() error {
 			dir := filepath.Dir(outPath)
 			var bindings_out strings.Builder
 			var build_out strings.Builder
-			bindings_out.WriteString(pkg.Name)
+
+			pkg_split := strings.Split(filepath.Dir(pkg.GoFiles[0]), "/")
+			pkg_name := pkg_split[len(pkg_split)-1]
+			bindings_out.WriteString(pkg_name)
 			bindings_out.WriteString("/_ffi_bindings.dylib")
-			build_out.WriteString(pkg.Name)
+			build_out.WriteString(pkg_name)
+
 			build_out.WriteString("/_ffi_bindings.go")
 
 			bindings_out_path := filepath.Join(dir, bindings_out.String())
