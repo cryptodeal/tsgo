@@ -223,11 +223,10 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		}
 	case *ast.ArrayType:
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
-			s.WriteString("string")
+			s.WriteString("*C.char")
 			break
 		}
-		g.writeType(s, t.Elt, depth, true)
-		s.WriteString("[]")
+		s.WriteString("*C.void")
 	case *ast.StructType:
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)

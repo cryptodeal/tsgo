@@ -11,6 +11,10 @@ import (
 
 type UsedParams []string
 
+func writeCGoHeaders(cg *strings.Builder) {
+
+}
+
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	cg.WriteString("// ")
