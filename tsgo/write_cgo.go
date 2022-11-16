@@ -15,7 +15,7 @@ type UsedParams []string
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	cg.WriteString("package ")
 	cg.WriteString(pkgName)
-	cg.WriteString("_Gen_TSGo\n\n")
+	cg.WriteString("_gen_tsgo\n\n")
 	cg.WriteString("/*\n")
 	cg.WriteString("#include <stdlib.h>\n")
 	cg.WriteString("#include <string.h>\n")

@@ -3,7 +3,9 @@ package tsgo
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -97,20 +99,18 @@ func (g *TSGo) Generate() error {
 			// TODO: write CGo wrappers to build_out_path
 
 			// builds command string to execute (used to compile bindings)
-			/*
-				var cmd_str strings.Builder
-				cmd_str.WriteString("go build --buildmode c-shared -o ")
-				cmd_str.WriteString(bindings_out_path)
-				cmd_str.WriteByte(' ')
-				cmd_str.WriteString(build_out_path)
+			var cmd_str strings.Builder
+			cmd_str.WriteString("go build --buildmode c-shared -o ")
+			cmd_str.WriteString(bindings_out_path)
+			cmd_str.WriteByte(' ')
+			cmd_str.WriteString(build_out_path)
 
-				cmd := exec.Command(cmd_str.String())
-				err := cmd.Run()
+			cmd := exec.Command(cmd_str.String())
+			err := cmd.Run()
 
-				if err != nil {
-					log.Fatal(err)
-				}
-			*/
+			if err != nil {
+				log.Fatal(err)
+			}
 
 		}
 	}
