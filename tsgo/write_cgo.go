@@ -77,10 +77,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	var goHelpersSB strings.Builder
 
 	caser := cases.Title(language.AmericanEnglish)
-
-	g.ffi.CImports = make(map[string]bool)
-	g.ffi.GoImports = make(map[string]bool)
-	g.ffi.FFIHelpers = make(map[string]bool)
 	g.addGoImport(&goImportsSB, g.conf.Path)
 
 	var fn_str strings.Builder

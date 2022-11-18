@@ -66,9 +66,16 @@ func (g *TSGo) Generate() error {
 
 		pkgConfig := g.conf.PackageConfig(pkg.ID)
 
+		ffi := &FFIState{
+			GoImports:  make(map[string]bool),
+			CImports:   make(map[string]bool),
+			FFIHelpers: make(map[string]bool),
+		}
+
 		pkgGen := &PackageGenerator{
 			conf:    pkgConfig,
 			GoFiles: pkg.GoFiles,
+			ffi:     ffi,
 			pkg:     pkg,
 		}
 		g.packageGenerators[pkg.PkgPath] = pkgGen
