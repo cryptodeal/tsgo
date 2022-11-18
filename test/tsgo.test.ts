@@ -14,7 +14,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
     const bar = _TestFunc2(foo)
     expect(typeof bar).toBe('number')
-    const out = new Float32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4))
+    const out = new Float32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, destroyPtr))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }

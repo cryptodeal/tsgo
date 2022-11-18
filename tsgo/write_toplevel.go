@@ -257,6 +257,10 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 2)
 		s.WriteString("ArraySize,\n")
 	}
+	if g.ffi.FFIHelpers["disposePtr"] {
+		g.writeIndent(s, 2)
+		s.WriteString("disposePtr,\n")
+	}
 	for i, f := range fd {
 		g.writeIndent(s, 2)
 		s.WriteByte('_')
@@ -278,6 +282,15 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString("ArraySize: {\n")
 		g.writeIndent(s, 2)
 		s.WriteString("args: [FFIType.ptr]\n")
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
+	}
+
+	if g.ffi.FFIHelpers["disposePtr"] {
+		g.writeIndent(s, 1)
+		s.WriteString("disposePtr: {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("args: [FFIType.ptr, FFIType.ptr]\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
 	}
