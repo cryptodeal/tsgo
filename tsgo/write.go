@@ -225,7 +225,6 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 			s.WriteString("*C.char")
 			break
 		}
-		g.writeType(s, t.Elt, depth, true)
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")

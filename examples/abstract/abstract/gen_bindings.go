@@ -12,14 +12,14 @@ import (
 
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {
-  *C.char := C.GoString(foo)
+  _foo := C.GoString(foo)
   _returned_value := C.int(abstract.TestFunc(_foo))
   return _returned_value
 }
 
 //export _TestFunc2
  func _TestFunc2 (foo *C.char) number /* float32 */unsafe.Pointer {
-  *C.char := C.GoString(foo)
+  _foo := C.GoString(foo)
   _returned_value := number /* float32 */unsafe.Pointer(abstract.TestFunc2(_foo))
   return _returned_value
 }
