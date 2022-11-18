@@ -151,6 +151,14 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				goHelpersSB.WriteString("}\n\n")
 				g.ffi.FFIHelpers["disposePtr"] = true
 			}
+			if !g.ffi.FFIHelpers["ArraySize"] {
+				goHelpersSB.WriteString("//export ArraySize\n")
+				goHelpersSB.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
+				g.writeIndent(&goHelpersSB, 1)
+				goHelpersSB.WriteString("return ptrTrckr[uintptr(array)]\n")
+				goHelpersSB.WriteString("}\n\n")
+
+			}
 			fn_str.WriteString("CFloat32")
 		} else {
 			fn_str.WriteString(res_type)

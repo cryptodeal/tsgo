@@ -14,7 +14,7 @@ import (
 var ptrTrckr = make(map[uintptr]C.size_t)
 func CFloat32(b []float32) unsafe.Pointer {
   p := C.malloc(C.size_t(len(b)))
-	sliceHeader := struct {
+  sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
