@@ -20,10 +20,17 @@ type TSGo struct {
 	packageGenerators map[string]*PackageGenerator
 }
 
+type FFIState struct {
+	GoImports  map[string]bool
+	CImports   map[string]bool
+	FFIHelpers map[string]bool
+}
+
 // Responsible for generating the code for an input package
 type PackageGenerator struct {
 	conf    *PackageConfig
 	pkg     *packages.Package
+	ffi     *FFIState
 	GoFiles []string
 }
 

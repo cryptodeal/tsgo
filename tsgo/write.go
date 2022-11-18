@@ -127,11 +127,10 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 		}
 	case *ast.ArrayType:
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
-			s.WriteString("string")
+			s.WriteString("FFIType.cstring")
 			break
 		}
-		g.writeType(s, t.Elt, depth, true)
-		s.WriteString("[]")
+		s.WriteString("FFIType.ptr")
 	case *ast.StructType:
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
@@ -226,7 +225,8 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 			s.WriteString("*C.char")
 			break
 		}
-		s.WriteString("*C.void")
+		g.writeType(s, t.Elt, depth, true)
+		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
