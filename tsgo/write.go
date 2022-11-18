@@ -238,18 +238,6 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		} else {
 			s.WriteString(getCGoIdent(t.String()))
 		}
-	case *ast.SelectorExpr:
-		// e.g. `time.Time`
-		longType := fmt.Sprintf("%s.%s", t.X, t.Sel)
-		mappedTsType, ok := g.conf.TypeMappings[longType]
-		if ok {
-			s.WriteString(mappedTsType)
-		} else { // For unknown types we use the fallback type
-			s.WriteString(g.conf.FallbackType)
-			s.WriteString(" /* ")
-			s.WriteString(longType)
-			s.WriteString(" */")
-		}
 	case *ast.MapType:
 		s.WriteString("{ [key: ")
 		g.writeType(s, t.Key, depth, false)

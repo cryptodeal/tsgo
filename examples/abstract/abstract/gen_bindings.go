@@ -3,59 +3,25 @@ package main
 
 /*
 #include <stdlib.h>
-
-static inline void* mallocFloatArr(size_t size) {
-	void *arr = malloc(size);
-	return arr;
-}
 */
 import "C"
 
 import (
-	"unsafe"
-
-	"github.com/cryptodeal/tsgo/examples/abstract"
+  "github.com/cryptodeal/tsgo/examples/abstract"
 )
-
-var ptrTrckr = make(map[uintptr]C.size_t)
-
-//export disposePtr
-func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-	delete(ptrTrckr, uintptr(ptr))
-	defer C.free(ptr)
-}
-
-func CFloat(b []float32) unsafe.Pointer {
-	p := C.mallocFloatArr(C.size_t(len(b)))
-	sliceHeader := struct {
-		p   unsafe.Pointer
-		len int
-		cap int
-	}{p, len(b), len(b)}
-	s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
-	copy(s, b)
-	ptrTrckr[uintptr(p)] = C.size_t(len(b))
-	return p
-}
-
-//export ArraySize
-func ArraySize(array unsafe.Pointer) C.size_t {
-	return ptrTrckr[uintptr(array)]
-}
 
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {
-  _foo := C.GoString(foo)
-  _returned_value := C.int(abstract.TestFunc(_foo))
+  *C.char := C.GoString(foo)
+  _returned_value := C.int(abstract.TestFunc(*C.char))
   return _returned_value
 }
 
 //export _TestFunc2
- func _TestFunc2 (foo *C.char) unsafe.Pointer {
-  _foo := C.GoString(foo)
-  temp := abstract.TestFunc2(_foo)
-	____returned_value := CFloat(temp)
-	return ____returned_value
+ func _TestFunc2 (foo *C.char) number /* float32 */unsafe.Pointer {
+  *C.char := C.GoString(foo)
+  _returned_value := number /* float32 */unsafe.Pointer(abstract.TestFunc2(*C.char))
+  return _returned_value
 }
 
 func main() {} // Required but ignored
