@@ -37,7 +37,7 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmt
 	cg.WriteString(t)
 	cg.WriteString(") unsafe.Pointer {\n")
 	g.writeIndent(cg, 1)
-	cg.WriteString("p := C.malloc(C.size_t(len(b)))")
+	cg.WriteString("p := C.malloc(C.size_t(len(b)))\n")
 	g.writeIndent(cg, 1)
 	cg.WriteString("sliceHeader := struct {\n")
 	g.writeIndent(cg, 2)
