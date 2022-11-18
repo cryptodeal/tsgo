@@ -121,7 +121,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				parsedSB := strings.Builder{}
 				parsedSB.WriteByte('_')
 				parsedSB.WriteString(param.Names[0].Name)
-				fn_str.WriteString(type_str)
+				fn_str.WriteString(parsedSB.String())
 				fn_str.WriteString(" := C.GoString(")
 				fn_str.WriteString(param.Names[0].Name)
 				fn_str.WriteString(")\n")
