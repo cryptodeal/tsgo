@@ -66,10 +66,14 @@ export interface StructBar {
 
 export const {
   symbols: {
+    ArraySize,
     _TestFunc,
     _TestFunc2
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  ArraySize: {
+    args: ["FFIType.ptr"]
+  },
   _TestFunc: {
     args: [FFIType.cstring],
     returns: FFIType.int

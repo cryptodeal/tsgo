@@ -277,7 +277,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 1)
 		s.WriteString("ArraySize: {\n")
 		g.writeIndent(s, 2)
-		s.WriteString("args: [\"FFIType.ptr\"]\n")
+		s.WriteString("args: [FFIType.ptr]\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
 	}
