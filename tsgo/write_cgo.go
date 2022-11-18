@@ -157,7 +157,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				g.writeIndent(&goHelpersSB, 1)
 				goHelpersSB.WriteString("return ptrTrckr[uintptr(array)]\n")
 				goHelpersSB.WriteString("}\n\n")
-
+				g.ffi.FFIHelpers["ArraySize"] = true
 			}
 			fn_str.WriteString("CFloat32")
 		} else {

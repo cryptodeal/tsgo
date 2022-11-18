@@ -77,8 +77,5 @@ export const {
   _TestFunc2: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
-  },
-  ArraySize: {
-    args: [FFIType.ptr],
   }
 })
