@@ -68,8 +68,8 @@ func (g *PackageGenerator) Generate() (string, error) {
 
 	if g.conf.FFIBindings {
 		path := strings.Split(g.conf.Path, "/")
-		g.writeFFIConfig(s, func_decl, path[len(path)-1])
 		g.writeCGo(cg, func_decl, path[len(path)-1])
+		g.writeFFIConfig(s, func_decl, path[len(path)-1])
 	}
 
 	return s.String(), nil

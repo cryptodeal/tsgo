@@ -253,6 +253,10 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
+	if g.ffi.FFIHelpers["ArraySize"] {
+		g.writeIndent(s, 2)
+		s.WriteString("ArraySize,\n")
+	}
 	for i, f := range fd {
 		g.writeIndent(s, 2)
 		s.WriteByte('_')
@@ -269,6 +273,14 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString(path)
 	s.WriteString("/gen_bindings")
 	s.WriteString(".dylib', {\n")
+	if g.ffi.FFIHelpers["ArraySize"] {
+		g.writeIndent(s, 1)
+		s.WriteString("ArraySize: {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("args: [\"FFIType.ptr\"]\n")
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
+	}
 
 	for i, f := range fd {
 		g.writeIndent(s, 1)

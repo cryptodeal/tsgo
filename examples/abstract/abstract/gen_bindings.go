@@ -30,6 +30,11 @@ func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
   C.free(ptr)
 }
 
+//export ArraySize
+func ArraySize(array unsafe.Pointer) C.size_t {
+  return ptrTrckr[uintptr(array)]
+}
+
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {
   _foo := C.GoString(foo)
