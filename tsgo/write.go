@@ -226,7 +226,10 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			s.WriteString("*C.char")
 			break
 		}
+		fmt.Println("t:", t)
+		fmt.Println("t.Elt:", t.Elt)
 		g.addGoImport(cg, "unsafe")
+		g.addPtrTrckr(gh)
 		g.addDisposePtr(gh)
 		var typeSB strings.Builder
 		g.writeCGoResType(&typeSB, cg, gh, fmtr, t.Elt, depth, false)

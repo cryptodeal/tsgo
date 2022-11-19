@@ -29,13 +29,6 @@ func CC.float(b []C.float) unsafe.Pointer {
   return p
 }
 
-var ptrTrckr = make(map[uintptr]unsafe.Pointer)
-
-//export ArraySize
-func ArraySize(array unsafe.Pointer) C.size_t {
-  return ptrTrckr[uintptr(array)]
-}
-
 //export _TestFunc
  func _TestFunc (foo *C.char) C.int {
   _foo := C.GoString(foo)
@@ -46,7 +39,7 @@ func ArraySize(array unsafe.Pointer) C.size_t {
 //export _TestFunc2
  func _TestFunc2 (foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
-  _returned_value := CFloat32(abstract.TestFunc2(_foo))
+  _returned_value := unsafe.Pointer(abstract.TestFunc2(_foo))
   return _returned_value
 }
 

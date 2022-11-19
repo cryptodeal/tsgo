@@ -98,8 +98,10 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 	}
 }
 
-func writePtrTrckr(s *strings.Builder) {
-	s.WriteString("var ptrTrckr = make(map[uintptr]unsafe.Pointer)\n\n")
+func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
+	if !g.ffi.FFIHelpers["ptrTrckr"] {
+		s.WriteString("var ptrTrckr = make(map[uintptr]unsafe.Pointer)\n\n")
+	}
 }
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
