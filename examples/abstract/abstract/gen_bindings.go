@@ -15,11 +15,11 @@ var ptrTrckr = make(map[uintptr]C.size_t)
 
 //export disposePtr
 func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-	ptr_num := uintptr(ptr)
-	if _, ok := ptrTrckr[ptr_num]; ok {
-		delete(ptrTrckr, ptr_num)
-		C.free(ptr)
-	}
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, uintptr(ptr))
+    defer C.free(ptr)
+  }
 }
 
 //export ArraySize
@@ -75,6 +75,30 @@ func CInt64(b []int64) unsafe.Pointer {
   return p
 }
 
+func CUint32(b []uint32) unsafe.Pointer {
+  p := C.malloc(C.size_t(len(b)))
+  sliceHeader := struct {
+    p   unsafe.Pointer
+    len int
+    cap int
+  }{p, len(b), len(b)}
+  s := *(*[]uint32)(unsafe.Pointer(&sliceHeader))
+  copy(s, b)
+  return p
+}
+
+func CUint64(b []uint64) unsafe.Pointer {
+  p := C.malloc(C.size_t(len(b)))
+  sliceHeader := struct {
+    p   unsafe.Pointer
+    len int
+    cap int
+  }{p, len(b), len(b)}
+  s := *(*[]uint64)(unsafe.Pointer(&sliceHeader))
+  copy(s, b)
+  return p
+}
+
 //export _IntTest
  func _IntTest (foo *C.char) C.int {
   _foo := C.GoString(foo)
@@ -107,6 +131,20 @@ func CInt64(b []int64) unsafe.Pointer {
  func _Int64ArrayTest (foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CInt64(abstract.Int64ArrayTest(_foo))
+  return _returned_value
+}
+
+//export _Uint32ArrayTest
+ func _Uint32ArrayTest (foo *C.char) unsafe.Pointer {
+  _foo := C.GoString(foo)
+  _returned_value := CUint32(abstract.Uint32ArrayTest(_foo))
+  return _returned_value
+}
+
+//export _Uint64ArrayTest
+ func _Uint64ArrayTest (foo *C.char) unsafe.Pointer {
+  _foo := C.GoString(foo)
+  _returned_value := CUint64(abstract.Uint64ArrayTest(_foo))
   return _returned_value
 }
 
