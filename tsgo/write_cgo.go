@@ -31,8 +31,11 @@ func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Buil
 }
 
 func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmtr cases.Caser) {
-	cg.WriteString("func C")
-	cg.WriteString(fmtr.String(t))
+	var arrTypeSB strings.Builder
+	arrTypeSB.WriteByte('C')
+	arrTypeSB.WriteString(fmtr.String(t))
+	cg.WriteString("func ")
+	cg.WriteString(arrTypeSB.String())
 	cg.WriteString("(b []")
 	cg.WriteString(t)
 	cg.WriteString(") unsafe.Pointer {\n")
@@ -58,6 +61,7 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmt
 	cg.WriteString("return p\n")
 	cg.WriteString("}\n\n")
 }
+
 func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
 	if _, ok := g.ffi.GoImports[pkg]; ok {
 		return
@@ -68,6 +72,34 @@ func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
 	s.WriteByte('"')
 	s.WriteByte('\n')
 	g.ffi.GoImports[pkg] = true
+}
+
+func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
+	if !g.ffi.FFIHelpers["disposePtr"] {
+		s.WriteString("//export disposePtr\n")
+		s.WriteString("func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("delete(ptrTrckr, uintptr(ptr))\n")
+		g.writeIndent(s, 1)
+		s.WriteString("C.free(ptr)\n")
+		s.WriteString("}\n\n")
+		g.ffi.FFIHelpers["disposePtr"] = true
+	}
+}
+
+func (g *PackageGenerator) addArraySize(s *strings.Builder) {
+	if !g.ffi.FFIHelpers["ArraySize"] {
+		s.WriteString("//export ArraySize\n")
+		s.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return ptrTrckr[uintptr(array)]\n")
+		s.WriteString("}\n\n")
+		g.ffi.FFIHelpers["ArraySize"] = true
+	}
+}
+
+func writePtrTrckr(s *strings.Builder) {
+	s.WriteString("var ptrTrckr = make(map[uintptr]unsafe.Pointer)\n\n")
 }
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
@@ -92,7 +124,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, param.Type, 0, true)
 			type_str := tempSB.String()
-			if type_str == "unsafe.Pointer" && !g.ffi.CImports["unsafe"] {
+			if type_str == "unsafe.Pointer" {
 				g.addGoImport(&goImportsSB, "unsafe")
 			}
 			fn_str.WriteString(type_str)
@@ -101,12 +133,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		var resSB strings.Builder
-		g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
+		g.writeCGoReturnType(&resSB, &goImportsSB, &goHelpersSB, caser, f.Type.Results.List[0].Type, 0, true)
 		res_type := resSB.String()
-		if res_type == "unsafe.Pointer" && !g.ffi.CImports["unsafe"] {
-			g.addGoImport(&goImportsSB, "unsafe")
-
-		}
 		fn_str.WriteString(") ")
 		fn_str.WriteString(res_type)
 		fn_str.WriteString(" {\n")
@@ -134,31 +162,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("_returned_value := ")
 		if res_type == "unsafe.Pointer" {
-			if !g.ffi.FFIHelpers["ptrTrckr"] {
-				goHelpersSB.WriteString("var ptrTrckr = make(map[uintptr]C.size_t)\n")
-			}
-			if !g.ffi.FFIHelpers["CFloat32"] {
-				g.writeCArrayHandler(&goHelpersSB, "float32", caser)
-				g.ffi.FFIHelpers["CFloat32"] = true
-			}
-			if !g.ffi.FFIHelpers["disposePtr"] {
-				goHelpersSB.WriteString("//export disposePtr\n")
-				goHelpersSB.WriteString("func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
-				g.writeIndent(&goHelpersSB, 1)
-				goHelpersSB.WriteString("delete(ptrTrckr, uintptr(ptr))\n")
-				g.writeIndent(&goHelpersSB, 1)
-				goHelpersSB.WriteString("C.free(ptr)\n")
-				goHelpersSB.WriteString("}\n\n")
-				g.ffi.FFIHelpers["disposePtr"] = true
-			}
-			if !g.ffi.FFIHelpers["ArraySize"] {
-				goHelpersSB.WriteString("//export ArraySize\n")
-				goHelpersSB.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
-				g.writeIndent(&goHelpersSB, 1)
-				goHelpersSB.WriteString("return ptrTrckr[uintptr(array)]\n")
-				goHelpersSB.WriteString("}\n\n")
-				g.ffi.FFIHelpers["ArraySize"] = true
-			}
+			writePtrTrckr(&goHelpersSB)
+			g.addDisposePtr(&goHelpersSB)
+			g.addArraySize(&goHelpersSB)
 			fn_str.WriteString("CFloat32")
 		} else {
 			fn_str.WriteString(res_type)

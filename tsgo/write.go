@@ -9,6 +9,7 @@ import (
 	"go/token"
 
 	"github.com/fatih/structtag"
+	"golang.org/x/text/cases"
 )
 
 var validJSNameRegexp = regexp.MustCompile(`(?m)^[\pL_][\pL\pN_]*$`)
@@ -208,8 +209,8 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 	}
 }
 
-// TODO: `writeFFIType` needs a major overhaul as logic is copied directly from writeType
-func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
+// used to add handlers for data types on an as needed basis (reduce code bloat)
+func (g *PackageGenerator) writeCGoReturnType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		if optionalParens {
@@ -225,11 +226,11 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 			s.WriteString("*C.char")
 			break
 		}
-		var arrTypeSB strings.Builder
-		g.writeType(&arrTypeSB, t.Elt, depth, true)
-		arr_type_str := arrTypeSB.String()
-		// log type of array so we can iterate on design for handling dif array types
-		fmt.Println("arr_type_str", arr_type_str)
+		g.addGoImport(cg, "unsafe")
+		g.addDisposePtr(gh)
+		arrType := g.getArrayType(t.Elt.(*ast.SelectorExpr))
+		g.writeCArrayHandler(gh, arrType, fmtr)
+
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")
@@ -294,6 +295,93 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		fmt.Println(err)
 		panic(err)
 	}
+}
+
+// TODO: `writeFFIType` needs a major overhaul as logic is copied directly from writeType
+func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
+	switch t := t.(type) {
+	case *ast.StarExpr:
+		if optionalParens {
+			s.WriteByte('(')
+		}
+		g.writeType(s, t.X, depth, false)
+		s.WriteString(" | undefined")
+		if optionalParens {
+			s.WriteByte(')')
+		}
+	case *ast.ArrayType:
+		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
+			s.WriteString("*C.char")
+			break
+		}
+		s.WriteString("unsafe.Pointer")
+	case *ast.StructType:
+		s.WriteString("{\n")
+		g.writeStructFields(s, t.Fields.List, depth+1)
+		g.writeIndent(s, depth+1)
+		s.WriteByte('}')
+	case *ast.Ident:
+		if t.String() == "any" {
+			s.WriteString(getCGoIdent(g.conf.FallbackType))
+		} else {
+			s.WriteString(getCGoIdent(t.String()))
+		}
+	case *ast.MapType:
+		s.WriteString("{ [key: ")
+		g.writeType(s, t.Key, depth, false)
+		s.WriteString("]: ")
+		g.writeType(s, t.Value, depth, false)
+		s.WriteByte('}')
+	case *ast.BasicLit:
+		s.WriteString(t.Value)
+	case *ast.ParenExpr:
+		s.WriteByte('(')
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte(')')
+	case *ast.BinaryExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte(' ')
+		s.WriteString(t.Op.String())
+		s.WriteByte(' ')
+		g.writeType(s, t.Y, depth, false)
+	case *ast.InterfaceType:
+		g.writeInterfaceFields(s, t.Methods.List, depth+1)
+	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
+		s.WriteString(g.conf.FallbackType)
+	case *ast.UnaryExpr:
+		if t.Op == token.TILDE {
+			// We just ignore the tilde token, in Typescript extended types are
+			// put into the generic typing itself, which we can't support yet.
+			g.writeType(s, t.X, depth, false)
+		} else {
+			err := fmt.Errorf("unhandled unary expr: %v\n %T", t, t)
+			fmt.Println(err)
+			panic(err)
+		}
+	case *ast.IndexListExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte('<')
+		for i, index := range t.Indices {
+			g.writeType(s, index, depth, false)
+			if i != len(t.Indices)-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteByte('>')
+	case *ast.IndexExpr:
+		g.writeType(s, t.X, depth, false)
+		s.WriteByte('<')
+		g.writeType(s, t.Index, depth, false)
+		s.WriteByte('>')
+	default:
+		err := fmt.Errorf("unhandled: %s\n %T", t, t)
+		fmt.Println(err)
+		panic(err)
+	}
+}
+
+func (g *PackageGenerator) getArrayType(t *ast.SelectorExpr) string {
+	return fmt.Sprintf("%s.%s", t.X, t.Sel)
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
