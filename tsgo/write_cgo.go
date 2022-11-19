@@ -83,6 +83,7 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 	fnNameSB.WriteString(numType)
 	fnNameSB.WriteString("Size")
 	if !g.ffi.FFIHelpers[fnNameSB.String()] {
+		s.WriteByte('\n')
 		s.WriteString("static inline size_t ")
 		s.WriteString(fnNameSB.String())
 		s.WriteString("() {\n")
@@ -111,7 +112,7 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 			s.WriteString("double")
 		}
 		s.WriteString(");\n")
-		s.WriteString("}\n\n")
+		s.WriteString("}\n")
 	}
 	return fnNameSB.String()
 }
