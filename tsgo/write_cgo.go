@@ -101,6 +101,7 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 
 func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	if !g.ffi.FFIHelpers["ptrTrckr"] {
+		g.ffi.FFIHelpers["ptrTrckr"] = true
 		s.WriteString("var ptrTrckr = make(map[uintptr]C.size_t)\n\n")
 	}
 }

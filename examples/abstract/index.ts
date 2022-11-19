@@ -68,8 +68,11 @@ export const {
   symbols: {
     ArraySize,
     disposePtr,
-    _TestFunc,
-    _TestFunc2
+    _IntTest,
+    _Float32ArrayTest,
+    _Float64ArrayTest,
+    _Int32ArrayTest,
+    _Int64ArrayTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
   ArraySize: {
@@ -78,11 +81,23 @@ export const {
   disposePtr: {
     args: [FFIType.ptr, FFIType.ptr]
   },
-  _TestFunc: {
+  _IntTest: {
     args: [FFIType.cstring],
     returns: FFIType.int
   },
-  _TestFunc2: {
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   }

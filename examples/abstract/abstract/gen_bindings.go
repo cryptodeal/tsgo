@@ -11,7 +11,7 @@ import (
   "unsafe"
 )
 
-var ptrTrckr = make(map[uintptr]unsafe.Pointer)
+var ptrTrckr = make(map[uintptr]C.size_t)
 
 //export disposePtr
 func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
@@ -46,7 +46,7 @@ func CFloat32(b []float32) unsafe.Pointer {
 //export _TestFunc2
  func _TestFunc2 (foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
-  _returned_value := unsafe.Pointer(abstract.TestFunc2(_foo))
+  _returned_value := CFloat32(abstract.TestFunc2(_foo))
   return _returned_value
 }
 
