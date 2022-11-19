@@ -135,6 +135,27 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
 	}
 }
 
+func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builder) {
+	if !g.ffi.FFIHelpers["encodeJSON"] {
+		g.addGoImport(gi, "encoding/json")
+		s.WriteString("func encodeJSON(x interface{}{}) {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("res, err := json.Marshal(x)\n")
+		g.writeIndent(s, 1)
+		s.WriteString("if err != nil {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("fmt.Println(err)\n")
+		g.writeIndent(s, 2)
+		s.WriteString("panic(err)\n")
+		g.writeIndent(s, 1)
+		s.WriteString("}\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return res\n")
+		s.WriteString("}\n\n")
+		g.ffi.FFIHelpers["encodeJSON"] = true
+	}
+}
+
 func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 	if !g.ffi.FFIHelpers["ArraySize"] {
 		s.WriteString("//export ArraySize\n")
@@ -189,9 +210,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(") ")
 		fn_str.WriteString(res_type)
 		fn_str.WriteString(" {\n")
-		g.writeIndent(&fn_str, 1)
 		used_vars := UsedParams{}
 		for _, param := range f.Type.Params.List {
+			g.writeIndent(&fn_str, 1)
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, param.Type, 0, true)
 			type_str := tempSB.String()
@@ -208,13 +229,11 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			default:
 				used_vars = append(used_vars, param.Names[0].Name)
 			}
-
 		}
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("_returned_value := ")
 		var tempResType strings.Builder
 		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true)
-
 		fn_str.WriteString(tempResType.String())
 
 		fn_str.WriteByte('(')

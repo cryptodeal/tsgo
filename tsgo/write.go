@@ -206,7 +206,8 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		s.WriteString("C.char")
+		g.addJSONEncoder(gh, cg)
+		s.WriteString("encodeJSON")
 	case *ast.ArrayType:
 		fmt.Println("writeCGoResType - *ast.ArrayType")
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
