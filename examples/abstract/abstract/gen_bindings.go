@@ -33,6 +33,7 @@ import "C"
 import (
   "github.com/cryptodeal/tsgo/examples/abstract"
   "unsafe"
+  "encoding/json"
 )
 
 var ptrTrckr = make(map[uintptr]C.size_t)
@@ -123,6 +124,15 @@ func CUint64(b []uint64) unsafe.Pointer {
   return p
 }
 
+func encodeJSON(x interface{}) {
+  res, err := json.Marshal(x)
+  if err != nil {
+    fmt.Println(err)
+    panic(err)
+  }
+  return res
+}
+
 //export _IntTest
  func _IntTest (foo *C.char) C.int {
   _foo := C.GoString(foo)
@@ -174,7 +184,7 @@ func CUint64(b []uint64) unsafe.Pointer {
 
 //export _TestStruct
  func _TestStruct () *C.char {
-    _returned_value := C.char(abstract.TestStruct())
+  _returned_value := encodeJSON(abstract.TestStruct())
   return _returned_value
 }
 

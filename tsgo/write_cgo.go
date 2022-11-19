@@ -138,7 +138,8 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
 func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builder) {
 	if !g.ffi.FFIHelpers["encodeJSON"] {
 		g.addGoImport(gi, "encoding/json")
-		s.WriteString("func encodeJSON(x interface{}{}) {\n")
+		g.addGoImport(gi, "fmt")
+		s.WriteString("func encodeJSON(x interface{}) {\n")
 		g.writeIndent(s, 1)
 		s.WriteString("res, err := json.Marshal(x)\n")
 		g.writeIndent(s, 1)
