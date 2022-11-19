@@ -231,9 +231,13 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			g.addDisposePtr(gh)
 			g.addArraySize(gh)
 			dat_type := g.getArrayType(v)
-			g.writeCArrayHandler(gh, dat_type, fmtr)
+			handler := g.writeCArrayHandler(gh, dat_type, fmtr)
+			s.WriteString(handler)
+
+		} else {
+			fmt.Println("unknown ptr type; returning as unsafe.Pointer (void*)")
+			s.WriteString("unsafe.Pointer")
 		}
-		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)

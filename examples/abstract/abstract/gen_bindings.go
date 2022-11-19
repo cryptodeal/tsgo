@@ -19,14 +19,19 @@ func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
   C.free(ptr)
 }
 
-func CC.float(b []C.float) unsafe.Pointer {
+//export ArraySize
+func ArraySize(array unsafe.Pointer) C.size_t {
+  return ptrTrckr[uintptr(array)]
+}
+
+func CFloat32(b []float32) unsafe.Pointer {
   p := C.malloc(C.size_t(len(b)))
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
   }{p, len(b), len(b)}
-  s := *(*[]C.float)(unsafe.Pointer(&sliceHeader))
+  s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   return p
 }

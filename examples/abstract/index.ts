@@ -66,11 +66,15 @@ export interface StructBar {
 
 export const {
   symbols: {
+    ArraySize,
     disposePtr,
     _TestFunc,
     _TestFunc2
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  ArraySize: {
+    args: [FFIType.ptr]
+  },
   disposePtr: {
     args: [FFIType.ptr, FFIType.ptr]
   },

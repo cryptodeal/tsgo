@@ -30,7 +30,7 @@ func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Buil
 	cg.WriteString(")\n\n")
 }
 
-func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmtr cases.Caser) {
+func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmtr cases.Caser) string {
 	var arrTypeSB strings.Builder
 	arrTypeSB.WriteByte('C')
 	arrTypeSB.WriteString(fmtr.String(t))
@@ -60,6 +60,7 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmt
 	g.writeIndent(cg, 1)
 	cg.WriteString("return p\n")
 	cg.WriteString("}\n\n")
+	return arrTypeSB.String()
 }
 
 func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
@@ -100,7 +101,7 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 
 func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	if !g.ffi.FFIHelpers["ptrTrckr"] {
-		s.WriteString("var ptrTrckr = make(map[uintptr]unsafe.Pointer)\n\n")
+		s.WriteString("var ptrTrckr = make(map[uintptr]C.size_t)\n\n")
 	}
 }
 
