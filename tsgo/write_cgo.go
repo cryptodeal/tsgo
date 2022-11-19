@@ -133,7 +133,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		var resSB strings.Builder
-		g.writeCGoReturnType(&resSB, &goImportsSB, &goHelpersSB, caser, f.Type.Results.List[0].Type, 0, true)
+		g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
 		res_type := resSB.String()
 		fn_str.WriteString(") ")
 		fn_str.WriteString(res_type)
@@ -161,14 +161,11 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("_returned_value := ")
-		if res_type == "unsafe.Pointer" {
-			writePtrTrckr(&goHelpersSB)
-			g.addDisposePtr(&goHelpersSB)
-			g.addArraySize(&goHelpersSB)
-			fn_str.WriteString("CFloat32")
-		} else {
-			fn_str.WriteString(res_type)
-		}
+		var tempResType strings.Builder
+		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, caser, f.Type.Results.List[0].Type, 0, true)
+
+		fn_str.WriteString(tempResType.String())
+
 		fn_str.WriteByte('(')
 		fn_str.WriteString(pkgName)
 		fn_str.WriteByte('.')

@@ -11,26 +11,25 @@ import (
   "unsafe"
 )
 
+//export disposePtr
+func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  delete(ptrTrckr, uintptr(ptr))
+  C.free(ptr)
+}
 
-var ptrTrckr = make(map[uintptr]C.size_t)
-
-func CFloat32(b []float32) unsafe.Pointer {
+func CC.float(b []C.float) unsafe.Pointer {
   p := C.malloc(C.size_t(len(b)))
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
   }{p, len(b), len(b)}
-  s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
+  s := *(*[]C.float)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   return p
 }
 
-//export disposePtr
-func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  delete(ptrTrckr, uintptr(ptr))
-  C.free(ptr)
-}
+var ptrTrckr = make(map[uintptr]unsafe.Pointer)
 
 //export ArraySize
 func ArraySize(array unsafe.Pointer) C.size_t {
