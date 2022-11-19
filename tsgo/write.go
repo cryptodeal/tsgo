@@ -211,7 +211,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	case *ast.ArrayType:
 		fmt.Println("writeCGoResType - *ast.ArrayType")
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
-			s.WriteString("*C.char")
+			s.WriteString("C.CString")
 			break
 		} else if ok {
 			g.addGoImport(cg, "unsafe")
@@ -221,7 +221,6 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			dat_type := g.getArrayType(v)
 			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)
 			s.WriteString(handler)
-
 		} else {
 			fmt.Println("unknown ptr type; returning as unsafe.Pointer (void*)")
 			s.WriteString("unsafe.Pointer")

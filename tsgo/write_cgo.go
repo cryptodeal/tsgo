@@ -259,6 +259,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			fn_str.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
 			g.writeIndent(&fn_str, 1)
 			fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+		} else if tempResType.String() == "C.CString" {
+			g.writeIndent(&fn_str, 1)
+			fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
 		}
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("return _returned_value\n")

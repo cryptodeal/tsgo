@@ -81,3 +81,7 @@ func Uint64ArrayTest(foo string) []uint64 {
 	fmt.Println("(logged from Golang) foo:", foo)
 	return out
 }
+
+func StringTest() string {
+	return "Hello, World!"
+}
