@@ -74,7 +74,8 @@ export const {
     _Int32ArrayTest,
     _Int64ArrayTest,
     _Uint32ArrayTest,
-    _Uint64ArrayTest
+    _Uint64ArrayTest,
+    _TestStruct
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
   ArraySize: {
@@ -110,5 +111,9 @@ export const {
   _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
+  },
+  _TestStruct: {
+,
+    returns: (StructBar | undefined)
   }
 })
