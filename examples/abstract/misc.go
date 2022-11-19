@@ -38,3 +38,14 @@ type StructBar struct {
 }
 
 // DROPPED: Floating comment at the end
+
+func TestStruct() *StructBar {
+	str := "asdlkfj"
+	structBar := &StructBar{
+		Field:                        "foo",
+		FieldWithWeirdJSONTag:        123,
+		FieldThatShouldNotBeOptional: &str,
+		FieldThatShouldBeReadonly:    "readonly",
+	}
+	return structBar
+}
