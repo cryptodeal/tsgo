@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, ArraySize, type StructBar } from '@tsgo/abstract'
+import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, ArraySize, type StructBar } from '@tsgo/abstract'
 import { toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
@@ -82,7 +82,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
   })
 
   it('should work - returns Go struct as JSON (`json.Marshal` struct)', () => {
-    const struct = <StructBar>JSON.parse(_TestStruct())
+    const struct = <StructBar>JSON.parse(_TestStruct().toString())
     expect(typeof struct).toBe('object')
     const keys = Object.keys(struct)
     for (let i = 0; i < keys.length; i++) {
@@ -113,4 +113,12 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
       }
     }
   })
+
+  it('should work - returns string (as cstring)', () => {
+    const str = _StringTest().toString()
+    console.log(str)
+    expect(typeof str).toBe('string')
+    expect(str).toBe('Hello, World!')
+  })
+
 })

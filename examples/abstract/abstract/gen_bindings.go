@@ -185,7 +185,8 @@ func encodeJSON(x interface{}) []byte {
 
 //export _StringTest
  func _StringTest () *C.char {
-  _returned_value := *C.char(abstract.StringTest())
+  _returned_value := C.CString(abstract.StringTest())
+  defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
 
