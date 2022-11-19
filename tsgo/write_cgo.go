@@ -232,9 +232,14 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		g.writeIndent(&fn_str, 1)
-		fn_str.WriteString("_returned_value := ")
 		var tempResType strings.Builder
 		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true)
+		if tempResType.String() == "encodeJSON" {
+			fn_str.WriteString("_temp_res_val := ")
+		} else {
+			fn_str.WriteString("_returned_value := ")
+		}
+
 		fn_str.WriteString(tempResType.String())
 
 		fn_str.WriteByte('(')
@@ -249,6 +254,12 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		fn_str.WriteString("))\n")
+		if tempResType.String() == "encodeJSON" {
+			g.writeIndent(&fn_str, 1)
+			fn_str.WriteString("_returned_value := C.CString(_temp_res_val)\n")
+			g.writeIndent(&fn_str, 1)
+			fn_str.WriteString("defer C.free(_returned_value)\n")
+		}
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("return _returned_value\n")
 		fn_str.WriteString("}\n\n")

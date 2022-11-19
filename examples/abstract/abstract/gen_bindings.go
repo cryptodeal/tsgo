@@ -125,7 +125,7 @@ func CUint64(b []uint64) unsafe.Pointer {
   return p
 }
 
-func encodeJSON(x interface{}) byte[] {
+func encodeJSON(x interface{}) []byte {
   res, err := json.Marshal(x)
   if err != nil {
     fmt.Println(err)
