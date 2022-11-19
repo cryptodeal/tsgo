@@ -89,20 +89,25 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
       switch (keys[i]) {
         case 'field':
           expect(typeof struct.field).toBe('string')
-          expect(struct[keys[i]]).toBe('foo')
+          expect(struct.field).toBe('foo')
+          break
         case 'weird':
           expect(typeof struct.weird).toBe('number')
-          expect(struct[keys[i]]).toBe(123)
+          expect(struct.weird).toBe(123)
+          break
         case 'field_that_should_be_optional': 
           if (struct.field_that_should_be_optional) {
             expect(typeof struct.field_that_should_be_optional).toBe('string')
           }
+          break
         case 'field_that_should_not_be_optional':
           expect(typeof struct.field_that_should_not_be_optional).toBe('string')
-          expect(struct[keys[i]]).toBe('bar')
+          expect(struct.field_that_should_not_be_optional).toBe('bar')
+          break
         case 'field_that_should_be_readonly':
           expect(typeof struct.field_that_should_be_readonly).toBe('string')
-          expect(struct[keys[i]]).toBe('readonly')
+          expect(struct.field_that_should_be_readonly).toBe('readonly')
+          break
         default:
           console.error(`Error: field ${keys[i]} not found in struct')}`)
       }
