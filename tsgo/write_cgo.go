@@ -15,7 +15,6 @@ import (
 type UsedParams []string
 
 func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Builder, ec *strings.Builder) {
-	cg.WriteString("// ")
 	g.writeFileCodegenHeader(cg)
 	cg.WriteString("package main\n\n")
 	cg.WriteString("/*\n")
