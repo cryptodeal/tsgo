@@ -11,6 +11,8 @@ import (
   "unsafe"
 )
 
+var ptrTrckr = make(map[uintptr]unsafe.Pointer)
+
 //export disposePtr
 func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
   delete(ptrTrckr, uintptr(ptr))

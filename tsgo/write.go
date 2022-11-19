@@ -225,17 +225,14 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
 			s.WriteString("*C.char")
 			break
+		} else if ok {
+			g.addGoImport(cg, "unsafe")
+			g.addPtrTrckr(gh)
+			g.addDisposePtr(gh)
+			g.addArraySize(gh)
+			dat_type := g.getArrayType(v)
+			g.writeCArrayHandler(gh, dat_type, fmtr)
 		}
-		fmt.Println("t:", t)
-		fmt.Println("t.Elt:", t.Elt)
-		g.addGoImport(cg, "unsafe")
-		g.addPtrTrckr(gh)
-		g.addDisposePtr(gh)
-		var typeSB strings.Builder
-		g.writeCGoResType(&typeSB, cg, gh, fmtr, t.Elt, depth, false)
-		fmt.Println("typeSB", typeSB.String())
-		g.writeCArrayHandler(gh, typeSB.String(), fmtr)
-
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")
@@ -385,8 +382,8 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 	}
 }
 
-func (g *PackageGenerator) getArrayType(t *ast.SelectorExpr) string {
-	return fmt.Sprintf("%s.%s", t.X, t.Sel)
+func (g *PackageGenerator) getArrayType(t *ast.Ident) string {
+	return t.Name
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
