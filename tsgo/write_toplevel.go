@@ -312,11 +312,10 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 					s.WriteByte(',')
 				}
 			}
-			s.WriteByte(']')
+			s.WriteString("],\n")
 		}
 
 		if len(f.Type.Results.List) == 1 {
-			s.WriteString(",\n")
 			g.writeIndent(s, 2)
 			s.WriteString("returns: ")
 			tempSB := &strings.Builder{}
