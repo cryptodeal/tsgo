@@ -256,9 +256,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString("))\n")
 		if tempResType.String() == "encodeJSON" {
 			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("_returned_value := C.CString(_temp_res_val)\n")
+			fn_str.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
 			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("defer C.free(_returned_value)\n")
+			fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
 		}
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("return _returned_value\n")

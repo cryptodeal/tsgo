@@ -185,7 +185,9 @@ func encodeJSON(x interface{}) []byte {
 
 //export _TestStruct
  func _TestStruct () *C.char {
-  _returned_value := encodeJSON(abstract.TestStruct())
+  _temp_res_val := encodeJSON(abstract.TestStruct())
+  _returned_value := C.CString(_temp_res_val)
+  defer C.free(_returned_value)
   return _returned_value
 }
 
