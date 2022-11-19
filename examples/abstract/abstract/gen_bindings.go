@@ -3,33 +3,30 @@ package main
 
 /*
 #include <stdlib.h>
-static inline size_t floatSize () {
-	return sizeof(float);
+static inline size_t float32Size() {
+  return sizeof(float);
 }
 
-static inline size_t doubleSize () {
-	return sizeof(double);
+static inline size_t float64Size() {
+  return sizeof(double);
 }
 
-static inline size_t intSize () {
-	return sizeof(int);
+static inline size_t int32Size() {
+  return sizeof(int32_t);
 }
 
-static inline size_t int32Size () {
-	return sizeof(int32_t);
+static inline size_t int64Size() {
+  return sizeof(int64_t);
 }
 
-static inline size_t int64Size () {
-	return sizeof(int64_t);
+static inline size_t uint32Size() {
+  return sizeof(uint32_t);
 }
 
-static inline size_t uint32Size () {
-	return sizeof(uint32_t);
+static inline size_t uint64Size() {
+  return sizeof(uint64_t);
 }
 
-static inline size_t uint64Size () {
-	return sizeof(uint64_t);
-}
 */
 import "C"
 
@@ -55,7 +52,7 @@ func ArraySize(array unsafe.Pointer) C.size_t {
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.floatSize())
+  p := C.malloc(C.size_t(len(b)) * C.float32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -67,7 +64,7 @@ func CFloat32(b []float32) unsafe.Pointer {
 }
 
 func CFloat64(b []float64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.doubleSize())
+  p := C.malloc(C.size_t(len(b)) * C.float64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
