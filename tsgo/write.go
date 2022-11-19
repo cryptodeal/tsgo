@@ -225,6 +225,11 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 			s.WriteString("*C.char")
 			break
 		}
+		var arrTypeSB strings.Builder
+		g.writeType(&arrTypeSB, t.Elt, depth, true)
+		arr_type_str := arrTypeSB.String()
+		// log type of array so we can iterate on design for handling dif array types
+		fmt.Println("arr_type_str", arr_type_str)
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
 		s.WriteString("{\n")
