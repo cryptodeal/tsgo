@@ -228,8 +228,10 @@ func (g *PackageGenerator) writeCGoReturnType(s *strings.Builder, cg *strings.Bu
 		}
 		g.addGoImport(cg, "unsafe")
 		g.addDisposePtr(gh)
-		arrType := g.getArrayType(t.Elt.(*ast.SelectorExpr))
-		g.writeCArrayHandler(gh, arrType, fmtr)
+		var typeSB strings.Builder
+		g.writeCGoReturnType(&typeSB, cg, gh, fmtr, t.Elt, depth, false)
+		fmt.Println("typeSB", typeSB.String())
+		g.writeCArrayHandler(gh, typeSB.String(), fmtr)
 
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
