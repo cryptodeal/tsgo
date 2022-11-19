@@ -113,7 +113,6 @@ export const {
     returns: FFIType.ptr
   },
   _TestStruct: {
-,
     returns: (StructBar | undefined)
   }
 })

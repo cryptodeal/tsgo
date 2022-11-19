@@ -173,8 +173,8 @@ func CUint64(b []uint64) unsafe.Pointer {
 }
 
 //export _TestStruct
- func _TestStruct () (StructBar | undefined) {
-    _returned_value := (StructBar | undefined)(abstract.TestStruct())
+ func _TestStruct () *C.char {
+    _returned_value := C.char(abstract.TestStruct())
   return _returned_value
 }
 
