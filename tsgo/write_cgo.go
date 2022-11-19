@@ -139,7 +139,7 @@ func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builde
 	if !g.ffi.FFIHelpers["encodeJSON"] {
 		g.addGoImport(gi, "encoding/json")
 		g.addGoImport(gi, "fmt")
-		s.WriteString("func encodeJSON(x interface{}) {\n")
+		s.WriteString("func encodeJSON(x interface{}) byte[] {\n")
 		g.writeIndent(s, 1)
 		s.WriteString("res, err := json.Marshal(x)\n")
 		g.writeIndent(s, 1)

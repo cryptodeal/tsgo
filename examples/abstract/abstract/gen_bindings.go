@@ -34,6 +34,7 @@ import (
   "github.com/cryptodeal/tsgo/examples/abstract"
   "unsafe"
   "encoding/json"
+  "fmt"
 )
 
 var ptrTrckr = make(map[uintptr]C.size_t)
