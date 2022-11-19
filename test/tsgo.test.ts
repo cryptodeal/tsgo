@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, ArraySize } from '@tsgo/abstract'
+import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, ArraySize, type StructBar } from '@tsgo/abstract'
 import { toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
@@ -78,6 +78,34 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const out = new BigUint64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, disposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
+    }
+  })
+
+  it('should work - returns Go struct as JSON (`json.Marshal` struct)', () => {
+    const struct = <StructBar>JSON.parse(_TestStruct())
+    expect(typeof struct).toBe('object')
+    const keys = Object.keys(struct)
+    for (let i = 0; i < keys.length; i++) {
+      switch (keys[i]) {
+        case 'field':
+          expect(typeof struct.field).toBe('string')
+          expect(struct[keys[i]]).toBe('foo')
+        case 'weird':
+          expect(typeof struct.weird).toBe('number')
+          expect(struct[keys[i]]).toBe(123)
+        case 'field_that_should_be_optional': 
+          if (struct.field_that_should_be_optional) {
+            expect(typeof struct.field_that_should_be_optional).toBe('string')
+          }
+        case 'field_that_should_not_be_optional':
+          expect(typeof struct.field_that_should_not_be_optional).toBe('string')
+          expect(struct[keys[i]]).toBe('bar')
+        case 'field_that_should_be_readonly':
+          expect(typeof struct.field_that_should_be_readonly).toBe('string')
+          expect(struct[keys[i]]).toBe('readonly')
+        default:
+          console.error(`Error: field ${keys[i]} not found in struct')}`)
+      }
     }
   })
 })
