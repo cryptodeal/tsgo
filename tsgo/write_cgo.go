@@ -175,6 +175,26 @@ func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	}
 }
 
+func (g *PackageGenerator) addArgHandler(s *strings.Builder, f *ast.Field, usedVars *UsedParams) {
+	g.writeIndent(s, 1)
+	var tempSB strings.Builder
+	g.writeCGoType(&tempSB, f.Type, 0, true)
+	type_str := tempSB.String()
+	switch type_str {
+	case "*C.char":
+		parsedSB := strings.Builder{}
+		parsedSB.WriteByte('_')
+		parsedSB.WriteString(f.Names[0].Name)
+		s.WriteString(parsedSB.String())
+		s.WriteString(" := C.GoString(")
+		s.WriteString(f.Names[0].Name)
+		s.WriteString(")\n")
+		*usedVars = append(*usedVars, parsedSB.String())
+	default:
+		*usedVars = append(*usedVars, f.Names[0].Name)
+	}
+}
+
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
 func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkgName string) {
 	var goImportsSB strings.Builder
@@ -184,13 +204,16 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	caser := cases.Title(language.AmericanEnglish)
 	g.addGoImport(&goImportsSB, g.conf.Path)
 
+	// writes all functions to single string builder
 	var fn_str strings.Builder
+	// iterate through all function declarations
 	for _, f := range fd {
 		fn_str.WriteString("//export _")
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("\n func _")
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString(" (")
+		// iterate through fn params, generating cgo function decl line
 		for i, param := range f.Type.Params.List {
 			fn_str.WriteString(param.Names[0].Name)
 			fn_str.WriteByte(' ')
@@ -211,25 +234,11 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(") ")
 		fn_str.WriteString(res_type)
 		fn_str.WriteString(" {\n")
+
+		// iterate through fn params, generate logic casting C type -> Go type
 		used_vars := UsedParams{}
 		for _, param := range f.Type.Params.List {
-			g.writeIndent(&fn_str, 1)
-			var tempSB strings.Builder
-			g.writeCGoType(&tempSB, param.Type, 0, true)
-			type_str := tempSB.String()
-			switch type_str {
-			case "*C.char":
-				parsedSB := strings.Builder{}
-				parsedSB.WriteByte('_')
-				parsedSB.WriteString(param.Names[0].Name)
-				fn_str.WriteString(parsedSB.String())
-				fn_str.WriteString(" := C.GoString(")
-				fn_str.WriteString(param.Names[0].Name)
-				fn_str.WriteString(")\n")
-				used_vars = append(used_vars, parsedSB.String())
-			default:
-				used_vars = append(used_vars, param.Names[0].Name)
-			}
+			g.addArgHandler(&fn_str, param, &used_vars)
 		}
 		g.writeIndent(&fn_str, 1)
 		var tempResType strings.Builder
@@ -247,6 +256,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteByte('.')
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("(")
+		// iterate through params (and converted params), writing args passed to function call
 		for i, param := range used_vars {
 			fn_str.WriteString(param)
 			if i < len(used_vars)-1 {
@@ -254,6 +264,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		fn_str.WriteString("))\n")
+		// generate handlers for casting Go type -> C type for FFI Return value
 		if tempResType.String() == "encodeJSON" {
 			g.writeIndent(&fn_str, 1)
 			fn_str.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
@@ -268,13 +279,17 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString("}\n\n")
 	}
 
+	// write headers, embedded C imports/logic, and Go imports
 	g.writeCGoHeaders(cg, &goImportsSB, &embeddedCSB)
-
+	// writes Go helper Fns (e.g. encodeJSON, ArraySize, CFloat32, etc.)
 	cg.WriteString(goHelpersSB.String())
 
+	// writes all of the wrapper functions for FFI (generated above)
 	cg.WriteString(fn_str.String())
+	// writes required `func main()` to appease compiler
 	cg.WriteString("func main() {} // Required but ignored")
 
+	// write the generated Cgo code to file
 	var outPath strings.Builder
 	outPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
 	outPath.WriteByte('/')
