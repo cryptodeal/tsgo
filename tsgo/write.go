@@ -210,7 +210,7 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 }
 
 // used to add handlers for data types on an as needed basis (reduce code bloat)
-func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool) {
+func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		if optionalParens {
@@ -231,7 +231,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			g.addDisposePtr(gh)
 			g.addArraySize(gh)
 			dat_type := g.getArrayType(v)
-			handler := g.writeCArrayHandler(gh, dat_type, fmtr)
+			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)
 			s.WriteString(handler)
 
 		} else {

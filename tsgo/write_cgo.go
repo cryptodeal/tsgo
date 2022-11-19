@@ -30,7 +30,8 @@ func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Buil
 	cg.WriteString(")\n\n")
 }
 
-func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmtr cases.Caser) string {
+func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.Builder, t string, fmtr cases.Caser) string {
+	sizeHandler := g.addCSizeHelper(ec, t)
 	var arrTypeSB strings.Builder
 	arrTypeSB.WriteByte('C')
 	arrTypeSB.WriteString(fmtr.String(t))
@@ -40,7 +41,9 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, t string, fmt
 	cg.WriteString(t)
 	cg.WriteString(") unsafe.Pointer {\n")
 	g.writeIndent(cg, 1)
-	cg.WriteString("p := C.malloc(C.size_t(len(b)))\n")
+	cg.WriteString("p := C.malloc(C.size_t(len(b)) * C.")
+	cg.WriteString(sizeHandler)
+	cg.WriteString("())\n")
 	g.writeIndent(cg, 1)
 	cg.WriteString("sliceHeader := struct {\n")
 	g.writeIndent(cg, 2)
@@ -73,6 +76,44 @@ func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
 	s.WriteByte('"')
 	s.WriteByte('\n')
 	g.ffi.GoImports[pkg] = true
+}
+
+func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) string {
+	var fnNameSB strings.Builder
+	fnNameSB.WriteString(numType)
+	fnNameSB.WriteString("Size")
+	if !g.ffi.FFIHelpers[fnNameSB.String()] {
+		s.WriteString("static inline size_t ")
+		s.WriteString(fnNameSB.String())
+		s.WriteString("() {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return sizeof(")
+		switch numType {
+		case "int8":
+			s.WriteString("int8_t")
+		case "int16":
+			s.WriteString("int16_t")
+		case "int32":
+			s.WriteString("int32_t")
+		case "int64":
+			s.WriteString("int64_t")
+		case "uint8":
+			s.WriteString("uint8_t")
+		case "uint16":
+			s.WriteString("uint16_t")
+		case "uint32":
+			s.WriteString("uint32_t")
+		case "uint64":
+			s.WriteString("uint64_t")
+		case "float32":
+			s.WriteString("float")
+		case "float64":
+			s.WriteString("double")
+		}
+		s.WriteString(");\n")
+		s.WriteString("}\n\n")
+	}
+	return fnNameSB.String()
 }
 
 func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
@@ -172,7 +213,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		g.writeIndent(&fn_str, 1)
 		fn_str.WriteString("_returned_value := ")
 		var tempResType strings.Builder
-		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, caser, f.Type.Results.List[0].Type, 0, true)
+		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true)
 
 		fn_str.WriteString(tempResType.String())
 

@@ -3,6 +3,33 @@ package main
 
 /*
 #include <stdlib.h>
+static inline size_t floatSize () {
+	return sizeof(float);
+}
+
+static inline size_t doubleSize () {
+	return sizeof(double);
+}
+
+static inline size_t intSize () {
+	return sizeof(int);
+}
+
+static inline size_t int32Size () {
+	return sizeof(int32_t);
+}
+
+static inline size_t int64Size () {
+	return sizeof(int64_t);
+}
+
+static inline size_t uint32Size () {
+	return sizeof(uint32_t);
+}
+
+static inline size_t uint64Size () {
+	return sizeof(uint64_t);
+}
 */
 import "C"
 
@@ -17,7 +44,7 @@ var ptrTrckr = make(map[uintptr]C.size_t)
 func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
   ptr_num := uintptr(ptr)
   if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, uintptr(ptr))
+    delete(ptrTrckr, ptr_num)
     defer C.free(ptr)
   }
 }
@@ -28,7 +55,7 @@ func ArraySize(array unsafe.Pointer) C.size_t {
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.floatSize())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -40,7 +67,7 @@ func CFloat32(b []float32) unsafe.Pointer {
 }
 
 func CFloat64(b []float64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.doubleSize())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -52,7 +79,7 @@ func CFloat64(b []float64) unsafe.Pointer {
 }
 
 func CInt32(b []int32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.int32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -64,7 +91,7 @@ func CInt32(b []int32) unsafe.Pointer {
 }
 
 func CInt64(b []int64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.int64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -76,7 +103,7 @@ func CInt64(b []int64) unsafe.Pointer {
 }
 
 func CUint32(b []uint32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.uint32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
@@ -88,7 +115,7 @@ func CUint32(b []uint32) unsafe.Pointer {
 }
 
 func CUint64(b []uint64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)))
+  p := C.malloc(C.size_t(len(b)) * C.uint64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
