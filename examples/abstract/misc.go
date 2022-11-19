@@ -49,3 +49,13 @@ func TestStruct() *StructBar {
 	}
 	return structBar
 }
+
+func TestMap() *map[int]string {
+	m := map[int]string{
+		1: "foo",
+		2: "bar",
+		3: "baz",
+		4: "qux",
+	}
+	return &m
+}

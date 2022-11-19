@@ -275,12 +275,8 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			s.WriteString(getCGoTypeHandler(t.String()))
 		}
 	case *ast.MapType:
-		fmt.Println("writeCGoResType - *ast.MapType")
-		s.WriteString("{ [key: ")
-		g.writeType(s, t.Key, depth, false)
-		s.WriteString("]: ")
-		g.writeType(s, t.Value, depth, false)
-		s.WriteByte('}')
+		g.addJSONEncoder(gh, cg)
+		s.WriteString("encodeJSON")
 	case *ast.BasicLit:
 		fmt.Println("writeCGoResType - *ast.BasicLit")
 		s.WriteString(t.Value)

@@ -116,9 +116,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
 
   it('should work - returns string (as cstring)', () => {
     const str = _StringTest().toString()
-    console.log(str)
     expect(typeof str).toBe('string')
     expect(str).toBe('Hello, World!')
   })
-
 })
