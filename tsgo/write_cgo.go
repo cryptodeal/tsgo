@@ -80,9 +80,15 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
 		s.WriteString("//export disposePtr\n")
 		s.WriteString("func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
 		g.writeIndent(s, 1)
-		s.WriteString("delete(ptrTrckr, uintptr(ptr))\n")
+		s.WriteString("ptr_num := uintptr(ptr)\n")
 		g.writeIndent(s, 1)
+		s.WriteString("if _, ok := ptrTrckr[ptr_num]; ok {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("delete(ptrTrckr, uintptr(ptr))\n")
+		g.writeIndent(s, 2)
 		s.WriteString("C.free(ptr)\n")
+		g.writeIndent(s, 1)
+		s.WriteString("}\n")
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["disposePtr"] = true
 	}

@@ -30,7 +30,7 @@ func IntTest(foo string) int {
 
 func Float32ArrayTest(foo string) []float32 {
 	out := []float32{}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		out = append(out, rand.Float32())
 	}
 	fmt.Println("(logged from Golang) foo:", foo)
@@ -39,7 +39,7 @@ func Float32ArrayTest(foo string) []float32 {
 
 func Float64ArrayTest(foo string) []float64 {
 	out := []float64{}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		out = append(out, rand.Float64())
 	}
 	fmt.Println("(logged from Golang) foo:", foo)
@@ -59,6 +59,24 @@ func Int64ArrayTest(foo string) []int64 {
 	out := []int64{}
 	for i := 0; i < 10; i++ {
 		out = append(out, rand.Int63())
+	}
+	fmt.Println("(logged from Golang) foo:", foo)
+	return out
+}
+
+func Uint32ArrayTest(foo string) []uint32 {
+	out := []uint32{}
+	for i := 0; i < 10; i++ {
+		out = append(out, rand.Uint32())
+	}
+	fmt.Println("(logged from Golang) foo:", foo)
+	return out
+}
+
+func Uint64ArrayTest(foo string) []uint64 {
+	out := []uint64{}
+	for i := 0; i < 10; i++ {
+		out = append(out, rand.Uint64())
 	}
 	fmt.Println("(logged from Golang) foo:", foo)
 	return out
