@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, ArraySize, type StructBar } from '@tsgo/abstract'
+import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, type StructBar } from '@tsgo/abstract'
 import { toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
@@ -118,5 +118,13 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const str = _StringTest().toString()
     expect(typeof str).toBe('string')
     expect(str).toBe('Hello, World!')
+  })
+
+  it('should work - returns map (Record<number, string>)', () => {
+    const str = <Record<number, string>>JSON.parse(_TestMap().toString())
+    const keys = Object.keys(str)
+    for (let i = 0; i < keys.length; i++) {
+      expect(typeof str[keys[i]]).toBe('string')
+    }
   })
 })

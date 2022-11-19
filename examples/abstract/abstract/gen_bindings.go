@@ -198,4 +198,12 @@ func encodeJSON(x interface{}) []byte {
   return _returned_value
 }
 
+//export _TestMap
+ func _TestMap () *C.char {
+  _temp_res_val := encodeJSON(abstract.TestMap())
+  _returned_value := C.CString(string(_temp_res_val))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
+}
+
 func main() {} // Required but ignored
