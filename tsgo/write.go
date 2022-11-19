@@ -108,6 +108,42 @@ func getCGoIdent(s string) string {
 	return "*C.void"
 }
 
+func getCGoTypeHandler(s string) string {
+	switch s {
+	case "bool":
+		// not valid type
+		return "C.bool"
+	case "int":
+		return "C.int"
+	case "int8":
+		return "C.int8_t"
+	case "int16":
+		return "C.int16_t"
+	case "int32":
+		return "C.int32_t"
+	case "int64":
+		return "C.int64_t"
+	case "uint":
+		return "C.uint"
+	case "uint8":
+		return "C.uint8_t"
+	case "uint16":
+		return "C.uint16_t"
+	case "uint32":
+		return "C.uint32_t"
+	case "uint64":
+		return "C.uint64_t"
+	case "float32":
+		return "C.float"
+	case "float64":
+		return "C.double"
+	case "string":
+		return "C.CString"
+	}
+	return "*C.void"
+
+}
+
 func (g *PackageGenerator) writeIndent(s *strings.Builder, depth int) {
 	for i := 0; i < depth; i++ {
 		s.WriteString(g.conf.Indent)
@@ -234,9 +270,9 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	case *ast.Ident:
 		fmt.Println("writeCGoResType - *ast.Ident")
 		if t.String() == "any" {
-			s.WriteString(getCGoIdent(g.conf.FallbackType))
+			s.WriteString(getCGoTypeHandler(g.conf.FallbackType))
 		} else {
-			s.WriteString(getCGoIdent(t.String()))
+			s.WriteString(getCGoTypeHandler(t.String()))
 		}
 	case *ast.MapType:
 		fmt.Println("writeCGoResType - *ast.MapType")
