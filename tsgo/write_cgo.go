@@ -175,7 +175,7 @@ func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	}
 }
 
-func (g *PackageGenerator) addArgHandler(s *strings.Builder, f *ast.Field, usedVars *UsedParams) {
+func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder, f *ast.Field, usedVars *UsedParams) {
 	g.writeIndent(s, 1)
 	var tempSB strings.Builder
 	g.writeCGoType(&tempSB, f.Type, 0, true)
@@ -190,9 +190,25 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, f *ast.Field, usedV
 		s.WriteString(f.Names[0].Name)
 		s.WriteString(")\n")
 		*usedVars = append(*usedVars, parsedSB.String())
+	case "unsafe.Pointer":
+		parsedSB := strings.Builder{}
+		parsedSB.WriteByte('_')
+		parsedSB.WriteString(f.Names[0].Name)
+		g.addGoImport(gi, "unsafe")
+		arr_dat_type := g.getArrayType(f.Type.(*ast.Ident))
+		s.WriteString(parsedSB.String())
+		s.WriteString(" := unsafe.Slice((*[]")
+		s.WriteString(arr_dat_type)
+		s.WriteString(")(")
+		s.WriteString(f.Names[0].Name)
+		s.WriteString("), int(ptrTrckr[uintptr(")
+		s.WriteString(f.Names[0].Name)
+		s.WriteString(")]))\n")
+		*usedVars = append(*usedVars, parsedSB.String())
 	default:
 		*usedVars = append(*usedVars, f.Names[0].Name)
 	}
+
 }
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
@@ -230,17 +246,19 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				fn_str.WriteString(", ")
 			}
 		}
-		var resSB strings.Builder
-		g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
-		res_type := resSB.String()
 		fn_str.WriteString(") ")
-		fn_str.WriteString(res_type)
+		var resSB strings.Builder
+		if len(f.Type.Results.List) > 0 {
+			g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
+			res_type := resSB.String()
+			fn_str.WriteString(res_type)
+		}
 		fn_str.WriteString(" {\n")
 
 		// iterate through fn params, generate logic casting C type -> Go type
 		used_vars := UsedParams{}
 		for _, param := range f.Type.Params.List {
-			g.addArgHandler(&fn_str, param, &used_vars)
+			g.addArgHandler(&fn_str, &goHelpersSB, param, &used_vars)
 		}
 		g.writeIndent(&fn_str, 1)
 		var tempResType strings.Builder

@@ -88,6 +88,6 @@ func StringTest() string {
 
 func ArrayArgTest(foo []float64) {
 	for i, v := range foo {
-		fmt.Printf("foo[%d] = %f", i, v)
+		fmt.Println("(logged from Golang) foo[", i, "]:", v)
 	}
 }
