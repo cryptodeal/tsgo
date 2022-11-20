@@ -130,9 +130,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
 
   it('should work - round trip `Float64Array`', () => {
     const test = new Float64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    const temp_ptr = ptr(test)
-    const res = _Float64ArrayTest(ptr(test))
-    console.log(res)
+    const res = _ArrayArgTest(ptr(test), test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, disposePtr()))

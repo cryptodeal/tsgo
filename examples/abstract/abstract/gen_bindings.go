@@ -27,10 +27,6 @@ static inline size_t uint32Size() {
 static inline size_t uint64Size() {
   return sizeof(uint64_t);
 }
-
-static inline size_t sizeOfArray(void *array) {
-	return sizeof(array) / sizeof(array[0]);
-}
 */
 import "C"
 
@@ -175,6 +171,7 @@ func encodeJSON(x interface{}) []byte {
 
 //export _Uint32ArrayTest
  func _Uint32ArrayTest (foo *C.char) unsafe.Pointer {
+	fmt.Println(foo)
   _foo := C.GoString(foo)
   _returned_value := CUint32(abstract.Uint32ArrayTest(_foo))
   return _returned_value
@@ -195,9 +192,12 @@ func encodeJSON(x interface{}) []byte {
 }
 
 //export _ArrayArgTest
- func _ArrayArgTest (foo unsafe.Pointer) unsafe.Pointer {
-  _foo := unsafe.Slice((*float64)(foo), int(C.sizeOfArray(foo)))
-  _returned_value := CFloat64(abstract.ArrayArgTest(_foo))
+ func _ArrayArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+	fmt.Println("len", _len)
+  _foo := unsafe.Slice((*float64)(foo), _len)
+	res := abstract.ArrayArgTest(_foo)
+	fmt.Println("res", res)
+  _returned_value := CFloat64(res)
   return _returned_value
 }
 

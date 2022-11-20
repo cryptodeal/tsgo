@@ -119,7 +119,7 @@ export const {
     returns: FFIType.cstring
   },
   _ArrayArgTest: {
-    args: [FFIType.ptr],
+    args: [FFIType.ptr, FFIType.int],
     returns: FFIType.ptr
   },
   _TestStruct: {
