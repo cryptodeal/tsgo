@@ -248,7 +248,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		fn_str.WriteString(") ")
 		var resSB strings.Builder
-		if len(f.Type.Results.List) > 0 {
+		if f.Type.Results.List == nil || len(f.Type.Results.List) > 0 {
 			g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
 			res_type := resSB.String()
 			fn_str.WriteString(res_type)
