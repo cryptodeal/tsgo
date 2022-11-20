@@ -76,6 +76,7 @@ export const {
     _Uint32ArrayTest,
     _Uint64ArrayTest,
     _StringTest,
+    _ArrayArgTest,
     _TestStruct,
     _TestMap
   }
@@ -116,6 +117,10 @@ export const {
   },
   _StringTest: {
     returns: FFIType.cstring
+  },
+  _ArrayArgTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
   },
   _TestStruct: {
     returns: FFIType.cstring
