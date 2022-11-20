@@ -249,7 +249,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		fn_str.WriteString(") ")
 		var resSB strings.Builder
-		if f.Type.Results != nil || f.Type.Results.List != nil || len(f.Type.Results.List) > 0 {
+		if f.Type.Results != nil || f.Type.Results.List != nil || f.Type.Results.List[0].Type != nil {
 			fmt.Println("f.Type.Results.List[0]", f.Type.Results.List[0])
 			g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
 			res_type := resSB.String()
