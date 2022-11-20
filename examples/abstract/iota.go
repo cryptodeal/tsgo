@@ -85,3 +85,9 @@ func Uint64ArrayTest(foo string) []uint64 {
 func StringTest() string {
 	return "Hello, World!"
 }
+
+func ArrayArgTest(foo []float64) {
+	for i, v := range foo {
+		fmt.Printf("foo[%d] = %f", i, v)
+	}
+}

@@ -175,7 +175,7 @@ func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	}
 }
 
-func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder, f *ast.Field, usedVars *UsedParams) {
+func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder, f *ast.Field, usedVars UsedParams) {
 	g.writeIndent(s, 1)
 	var tempSB strings.Builder
 	g.writeCGoType(&tempSB, f.Type, 0, true)
@@ -189,7 +189,7 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 		s.WriteString(" := C.GoString(")
 		s.WriteString(f.Names[0].Name)
 		s.WriteString(")\n")
-		*usedVars = append(*usedVars, parsedSB.String())
+		usedVars = append(usedVars, parsedSB.String())
 	case "unsafe.Pointer":
 		parsedSB := strings.Builder{}
 		parsedSB.WriteByte('_')
@@ -204,9 +204,9 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 		s.WriteString("), int(ptrTrckr[uintptr(")
 		s.WriteString(f.Names[0].Name)
 		s.WriteString(")]))\n")
-		*usedVars = append(*usedVars, parsedSB.String())
+		usedVars = append(usedVars, parsedSB.String())
 	default:
-		*usedVars = append(*usedVars, f.Names[0].Name)
+		usedVars = append(usedVars, f.Names[0].Name)
 	}
 }
 
@@ -255,7 +255,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		// iterate through fn params, generate logic casting C type -> Go type
 		used_vars := UsedParams{}
 		for _, param := range f.Type.Params.List {
-			g.addArgHandler(&fn_str, &goHelpersSB, param, &used_vars)
+			g.addArgHandler(&fn_str, &goHelpersSB, param, used_vars)
 		}
 		g.writeIndent(&fn_str, 1)
 		var tempResType strings.Builder
