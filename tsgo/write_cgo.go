@@ -196,7 +196,7 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 		parsedSB.WriteByte('_')
 		parsedSB.WriteString(f.Names[0].Name)
 		g.addGoImport(gi, "unsafe")
-		arr_dat_type := g.getArrayType(f.Type.(*ast.Ident))
+		arr_dat_type := g.getArrayType(f.Type)
 		s.WriteString(parsedSB.String())
 		s.WriteString(" := unsafe.Slice((*[]")
 		s.WriteString(arr_dat_type)
