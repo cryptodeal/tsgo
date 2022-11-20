@@ -27,10 +27,6 @@ static inline size_t uint32Size() {
 static inline size_t uint64Size() {
   return sizeof(uint64_t);
 }
-
-static inline size_t float64Size() {
-  return sizeof(double);
-}
 */
 import "C"
 
@@ -129,18 +125,6 @@ func CUint64(b []uint64) unsafe.Pointer {
   return p
 }
 
-func CFloat64(b []float64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.float64Size())
-  sliceHeader := struct {
-    p   unsafe.Pointer
-    len int
-    cap int
-  }{p, len(b), len(b)}
-  s := *(*[]float64)(unsafe.Pointer(&sliceHeader))
-  copy(s, b)
-  return p
-}
-
 func encodeJSON(x interface{}) []byte {
   res, err := json.Marshal(x)
   if err != nil {
@@ -208,7 +192,7 @@ func encodeJSON(x interface{}) []byte {
 
 //export _ArrayArgTest
  func _ArrayArgTest (foo unsafe.Pointer) unsafe.Pointer {
-  _foo := unsafe.Slice((*[]float64)(foo), int(ptrTrckr[uintptr(foo)]))
+  _foo := unsafe.Slice((*float64)(foo), int(ptrTrckr[uintptr(foo)]))
   _returned_value := CFloat64(abstract.ArrayArgTest(_foo))
   return _returned_value
 }

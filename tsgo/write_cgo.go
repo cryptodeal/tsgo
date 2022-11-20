@@ -64,6 +64,8 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.B
 		g.writeIndent(cg, 1)
 		cg.WriteString("return p\n")
 		cg.WriteString("}\n\n")
+		g.ffi.FFIHelpers[arrTypeSB.String()] = true
+
 	}
 	return arrTypeSB.String()
 }
@@ -115,7 +117,6 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 		}
 		s.WriteString(");\n")
 		s.WriteString("}\n")
-		g.ffi.FFIHelpers[fnNameSB.String()] = true
 	}
 	return fnNameSB.String()
 }
@@ -201,7 +202,7 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 		g.addGoImport(gi, "unsafe")
 		arr_dat_type := g.getArrayType(f.Type)
 		s.WriteString(parsedSB.String())
-		s.WriteString(" := unsafe.Slice((*[]")
+		s.WriteString(" := unsafe.Slice((*")
 		s.WriteString(arr_dat_type)
 		s.WriteString(")(")
 		s.WriteString(f.Names[0].Name)
