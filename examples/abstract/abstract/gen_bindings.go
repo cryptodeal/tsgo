@@ -27,6 +27,10 @@ static inline size_t uint32Size() {
 static inline size_t uint64Size() {
   return sizeof(uint64_t);
 }
+
+static inline size_t float64Size() {
+  return sizeof(double);
+}
 */
 import "C"
 

@@ -24,6 +24,7 @@ type FFIState struct {
 	GoImports  map[string]bool
 	CImports   map[string]bool
 	FFIHelpers map[string]bool
+	CHelpers   map[string]bool
 }
 
 // Responsible for generating the code for an input package
