@@ -27,10 +27,6 @@ static inline size_t uint32Size() {
 static inline size_t uint64Size() {
   return sizeof(uint64_t);
 }
-
-static inline size_t float64Size() {
-  return sizeof(double);
-}
 */
 import "C"
 
@@ -198,6 +194,7 @@ func encodeJSON(x interface{}) []byte {
  func _ArrayArgTest (foo unsafe.Pointer) unsafe.Pointer {
   _foo := unsafe.Slice((*float64)(foo), int(ptrTrckr[uintptr(foo)]))
   _returned_value := CFloat64(abstract.ArrayArgTest(_foo))
+	fmt.Println(_returned_value)
   return _returned_value
 }
 

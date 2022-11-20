@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, type StructBar } from '@tsgo/abstract'
-import { toArrayBuffer } from 'bun:ffi'
+import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _ArrayArgTest, type StructBar } from '@tsgo/abstract'
+import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
   it('basic; should work - returns `int`', () => {
@@ -127,4 +127,18 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
       expect(typeof str[keys[i]]).toBe('string')
     }
   })
+
+  it('should work - round trip `Float64Array`', () => {
+    const test = new Float64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    const temp_ptr = ptr(test)
+    const res = _Float64ArrayTest(ptr(test))
+    console.log(res)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, disposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+  
 })
