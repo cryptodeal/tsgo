@@ -64,7 +64,7 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.B
 		g.writeIndent(cg, 1)
 		cg.WriteString("copy(s, b)\n")
 		g.writeIndent(cg, 1)
-		cg.WriteString("ptrTrckr[uintptr(p)] = C.size_t(arr_len)")
+		cg.WriteString("ptrTrckr[uintptr(p)] = C.size_t(arr_len)\n")
 		g.writeIndent(cg, 1)
 		cg.WriteString("return p\n")
 		cg.WriteString("}\n\n")

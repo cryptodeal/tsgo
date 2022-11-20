@@ -54,75 +54,81 @@ func ArraySize(array unsafe.Pointer) C.size_t {
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.float32Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.float32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func CFloat64(b []float64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.float64Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.float64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]float64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func CInt32(b []int32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.int32Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.int32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]int32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func CInt64(b []int64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.int64Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.int64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]int64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func CUint32(b []uint32) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.uint32Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.uint32Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]uint32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func CUint64(b []uint64) unsafe.Pointer {
-  p := C.malloc(C.size_t(len(b)) * C.uint64Size())
+  arr_len := len(b)
+  p := C.malloc(C.size_t(arr_len) * C.uint64Size())
   sliceHeader := struct {
     p   unsafe.Pointer
     len int
     cap int
-  }{p, len(b), len(b)}
+  }{p, arr_len, arr_len}
   s := *(*[]uint64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
 }
 
 func encodeJSON(x interface{}) []byte {
@@ -171,7 +177,6 @@ func encodeJSON(x interface{}) []byte {
 
 //export _Uint32ArrayTest
  func _Uint32ArrayTest (foo *C.char) unsafe.Pointer {
-	fmt.Println(foo)
   _foo := C.GoString(foo)
   _returned_value := CUint32(abstract.Uint32ArrayTest(_foo))
   return _returned_value
@@ -193,11 +198,8 @@ func encodeJSON(x interface{}) []byte {
 
 //export _ArrayArgTest
  func _ArrayArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
-	fmt.Println("len", _len)
   _foo := unsafe.Slice((*float64)(foo), _len)
-	res := abstract.ArrayArgTest(_foo)
-	fmt.Println("res", res)
-  _returned_value := CFloat64(res)
+  _returned_value := CFloat64(abstract.ArrayArgTest(_foo))
   return _returned_value
 }
 
