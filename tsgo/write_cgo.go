@@ -1,6 +1,7 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"io/ioutil"
 	"log"
@@ -249,6 +250,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(") ")
 		var resSB strings.Builder
 		if f.Type.Results != nil || f.Type.Results.List != nil || len(f.Type.Results.List) > 0 {
+			fmt.Println(f.Type)
+			fmt.Println(f.Type.Results)
 			g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
 			res_type := resSB.String()
 			fn_str.WriteString(res_type)
