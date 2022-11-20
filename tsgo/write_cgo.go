@@ -246,7 +246,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			fn_str.WriteString(type_str)
 			if type_str == "unsafe.Pointer" {
 				g.addGoImport(&goImportsSB, "unsafe")
-				arr_dat_type := g.getArrayType(f.Type)
+				arr_dat_type := g.getArrayType(param.Type)
 				if arr_dat_type != "byte" {
 					fn_str.WriteString(", _len int")
 				}
