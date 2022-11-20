@@ -207,9 +207,8 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 		s.WriteString(arr_dat_type)
 		s.WriteString(")(")
 		s.WriteString(f.Names[0].Name)
-		s.WriteString("), int(ptrTrckr[uintptr(")
-		s.WriteString(f.Names[0].Name)
-		s.WriteString(")]))\n")
+		s.WriteString("), _len")
+		s.WriteString(")\n")
 		*usedVars = append(*usedVars, parsedSB.String())
 	default:
 		*usedVars = append(*usedVars, f.Names[0].Name)
@@ -244,10 +243,14 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, param.Type, 0, true)
 			type_str := tempSB.String()
+			fn_str.WriteString(type_str)
 			if type_str == "unsafe.Pointer" {
 				g.addGoImport(&goImportsSB, "unsafe")
+				arr_dat_type := g.getArrayType(f.Type)
+				if arr_dat_type != "byte" {
+					fn_str.WriteString(", _len int")
+				}
 			}
-			fn_str.WriteString(type_str)
 			if i < len(f.Type.Params.List)-1 {
 				fn_str.WriteString(", ")
 			}
