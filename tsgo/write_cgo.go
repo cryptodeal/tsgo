@@ -115,6 +115,7 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 		}
 		s.WriteString(");\n")
 		s.WriteString("}\n")
+		g.ffi.FFIHelpers[fnNameSB.String()] = true
 	}
 	return fnNameSB.String()
 }
