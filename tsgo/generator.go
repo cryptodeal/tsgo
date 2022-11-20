@@ -71,6 +71,7 @@ func (g *TSGo) Generate() error {
 			GoImports:  make(map[string]bool),
 			CImports:   make(map[string]bool),
 			FFIHelpers: make(map[string]bool),
+			CHelpers:   make(map[string]bool),
 		}
 
 		pkgGen := &PackageGenerator{
