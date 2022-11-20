@@ -86,8 +86,9 @@ func StringTest() string {
 	return "Hello, World!"
 }
 
-func ArrayArgTest(foo []float64) {
+func ArrayArgTest(foo []float64) []float64 {
 	for i, v := range foo {
 		fmt.Println("(logged from Golang) foo[", i, "]:", v)
 	}
+	return foo
 }

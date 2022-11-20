@@ -254,7 +254,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			g.addPtrTrckr(gh)
 			g.addDisposePtr(gh)
 			g.addArraySize(gh)
-			dat_type := g.getArrayType(v)
+			dat_type := g.getArrayType(t)
 			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)
 			s.WriteString(handler)
 		} else {
@@ -409,8 +409,21 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 	}
 }
 
-func (g *PackageGenerator) getArrayType(t *ast.Ident) string {
-	return t.Name
+func (g *PackageGenerator) getArrayType(t ast.Expr) string {
+	switch t := t.(type) {
+	case *ast.ArrayType:
+		fmt.Println("writeCGoResType - *ast.ArrayType")
+		if v, ok := t.Elt.(*ast.Ident); ok {
+			return v.String()
+		}
+		err := fmt.Errorf("unhandled: no ident found in `getArrayType`")
+		fmt.Println(err)
+		panic(err)
+	default:
+		err := fmt.Errorf("unhandled: %s\n %T", t, t)
+		fmt.Println(err)
+		panic(err)
+	}
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
