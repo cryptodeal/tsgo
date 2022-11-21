@@ -188,10 +188,10 @@ func (g *PackageGenerator) addCDisposeHelpers(pkgName string) {
 		cHelpers.WriteString("}\n")
 
 		var helpersPath strings.Builder
-		headersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
-		headersPath.WriteByte('/')
-		headersPath.WriteString(pkgName)
-		headersPath.WriteString("/helpers.c")
+		helpersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
+		helpersPath.WriteByte('/')
+		helpersPath.WriteString(pkgName)
+		helpersPath.WriteString("/helpers.c")
 
 		err = os.MkdirAll(filepath.Dir(helpersPath.String()), os.ModePerm)
 		if err != nil {
