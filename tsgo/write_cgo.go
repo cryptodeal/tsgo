@@ -146,7 +146,7 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		s.WriteString("}\n\n")
-		g.ffi.FFIHelpers["disposePtr"] = true
+		g.ffi.FFIHelpers["dispose"] = true
 	}
 
 	if !g.ffi.FFIHelpers["genDisposePtr"] {
