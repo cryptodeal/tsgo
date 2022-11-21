@@ -191,7 +191,7 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		cHelpers.WriteString("void disposePtr(void *ptr, void *ctx)\n")
 		cHelpers.WriteString("{\n")
 		g.writeIndent(&cHelpers, 1)
-		cHelpers.WriteString("disposePtr(ptr, ctx);\n")
+		cHelpers.WriteString("dispose(ptr, ctx);\n")
 		cHelpers.WriteString("}\n")
 
 		var helpersPath strings.Builder

@@ -13,7 +13,6 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
     const bar = _Float32ArrayTest(foo)
     expect(typeof bar).toBe('number')
-    console.log(bar)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float32Array(toArrayBuffer(bar,0, ArraySize(bar) * 4, genDisposePtr()))
@@ -137,8 +136,6 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
-      console.log("out[i]:", out[i])
-      console.log("test[i]:", test[i])
       expect(out[i]).toBe(test[i])
     }
   })
