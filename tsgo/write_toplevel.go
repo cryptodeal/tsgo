@@ -313,7 +313,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				if j < len(f.Type.Params.List)-1 {
 					s.WriteString(", ")
 				}
-				if tempSB.String() == "FFIType.ptr" && g.getArrayType(f.Type) != "byte" {
+				if tempSB.String() == "FFIType.ptr" && g.getArrayType(param.Type) != "byte" {
 					s.WriteString(" FFIType.int")
 					if j < len(f.Type.Params.List)-1 {
 						s.WriteString(", ")
