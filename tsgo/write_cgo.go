@@ -142,7 +142,7 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 		s.WriteString("} else {\n")
 		g.writeIndent(s, 2)
 		g.addGoImport(gi, "fmt")
-		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\"), ptr_num)\n")
+		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\", ptr_num)\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		s.WriteString("}\n\n")
@@ -241,7 +241,7 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder)
 		s.WriteString("}\n")
 		g.writeIndent(s, 1)
 		g.addGoImport(gi, "fmt")
-		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\"), ptr_num)\n")
+		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\", ptr_num)\n")
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["ArraySize"] = true
 	}
