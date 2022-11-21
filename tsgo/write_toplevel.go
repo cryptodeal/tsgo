@@ -257,9 +257,9 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 2)
 		s.WriteString("ArraySize,\n")
 	}
-	if g.ffi.FFIHelpers["disposePtr"] {
+	if g.ffi.FFIHelpers["genDisposePtr"] {
 		g.writeIndent(s, 2)
-		s.WriteString("disposePtr,\n")
+		s.WriteString("genDisposePtr,\n")
 	}
 	for i, f := range fd {
 		g.writeIndent(s, 2)

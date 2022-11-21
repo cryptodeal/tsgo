@@ -3,6 +3,7 @@ package main
 
 /*
 #include <stdlib.h>
+#include "helpers.h"
 
 static inline size_t float32Size() {
   return sizeof(float);
