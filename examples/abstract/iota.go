@@ -86,9 +86,44 @@ func StringTest() string {
 	return "Hello, World!"
 }
 
-func ArrayArgTest(foo []float64) []float64 {
+func Float32ArgTest(foo []float32) []float32 {
+	for i := 0; i < len(foo); i++ {
+		foo[i] = (foo[i] * float32(2))
+	}
+	return foo
+}
+
+func Float64ArgTest(foo []float64) []float64 {
 	for i := 0; i < len(foo); i++ {
 		foo[i] = (foo[i] * float64(2))
+	}
+	return foo
+}
+
+func Int32ArgTest(foo []int32) []int32 {
+	for i := 0; i < len(foo); i++ {
+		foo[i] = (foo[i] * int32(2))
+	}
+	return foo
+}
+
+func Int64ArgTest(foo []int64) []int64 {
+	for i := 0; i < len(foo); i++ {
+		foo[i] = (foo[i] * int64(2))
+	}
+	return foo
+}
+
+func Uint32ArgTest(foo []uint32) []uint32 {
+	for i := 0; i < len(foo); i++ {
+		foo[i] = (foo[i] * uint32(2))
+	}
+	return foo
+}
+
+func Uint64ArgTest(foo []uint64) []uint64 {
+	for i := 0; i < len(foo); i++ {
+		foo[i] = (foo[i] * uint64(2))
 	}
 	return foo
 }

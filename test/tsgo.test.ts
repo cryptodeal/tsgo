@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _ArrayArgTest, type StructBar } from '@tsgo/abstract'
+import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
@@ -128,10 +128,22 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     }
   })
 
-  it('should work - round trip + mutate underlying data; returns `Float64Array`', () => {
+  it('should work - round trip `Float32Array`; mutate underlying data', () => {
+    const test = new Float32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    const temp_ptr = ptr(test)
+    const res = _Float32ArgTest(temp_ptr, test.length)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new Float32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+
+  it('should work - round trip `Float64Array`; mutate underlying data', () => {
     const test = new Float64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const temp_ptr = ptr(test)
-    const res = _ArrayArgTest(temp_ptr, test.length)
+    const res = _Float64ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
@@ -139,5 +151,55 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
       expect(out[i]).toBe(test[i])
     }
   })
+
+  it('should work - round trip `Int32Array`; mutate underlying data', () => {
+    const test = new Int32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    const temp_ptr = ptr(test)
+    const res = _Int32ArgTest(temp_ptr, test.length)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new Int32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+
+  it('should work - round trip `BigInt64Array`; mutate underlying data', () => {
+    const test = new BigInt64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => BigInt(v)))
+    const temp_ptr = ptr(test)
+    const res = _Int64ArgTest(temp_ptr, test.length)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new BigInt64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+
+  it('should work - round trip `Uint32Array`; mutate underlying data', () => {
+    const test = new Uint32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    const temp_ptr = ptr(test)
+    const res = _Uint32ArgTest(temp_ptr, test.length)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new Uint32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+
+  it('should work - round trip `Uint64Array`; mutate underlying data', () => {
+    const test = new BigUint64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => BigInt(v)))
+    const temp_ptr = ptr(test)
+    const res = _Uint64ArgTest(temp_ptr, test.length)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - overload toArrayBuffer params
+    const out = new BigUint64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
+    for (let i = 0; i < test.length; i++) {
+      expect(out[i]).toBe(test[i])
+    }
+  })
+
+
   
 })

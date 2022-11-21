@@ -76,7 +76,12 @@ export const {
     _Uint32ArrayTest,
     _Uint64ArrayTest,
     _StringTest,
-    _ArrayArgTest,
+    _Float32ArgTest,
+    _Float64ArgTest,
+    _Int32ArgTest,
+    _Int64ArgTest,
+    _Uint32ArgTest,
+    _Uint64ArgTest,
     _TestStruct,
     _TestMap
   }
@@ -119,7 +124,27 @@ export const {
   _StringTest: {
     returns: FFIType.cstring
   },
-  _ArrayArgTest: {
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.int],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.int],
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.int],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.int],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.int],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.int],
     returns: FFIType.ptr
   },

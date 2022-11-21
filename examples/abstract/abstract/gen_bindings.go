@@ -214,10 +214,45 @@ func encodeJSON(x interface{}) []byte {
   return _returned_value
 }
 
-//export _ArrayArgTest
- func _ArrayArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+//export _Float32ArgTest
+ func _Float32ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+  _foo := unsafe.Slice((*float32)(foo), _len)
+  _returned_value := CFloat32(abstract.Float32ArgTest(_foo))
+  return _returned_value
+}
+
+//export _Float64ArgTest
+ func _Float64ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
   _foo := unsafe.Slice((*float64)(foo), _len)
-  _returned_value := CFloat64(abstract.ArrayArgTest(_foo))
+  _returned_value := CFloat64(abstract.Float64ArgTest(_foo))
+  return _returned_value
+}
+
+//export _Int32ArgTest
+ func _Int32ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+  _foo := unsafe.Slice((*int32)(foo), _len)
+  _returned_value := CInt32(abstract.Int32ArgTest(_foo))
+  return _returned_value
+}
+
+//export _Int64ArgTest
+ func _Int64ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+  _foo := unsafe.Slice((*int64)(foo), _len)
+  _returned_value := CInt64(abstract.Int64ArgTest(_foo))
+  return _returned_value
+}
+
+//export _Uint32ArgTest
+ func _Uint32ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+  _foo := unsafe.Slice((*uint32)(foo), _len)
+  _returned_value := CUint32(abstract.Uint32ArgTest(_foo))
+  return _returned_value
+}
+
+//export _Uint64ArgTest
+ func _Uint64ArgTest (foo unsafe.Pointer, _len int) unsafe.Pointer {
+  _foo := unsafe.Slice((*uint64)(foo), _len)
+  _returned_value := CUint64(abstract.Uint64ArgTest(_foo))
   return _returned_value
 }
 
