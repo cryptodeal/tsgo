@@ -108,7 +108,6 @@ func (g *TSGo) Generate() error {
 
 			var build_out strings.Builder
 			build_out.WriteString(pkg_name)
-			build_out.WriteString("/gen_bindings.go")
 			build_out_path := filepath.Join(dir, build_out.String())
 
 			// builds command string to execute (used to compile bindings)

@@ -51,6 +51,7 @@ func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
   }
 }
 
+//export genDisposePtr
 func genDisposePtr() unsafe.Pointer {
   return C.disposePtr
 }
