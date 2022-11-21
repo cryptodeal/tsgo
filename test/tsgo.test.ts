@@ -136,7 +136,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
-      expect(out[i]).toBe(test[i])
+      expect(out[i]).toBe(test[i] * 2)
     }
   })
   

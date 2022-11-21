@@ -88,7 +88,7 @@ func StringTest() string {
 
 func ArrayArgTest(foo []float64) []float64 {
 	for i := 0; i < len(foo); i++ {
-		fmt.Println("(logged from Golang) foo[", i, "]:", foo[i])
+		foo[i] = foo[i] * 2
 	}
 	return foo
 }
