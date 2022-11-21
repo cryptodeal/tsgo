@@ -283,16 +283,16 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 2)
 		s.WriteString("args: [FFIType.ptr],\n")
 		g.writeIndent(s, 2)
-		s.WriteString("ret: FFIType.u64_fast\n")
+		s.WriteString("returns: FFIType.u64_fast\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
 	}
 
-	if g.ffi.FFIHelpers["disposePtr"] {
+	if g.ffi.FFIHelpers["genDisposePtr"] {
 		g.writeIndent(s, 1)
-		s.WriteString("disposePtr: {\n")
+		s.WriteString("genDisposePtr: {\n")
 		g.writeIndent(s, 2)
-		s.WriteString("args: [FFIType.ptr, FFIType.ptr]\n")
+		s.WriteString("returns: FFIType.ptr\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
 	}

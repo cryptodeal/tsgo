@@ -127,9 +127,9 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 }
 
 func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
-	if !g.ffi.FFIHelpers["disposePtr"] {
-		s.WriteString("//export disposePtr\n")
-		s.WriteString("func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
+	if !g.ffi.FFIHelpers["dispose"] {
+		s.WriteString("//export dispose\n")
+		s.WriteString("func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
 		g.writeIndent(s, 1)
 		s.WriteString("ptr_num := uintptr(ptr)\n")
 		g.writeIndent(s, 1)
@@ -139,9 +139,68 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
 		g.writeIndent(s, 2)
 		s.WriteString("defer C.free(ptr)\n")
 		g.writeIndent(s, 1)
+		s.WriteString("} else {\n")
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("panic(%q, ptr_num, %q)\n", "Error: pointer `", "` not found in ptrTrckr map"))
+		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["disposePtr"] = true
+	}
+
+	if !g.ffi.FFIHelpers["genDisposePtr"] {
+		s.WriteString("func genDisposePtr() unsafe.Pointer {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return C.disposePtr\n")
+		s.WriteString("}\n\n")
+		g.ffi.FFIHelpers["genDisposePtr"] = true
+	}
+}
+
+func (g *PackageGenerator) addCDisposeHelpers(pkgName string) {
+	if !g.ffi.CHelpers["helpers.h"] && !g.ffi.CHelpers["helpers.c"] {
+		var cHelpersHeaders strings.Builder
+		var cHelpers strings.Builder
+
+		g.writeFileCodegenHeader(&cHelpersHeaders)
+		cHelpersHeaders.WriteString("void disposePtr(void *, void *);")
+
+		var headersPath strings.Builder
+		headersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
+		headersPath.WriteByte('/')
+		headersPath.WriteString(pkgName)
+		headersPath.WriteString("/helpers.h")
+		err := os.MkdirAll(filepath.Dir(headersPath.String()), os.ModePerm)
+		if err != nil {
+			log.Fatalf("TSGo failed: %v", err)
+		}
+		err = ioutil.WriteFile(headersPath.String(), []byte(cHelpersHeaders.String()), os.ModePerm)
+		if err != nil {
+			log.Fatalf("TSGo failed: %v", err)
+		}
+
+		g.writeFileCodegenHeader(&cHelpers)
+		cHelpers.WriteString("#include \"_cgo_export.h\"\n\n")
+		cHelpers.WriteString("void disposePtr(void *ptr, void *ctx)\n")
+		cHelpers.WriteString("{\n")
+		g.writeIndent(&cHelpers, 1)
+		cHelpers.WriteString("disposePtr(ptr, ctx);\n")
+		cHelpers.WriteString("}\n")
+
+		var helpersPath strings.Builder
+		headersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
+		headersPath.WriteByte('/')
+		headersPath.WriteString(pkgName)
+		headersPath.WriteString("/helpers.c")
+
+		err = os.MkdirAll(filepath.Dir(helpersPath.String()), os.ModePerm)
+		if err != nil {
+			log.Fatalf("TSGo failed: %v", err)
+		}
+		err = ioutil.WriteFile(helpersPath.String(), []byte(cHelpers.String()), os.ModePerm)
+		if err != nil {
+			log.Fatalf("TSGo failed: %v", err)
+		}
 	}
 }
 
@@ -172,7 +231,15 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 		s.WriteString("//export ArraySize\n")
 		s.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
 		g.writeIndent(s, 1)
-		s.WriteString("return ptrTrckr[uintptr(array)]\n")
+		s.WriteString("ptr_num := uintptr(array)\n")
+		g.writeIndent(s, 1)
+		s.WriteString("if val, ok := ptrTrckr[ptr_num]; ok {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("return val\n")
+		g.writeIndent(s, 1)
+		s.WriteString("}\n")
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("panic(%q, ptr_num, %q)\n", "Error: pointer `", "` not found in ptrTrckr map"))
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["ArraySize"] = true
 	}
@@ -276,7 +343,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		g.writeIndent(&fn_str, 1)
 		var tempResType strings.Builder
-		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true)
+		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
 		if tempResType.String() == "encodeJSON" {
 			fn_str.WriteString("_temp_res_val := ")
 		} else {

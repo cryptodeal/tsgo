@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { disposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _ArrayArgTest, type StructBar } from '@tsgo/abstract'
+import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _ArrayArgTest, type StructBar } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
@@ -13,9 +13,10 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
     const bar = _Float32ArrayTest(foo)
     expect(typeof bar).toBe('number')
+    console.log(bar)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(bar,0, ArraySize(bar) * 4))
+    const out = new Float32Array(toArrayBuffer(bar,0, ArraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -27,7 +28,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, disposePtr()))
+    const out = new Float64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -39,7 +40,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Int32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, disposePtr()))
+    const out = new Int32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -51,7 +52,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigInt64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, disposePtr()))
+    const out = new BigInt64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
@@ -63,7 +64,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Uint32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, disposePtr()))
+    const out = new Uint32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -75,7 +76,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigUint64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, disposePtr()))
+    const out = new BigUint64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
@@ -134,7 +135,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     const res = _ArrayArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, disposePtr()))
+    const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       console.log("out[i]:", out[i])
       console.log("test[i]:", test[i])

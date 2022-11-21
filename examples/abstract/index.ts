@@ -67,7 +67,7 @@ export interface StructBar {
 export const {
   symbols: {
     ArraySize,
-    disposePtr,
+    genDisposePtr,
     _IntTest,
     _Float32ArrayTest,
     _Float64ArrayTest,
@@ -85,8 +85,8 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
-  disposePtr: {
-    returns: FFIType.ptr,
+  genDisposePtr: {
+    returns: FFIType.ptr
   },
   _IntTest: {
     args: [FFIType.cstring],
