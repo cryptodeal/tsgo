@@ -152,6 +152,7 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 	}
 
 	if !g.ffi.FFIHelpers["genDisposePtr"] {
+		s.WriteString("//export genDisposePtr\n")
 		s.WriteString("func genDisposePtr() unsafe.Pointer {\n")
 		g.writeIndent(s, 1)
 		s.WriteString("return C.disposePtr\n")
