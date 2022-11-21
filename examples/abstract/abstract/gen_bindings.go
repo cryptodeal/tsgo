@@ -3,7 +3,6 @@ package main
 
 /*
 #include <stdlib.h>
-#include "helpers.h"
 
 static inline size_t float32Size() {
   return sizeof(float);
@@ -47,20 +46,21 @@ func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
     delete(ptrTrckr, ptr_num)
     defer C.free(ptr)
   } else {
-		err := fmt.Sprintf("Pointer `%d` not found in ptrTrckr", ptr)
-		panic(err)
-	}
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
-//export genDisposePtr
 func genDisposePtr() unsafe.Pointer {
-	return C.disposePtr
+  return C.disposePtr
 }
-
 
 //export ArraySize
 func ArraySize(array unsafe.Pointer) C.size_t {
-  return ptrTrckr[uintptr(array)]
+  ptr_num := uintptr(array)
+  if val, ok := ptrTrckr[ptr_num]; ok {
+    return val
+  }
+  panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
@@ -74,9 +74,18 @@ func CFloat32(b []float32) unsafe.Pointer {
   s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func CFloat64(b []float64) unsafe.Pointer {
@@ -90,9 +99,18 @@ func CFloat64(b []float64) unsafe.Pointer {
   s := *(*[]float64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func CInt32(b []int32) unsafe.Pointer {
@@ -106,9 +124,18 @@ func CInt32(b []int32) unsafe.Pointer {
   s := *(*[]int32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func CInt64(b []int64) unsafe.Pointer {
@@ -122,9 +149,18 @@ func CInt64(b []int64) unsafe.Pointer {
   s := *(*[]int64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func CUint32(b []uint32) unsafe.Pointer {
@@ -138,9 +174,18 @@ func CUint32(b []uint32) unsafe.Pointer {
   s := *(*[]uint32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func CUint64(b []uint64) unsafe.Pointer {
@@ -154,9 +199,18 @@ func CUint64(b []uint64) unsafe.Pointer {
   s := *(*[]uint64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
-	fmt.Println("ptrTrcker[", uintptr(p), "]", ptrTrckr[uintptr(p)])
-	fmt.Println(p)
   return p
+}
+
+//export dispose
+func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
+  ptr_num := uintptr(ptr)
+  if _, ok := ptrTrckr[ptr_num]; ok {
+    delete(ptrTrckr, ptr_num)
+    defer C.free(ptr)
+  } else {
+    panic("Error: pointer `", ptr_num, "` not found in ptrTrckr map")
+  }
 }
 
 func encodeJSON(x interface{}) []byte {

@@ -252,9 +252,9 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		} else if ok {
 			g.addGoImport(cg, "unsafe")
 			g.addPtrTrckr(gh)
-			g.addDisposePtr(gh)
+			g.addDisposePtr(gh, cg)
 			g.addCDisposeHelpers(pkgName)
-			g.addArraySize(gh)
+			g.addArraySize(gh, cg)
 			dat_type := g.getArrayType(t)
 			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)
 			s.WriteString(handler)

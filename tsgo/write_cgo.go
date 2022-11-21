@@ -126,7 +126,7 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 	return fnNameSB.String()
 }
 
-func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
+func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder) {
 	if !g.ffi.FFIHelpers["dispose"] {
 		s.WriteString("//export dispose\n")
 		s.WriteString("func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
@@ -141,7 +141,8 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder) {
 		g.writeIndent(s, 1)
 		s.WriteString("} else {\n")
 		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("panic(%q, ptr_num, %q)\n", "Error: pointer `", "` not found in ptrTrckr map"))
+		g.addGoImport(gi, "fmt")
+		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\"), ptr_num)\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		s.WriteString("}\n\n")
@@ -226,7 +227,7 @@ func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builde
 	}
 }
 
-func (g *PackageGenerator) addArraySize(s *strings.Builder) {
+func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder) {
 	if !g.ffi.FFIHelpers["ArraySize"] {
 		s.WriteString("//export ArraySize\n")
 		s.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
@@ -239,7 +240,8 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder) {
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		g.writeIndent(s, 1)
-		s.WriteString(fmt.Sprintf("panic(%q, ptr_num, %q)\n", "Error: pointer `", "` not found in ptrTrckr map"))
+		g.addGoImport(gi, "fmt")
+		s.WriteString("fmt.Sprintf(\"panic(Error: pointer `%d` not found in ptrTrckr\"), ptr_num)\n")
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["ArraySize"] = true
 	}
