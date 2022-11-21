@@ -46,7 +46,7 @@ func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
     delete(ptrTrckr, ptr_num)
     defer C.free(ptr)
   } else {
-    fmt.Sprintf("panic(Error: pointer `%d` not found in ptrTrckr", ptr_num)
+    fmt.Sprintf("panic(Error: pointer `%d` not found in ptrTrckr"), ptr_num)
   }
 }
 
