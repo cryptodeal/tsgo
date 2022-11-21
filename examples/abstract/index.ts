@@ -82,10 +82,11 @@ export const {
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
   ArraySize: {
-    args: [FFIType.ptr]
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
   },
   disposePtr: {
-    args: [FFIType.ptr, FFIType.ptr]
+    returns: FFIType.ptr,
   },
   _IntTest: {
     args: [FFIType.cstring],

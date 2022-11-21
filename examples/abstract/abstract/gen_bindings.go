@@ -40,17 +40,29 @@ import (
 var ptrTrckr = make(map[uintptr]C.size_t)
 
 //export disposePtr
-func disposePtr(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  }
+func disposePtr() unsafe.Pointer {
+	dispose := func (ptr unsafe.Pointer, ctx unsafe.Pointer) {
+		ptr_num := uintptr(ptr)
+		fmt.Println(ptr)
+		fmt.Println(ptr_num)
+		if _, ok := ptrTrckr[ptr_num]; ok {
+			delete(ptrTrckr, ptr_num)
+			defer C.free(ptr)
+		}
+	}
+	
+	return unsafe.Pointer(&dispose)
 }
 
 //export ArraySize
 func ArraySize(array unsafe.Pointer) C.size_t {
-  return ptrTrckr[uintptr(array)]
+	fmt.Println(array)
+	fmt.Println(uintptr(array))
+	if val, ok := ptrTrckr[uintptr(array)]; ok {
+		return val
+	} else {
+		panic("ArraySize: array not found")
+	}
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
@@ -63,7 +75,10 @@ func CFloat32(b []float32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func CFloat64(b []float64) unsafe.Pointer {
@@ -76,7 +91,10 @@ func CFloat64(b []float64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]float64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func CInt32(b []int32) unsafe.Pointer {
@@ -89,7 +107,10 @@ func CInt32(b []int32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]int32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func CInt64(b []int64) unsafe.Pointer {
@@ -102,7 +123,10 @@ func CInt64(b []int64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]int64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func CUint32(b []uint32) unsafe.Pointer {
@@ -115,7 +139,10 @@ func CUint32(b []uint32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]uint32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func CUint64(b []uint64) unsafe.Pointer {
@@ -128,7 +155,10 @@ func CUint64(b []uint64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]uint64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)  return p
+  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+	fmt.Println(ptrTrckr[uintptr(p)])
+	fmt.Println(uintptr(p))
+  return p
 }
 
 func encodeJSON(x interface{}) []byte {
@@ -151,6 +181,7 @@ func encodeJSON(x interface{}) []byte {
  func _Float32ArrayTest (foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CFloat32(abstract.Float32ArrayTest(_foo))
+	fmt.Println(_returned_value)
   return _returned_value
 }
 

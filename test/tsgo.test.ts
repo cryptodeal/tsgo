@@ -15,7 +15,7 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, disposePtr()))
+    const out = new Float32Array(toArrayBuffer(bar,0, ArraySize(bar) * 4))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -130,11 +130,14 @@ describe('tsgo - gen CGo Code + Bindings Proof of Concept', () => {
 
   it('should work - round trip `Float64Array`', () => {
     const test = new Float64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    const res = _ArrayArgTest(ptr(test), test.length)
+    const temp_ptr = ptr(test)
+    const res = _ArrayArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, disposePtr()))
     for (let i = 0; i < test.length; i++) {
+      console.log("out[i]:", out[i])
+      console.log("test[i]:", test[i])
       expect(out[i]).toBe(test[i])
     }
   })
