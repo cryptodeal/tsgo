@@ -239,7 +239,7 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 }
 
 // used to add handlers for data types on an as needed basis (reduce code bloat)
-func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool, pkgName string) {
+func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool, pkgName string) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		g.addJSONEncoder(gh, cg)
@@ -253,7 +253,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			g.addGoImport(cg, "unsafe")
 			g.addPtrTrckr(gh)
 			g.addDisposePtr(gh, cg)
-			g.addCDisposeHelpers(pkgName)
+			g.addCDisposeHelpers(ci, pkgName)
 			g.addArraySize(gh, cg)
 			dat_type := g.getArrayType(t)
 			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)

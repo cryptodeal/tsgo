@@ -15,11 +15,13 @@ import (
 
 type UsedParams []string
 
-func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Builder, ec *strings.Builder) {
+func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Builder, ec *strings.Builder, ci *strings.Builder) {
 	g.writeFileCodegenHeader(cg)
 	cg.WriteString("package main\n\n")
 	cg.WriteString("/*\n")
 	cg.WriteString("#include <stdlib.h>\n")
+	cg.WriteString(ci.String())
+
 	// not needed afaik
 	// cg.WriteString("#include <string.h>\n")
 	cg.WriteString(ec.String())
@@ -158,8 +160,11 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 	}
 }
 
-func (g *PackageGenerator) addCDisposeHelpers(pkgName string) {
-	if !g.ffi.CHelpers["helpers.h"] && !g.ffi.CHelpers["helpers.c"] {
+func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName string) {
+	if !g.ffi.CHelpers["helpers.h"] && !g.ffi.CHelpers["helpers.c"] && !g.ffi.CImports["helpers.h"] {
+		ci.WriteString("#include \"helpers.h\"\n")
+		g.ffi.CImports["helpers.h"] = true
+
 		var cHelpersHeaders strings.Builder
 		var cHelpers strings.Builder
 
@@ -294,6 +299,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	var goImportsSB strings.Builder
 	var embeddedCSB strings.Builder
 	var goHelpersSB strings.Builder
+	var cImportsSB strings.Builder
 
 	caser := cases.Title(language.AmericanEnglish)
 	g.addGoImport(&goImportsSB, g.conf.Path)
@@ -345,7 +351,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		g.writeIndent(&fn_str, 1)
 		var tempResType strings.Builder
-		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
+		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
 		if tempResType.String() == "encodeJSON" {
 			fn_str.WriteString("_temp_res_val := ")
 		} else {
@@ -383,7 +389,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	}
 
 	// write headers, embedded C imports/logic, and Go imports
-	g.writeCGoHeaders(cg, &goImportsSB, &embeddedCSB)
+	g.writeCGoHeaders(cg, &goImportsSB, &embeddedCSB, &cImportsSB)
 	// writes Go helper Fns (e.g. encodeJSON, ArraySize, CFloat32, etc.)
 	cg.WriteString(goHelpersSB.String())
 

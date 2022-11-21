@@ -77,17 +77,6 @@ func CFloat32(b []float32) unsafe.Pointer {
   return p
 }
 
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
-}
-
 func CFloat64(b []float64) unsafe.Pointer {
   arr_len := len(b)
   p := C.malloc(C.size_t(arr_len) * C.float64Size())
@@ -100,17 +89,6 @@ func CFloat64(b []float64) unsafe.Pointer {
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
   return p
-}
-
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
 }
 
 func CInt32(b []int32) unsafe.Pointer {
@@ -127,17 +105,6 @@ func CInt32(b []int32) unsafe.Pointer {
   return p
 }
 
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
-}
-
 func CInt64(b []int64) unsafe.Pointer {
   arr_len := len(b)
   p := C.malloc(C.size_t(arr_len) * C.int64Size())
@@ -150,17 +117,6 @@ func CInt64(b []int64) unsafe.Pointer {
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
   return p
-}
-
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
 }
 
 func CUint32(b []uint32) unsafe.Pointer {
@@ -177,17 +133,6 @@ func CUint32(b []uint32) unsafe.Pointer {
   return p
 }
 
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
-}
-
 func CUint64(b []uint64) unsafe.Pointer {
   arr_len := len(b)
   p := C.malloc(C.size_t(arr_len) * C.uint64Size())
@@ -200,17 +145,6 @@ func CUint64(b []uint64) unsafe.Pointer {
   copy(s, b)
   ptrTrckr[uintptr(p)] = C.size_t(arr_len)
   return p
-}
-
-//export dispose
-func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
-    defer C.free(ptr)
-  } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
-  }
 }
 
 func encodeJSON(x interface{}) []byte {
