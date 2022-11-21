@@ -88,7 +88,7 @@ func StringTest() string {
 
 func ArrayArgTest(foo []float64) []float64 {
 	for i := 0; i < len(foo); i++ {
-		foo[i] = foo[i] * 2
+		foo[i] = (foo[i] * float64(2))
 	}
 	return foo
 }
