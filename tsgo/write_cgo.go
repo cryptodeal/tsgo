@@ -66,7 +66,7 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.B
 		g.writeIndent(cg, 1)
 		cg.WriteString("copy(s, b)\n")
 		g.writeIndent(cg, 1)
-		cg.WriteString("ptrTrckr[uintptr(p)] = C.size_t(arr_len)\n")
+		cg.WriteString("ptrTrckr[p] = C.size_t(arr_len)\n")
 		g.writeIndent(cg, 1)
 		cg.WriteString("return p\n")
 		cg.WriteString("}\n\n")
@@ -133,18 +133,16 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 		s.WriteString("//export dispose\n")
 		s.WriteString("func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {\n")
 		g.writeIndent(s, 1)
-		s.WriteString("ptr_num := uintptr(ptr)\n")
-		g.writeIndent(s, 1)
-		s.WriteString("if _, ok := ptrTrckr[ptr_num]; ok {\n")
+		s.WriteString("if _, ok := ptrTrckr[ptr]; ok {\n")
 		g.writeIndent(s, 2)
-		s.WriteString("delete(ptrTrckr, ptr_num)\n")
+		s.WriteString("delete(ptrTrckr, ptr)\n")
 		g.writeIndent(s, 2)
 		s.WriteString("defer C.free(ptr)\n")
 		g.writeIndent(s, 1)
 		s.WriteString("} else {\n")
 		g.writeIndent(s, 2)
 		g.addGoImport(gi, "fmt")
-		s.WriteString("panic(fmt.Sprintf(\"Error: pointer `%d` not found in ptrTrckr\", ptr_num))\n")
+		s.WriteString("panic(fmt.Sprintf(\"Error: `%#v` not found in ptrTrckr\", ptr))\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		s.WriteString("}\n\n")
@@ -236,18 +234,16 @@ func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builde
 func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder) {
 	if !g.ffi.FFIHelpers["ArraySize"] {
 		s.WriteString("//export ArraySize\n")
-		s.WriteString("func ArraySize(array unsafe.Pointer) C.size_t {\n")
+		s.WriteString("func ArraySize(ptr unsafe.Pointer) C.size_t {\n")
 		g.writeIndent(s, 1)
-		s.WriteString("ptr_num := uintptr(array)\n")
-		g.writeIndent(s, 1)
-		s.WriteString("if val, ok := ptrTrckr[ptr_num]; ok {\n")
+		s.WriteString("if val, ok := ptrTrckr[ptr]; ok {\n")
 		g.writeIndent(s, 2)
 		s.WriteString("return val\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n")
 		g.writeIndent(s, 1)
 		g.addGoImport(gi, "fmt")
-		s.WriteString("panic(fmt.Sprintf(\"Error: pointer `%d` not found in ptrTrckr\", ptr_num))\n")
+		s.WriteString("panic(fmt.Sprintf(\"Error: `%#v` not found in ptrTrckr\", ptr))\n")
 		s.WriteString("}\n\n")
 		g.ffi.FFIHelpers["ArraySize"] = true
 	}
@@ -255,8 +251,8 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder)
 
 func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	if !g.ffi.FFIHelpers["ptrTrckr"] {
+		s.WriteString("var ptrTrckr = make(map[unsafe.Pointer]C.size_t)\n\n")
 		g.ffi.FFIHelpers["ptrTrckr"] = true
-		s.WriteString("var ptrTrckr = make(map[uintptr]C.size_t)\n\n")
 	}
 }
 
