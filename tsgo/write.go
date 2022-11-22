@@ -436,7 +436,10 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 }
 
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
-	return t.(*ast.Ident).Name
+	if v, ok := t.(*ast.Ident); ok {
+		return v.Name
+	}
+	return ""
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
