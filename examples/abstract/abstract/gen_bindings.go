@@ -3,7 +3,6 @@ package main
 
 /*
 #include <stdlib.h>
-#include <stdint.h>
 #include "helpers.h"
 
 static inline size_t float32Size() {
@@ -37,7 +36,6 @@ import (
   "unsafe"
   "fmt"
   "encoding/json"
-	"runtime/cgo"
 )
 
 var ptrTrckr = make(map[unsafe.Pointer]C.size_t)
@@ -257,8 +255,11 @@ func encodeJSON(x interface{}) []byte {
 }
 
 //export _TestStruct
- func _TestStruct () unsafe.Pointer {
-   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.TestStruct())))
+ func _TestStruct () *C.char {
+  _temp_res_val := encodeJSON(abstract.TestStruct())
+  _returned_value := C.CString(string(_temp_res_val))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
 }
 
 //export _TestMap
@@ -267,49 +268,6 @@ func encodeJSON(x interface{}) []byte {
   _returned_value := C.CString(string(_temp_res_val))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
-}
-
-//export StructField
-func StructField(handle C.uintptr_t) *C.char {
-	h := cgo.Handle(handle)
-	s := h.Value().(*abstract.StructBar)
-	_returned_value := C.CString(string(s.Field))
-	return _returned_value
-}
-
-//export StructFieldWithWeirdJSONTag
-func StructFieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
-	h := cgo.Handle(handle)
-	s := h.Value().(*abstract.StructBar)
-	_returned_value := C.int64_t(s.FieldWithWeirdJSONTag)
-	return _returned_value
-}
-
-//export StructFieldThatShouldBeOptional
-func StructFieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
-	h := cgo.Handle(handle)
-	s := h.Value().(*abstract.StructBar)
-	if s.FieldThatShouldBeOptional == nil {
-		return nil
-	}
-	_returned_value := C.CString(*s.FieldThatShouldBeOptional)
-	return _returned_value
-}
-
-//export StructFieldThatShouldNotBeOptional
-func StructFieldThatShouldNotBeOptional(handle C.uintptr_t)  *C.char {
-	h := cgo.Handle(handle)
-	s := h.Value().(*abstract.StructBar)
-	_returned_value := C.CString(*s.FieldThatShouldNotBeOptional)
-	return _returned_value
-}
-
-//export StructFieldThatShouldBeReadonly
-func StructFieldThatShouldBeReadonly(handle C.uintptr_t)  *C.char {
-	h := cgo.Handle(handle)
-	s := h.Value().(*abstract.StructBar)
-	_returned_value := C.CString(s.FieldThatShouldBeReadonly)
-	return _returned_value
 }
 
 func main() {} // Required but ignored
