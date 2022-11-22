@@ -393,7 +393,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 		}
 		if tempResType.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
-			fn_str.WriteByte(')')
+			fn_str.WriteString(")))")
 		}
 		fn_str.WriteString("))\n")
 		// generate handlers for casting Go type -> C type for FFI Return value

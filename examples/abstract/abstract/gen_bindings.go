@@ -4,6 +4,8 @@ package main
 /*
 #include <stdlib.h>
 #include "helpers.h"
+  #include <stdint.h>
+  #include <stdint.h>
 
 static inline size_t float32Size() {
   return sizeof(float);
@@ -255,10 +257,8 @@ func encodeJSON(x interface{}) []byte {
 }
 
 //export _TestStruct
- func _TestStruct () *C.char {
-  _temp_res_val := encodeJSON(abstract.TestStruct())
-  _returned_value := C.CString(string(_temp_res_val))
-  defer C.free(unsafe.Pointer(_returned_value))
+ func _TestStruct () unsafe.Pointer {
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((abstract.TestStruct()))
   return _returned_value
 }
 
