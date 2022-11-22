@@ -9,6 +9,8 @@ packages:
       uuid.UUID: "string"
   - path: "github.com/cryptodeal/tsgo/examples/abstract"
     ffi_bindings: true
+    wrap_structs:
+      - "StructBar"
     indent: "  "
     exclude_files:
       - "excluded.go"
