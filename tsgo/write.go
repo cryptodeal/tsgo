@@ -246,6 +246,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		struct_name := g.getStructName(t.X)
 		if g.IsWrappedEnum(struct_name) {
 			g.addCImport(ci, "stdint.h")
+			g.addGoImport(cg, "runtime/cgo")
 			s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
 		} else {
 			g.addJSONEncoder(gh, cg)

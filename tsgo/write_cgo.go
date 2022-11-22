@@ -95,7 +95,7 @@ func (g *PackageGenerator) addCImport(s *strings.Builder, pkg string) {
 	s.WriteString("#include <")
 	s.WriteString(pkg)
 	s.WriteString(">\n")
-	g.ffi.GoImports[pkg] = true
+	g.ffi.CImports[pkg] = true
 }
 
 func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) string {
