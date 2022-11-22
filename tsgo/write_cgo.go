@@ -329,7 +329,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("\n func _")
 		fn_str.WriteString(f.Name.Name)
-		fn_str.WriteString(" (")
+		fn_str.WriteString("(")
 		// iterate through fn params, generating cgo function decl line
 		for i, param := range f.Type.Params.List {
 			fn_str.WriteString(param.Names[0].Name)
