@@ -243,9 +243,14 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		fmt.Println("writeCGoResType - *ast.StarExpr", t)
-		g.addJSONEncoder(gh, cg)
-		s.WriteString("encodeJSON")
-		g.getStructName(t.X)
+		struct_name := g.getStructName(t.X)
+		if g.IsWrappedEnum(struct_name) {
+			g.addCImport(ci, "stdint.h")
+			s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
+		} else {
+			g.addJSONEncoder(gh, cg)
+			s.WriteString("encodeJSON")
+		}
 	case *ast.ArrayType:
 		fmt.Println("writeCGoResType - *ast.ArrayType", t)
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
@@ -431,73 +436,7 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 }
 
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
-	switch t := t.(type) {
-	case *ast.StarExpr:
-		fmt.Println("getStructName - *ast.StarExpr")
-		return ""
-
-	case *ast.ArrayType:
-		fmt.Println("getStructName - *ast.ArrayType")
-		if v, ok := t.Elt.(*ast.Ident); ok {
-			return v.String()
-		}
-		err := fmt.Errorf("unhandled: no ident found in `getArrayType`")
-		fmt.Println(err)
-		panic(err)
-
-	case *ast.StructType:
-		fmt.Println("getStructName - *ast.StructType")
-		return ""
-
-	case *ast.Ident:
-		fmt.Println("getStructName - *ast.Ident")
-		return ""
-
-	case *ast.SelectorExpr:
-		fmt.Println("getStructName - *ast.SelectorExpr")
-		return ""
-
-	case *ast.MapType:
-		fmt.Println("getStructName - *ast.MapType")
-		return ""
-
-	case *ast.BasicLit:
-		fmt.Println("getStructName - *ast.BasicLit")
-		return ""
-
-	case *ast.ParenExpr:
-		fmt.Println("getStructName - *ast.ParenExpr")
-		return ""
-
-	case *ast.BinaryExpr:
-		fmt.Println("getStructName - *ast.BinaryExpr")
-		return ""
-
-	case *ast.InterfaceType:
-		fmt.Println("getStructName - *ast.InterfaceType")
-		return ""
-
-	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
-		fmt.Println("getStructName - *ast.CallExpr, *ast.FuncType, *ast.ChanType")
-		return ""
-
-	case *ast.UnaryExpr:
-		fmt.Println("getStructName - *ast.UnaryExpr")
-		return ""
-
-	case *ast.IndexListExpr:
-		fmt.Println("getStructName - *ast.IndexListExpr")
-		return ""
-
-	case *ast.IndexExpr:
-		fmt.Println("getStructName - *ast.IndexExpr")
-		return ""
-
-	default:
-		err := fmt.Errorf("unhandled: %s\n %T", t, t)
-		fmt.Println(err)
-		panic(err)
-	}
+	return t.(*ast.Ident).String()
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {

@@ -10,3 +10,12 @@ func (g *PackageGenerator) IsEnumStruct(name string) bool {
 	}
 	return false
 }
+
+func (g *PackageGenerator) IsWrappedEnum(name string) bool {
+	for _, v := range g.conf.WrapStructs {
+		if strings.EqualFold(v, name) {
+			return true
+		}
+	}
+	return false
+}

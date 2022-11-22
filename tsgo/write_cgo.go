@@ -1,7 +1,6 @@
 package tsgo
 
 import (
-	"fmt"
 	"go/ast"
 	"io/ioutil"
 	"log"
@@ -85,6 +84,17 @@ func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
 	s.WriteString(pkg)
 	s.WriteByte('"')
 	s.WriteByte('\n')
+	g.ffi.GoImports[pkg] = true
+}
+
+func (g *PackageGenerator) addCImport(s *strings.Builder, pkg string) {
+	if _, ok := g.ffi.CImports[pkg]; ok {
+		return
+	}
+	g.writeIndent(s, 1)
+	s.WriteString("#include <")
+	s.WriteString(pkg)
+	s.WriteString(">\n")
 	g.ffi.GoImports[pkg] = true
 }
 
@@ -342,10 +352,15 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(") ")
 		var resSB strings.Builder
 		if f.Type.Results != nil || f.Type.Results.List != nil || f.Type.Results.List[0] != nil || f.Type.Results.List[0].Type != nil {
-			fmt.Println("f.Type.Results.List[0]", f.Type.Results.List[0])
-			g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
-			res_type := resSB.String()
-			fn_str.WriteString(res_type)
+			var is_struct strings.Builder
+			g.writeCGoResType(&is_struct, &goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
+			if is_struct.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
+				fn_str.WriteString("unsafe.Pointer")
+			} else {
+				g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
+				res_type := resSB.String()
+				fn_str.WriteString(res_type)
+			}
 		}
 		fn_str.WriteString(" {\n")
 
@@ -376,6 +391,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			if i < len(used_vars)-1 {
 				fn_str.WriteString(", ")
 			}
+		}
+		if tempResType.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
+			fn_str.WriteByte(')')
 		}
 		fn_str.WriteString("))\n")
 		// generate handlers for casting Go type -> C type for FFI Return value
