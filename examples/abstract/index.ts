@@ -83,12 +83,6 @@ export const {
     _Uint32ArgTest,
     _Uint64ArgTest,
     _TestStruct,
-    StructField,
-    StructFieldWithWeirdJSONTag,
-    StructFieldThatShouldBeOptional,
-    StructFieldThatShouldNotBeOptional,
-    StructFieldThatShouldBeReadonly,
-    TestHandle,
     _TestMap
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
@@ -155,57 +149,9 @@ export const {
     returns: FFIType.ptr
   },
   _TestStruct: {
-    returns: FFIType.ptr
-  },
-  StructField: {
-    args: [FFIType.ptr],
-    returns: FFIType.cstring
-  },
-  StructFieldWithWeirdJSONTag: {
-    args: [FFIType.ptr],
-    returns: FFIType.i64_fast
-  },
-  StructFieldThatShouldBeOptional: {
-    args: [FFIType.ptr],
-    returns: FFIType.cstring
-  },
-  StructFieldThatShouldNotBeOptional: {
-    args: [FFIType.ptr],
-    returns: FFIType.cstring
-  },
-  StructFieldThatShouldBeReadonly: {
-    args: [FFIType.ptr],
     returns: FFIType.cstring
   },
   _TestMap: {
     returns: FFIType.cstring
   }
 })
-
-export class StructBarTest {
-  private _ptr: number;
-  
-  constructor(ptr: number) {
-    this._ptr = ptr;
-  }
-
-  get Field(): Foo {
-    return StructField(this._ptr).toString();
-  }
-
-  get FieldWithWeirdJSONTag(): number /* int64 */ {
-    return StructFieldWithWeirdJSONTag(this._ptr);
-  }
-
-  get FieldThatShouldBeOptional(): string | undefined {
-    return StructFieldThatShouldBeOptional(this._ptr).toString();
-  }
-
-  get FieldThatShouldNotBeOptional(): string {
-    return StructFieldThatShouldNotBeOptional(this._ptr).toString();
-  }
-
-  get FieldThatShouldBeReadonly(): string {
-    return StructFieldThatShouldBeReadonly(this._ptr).toString();
-  }
-}
