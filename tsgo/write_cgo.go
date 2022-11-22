@@ -168,7 +168,9 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		var cHelpers strings.Builder
 
 		g.writeFileCodegenHeader(&cHelpersHeaders)
-		cHelpersHeaders.WriteString("void disposePtr(void *, void *);")
+		cHelpersHeaders.WriteString("#include <stdint.h>\n")
+		cHelpersHeaders.WriteString("void disposePtr(void *, void *);\n")
+		cHelpersHeaders.WriteString("void *hackyHandle(uintptr_t);\n")
 
 		var headersPath strings.Builder
 		headersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
@@ -190,6 +192,12 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		cHelpers.WriteString("{\n")
 		g.writeIndent(&cHelpers, 1)
 		cHelpers.WriteString("dispose(ptr, ctx);\n")
+		cHelpers.WriteString("}\n")
+
+		cHelpers.WriteString("void *hackyHandle(uintptr_t ptr)\n")
+		cHelpers.WriteString("{\n")
+		g.writeIndent(&cHelpers, 1)
+		cHelpers.WriteString("return (void *)ptr;\n")
 		cHelpers.WriteString("}\n")
 
 		var helpersPath strings.Builder

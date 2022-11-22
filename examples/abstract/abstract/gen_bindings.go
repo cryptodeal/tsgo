@@ -3,6 +3,7 @@ package main
 
 /*
 #include <stdlib.h>
+#include <stdint.h>
 #include "helpers.h"
 
 static inline size_t float32Size() {
@@ -36,18 +37,18 @@ import (
   "unsafe"
   "fmt"
   "encoding/json"
+	"runtime/cgo"
 )
 
-var ptrTrckr = make(map[uintptr]C.size_t)
+var ptrTrckr = make(map[unsafe.Pointer]C.size_t)
 
 //export dispose
 func dispose(ptr unsafe.Pointer, ctx unsafe.Pointer) {
-  ptr_num := uintptr(ptr)
-  if _, ok := ptrTrckr[ptr_num]; ok {
-    delete(ptrTrckr, ptr_num)
+  if _, ok := ptrTrckr[ptr]; ok {
+    delete(ptrTrckr, ptr)
     defer C.free(ptr)
   } else {
-    panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
+    panic(fmt.Sprintf("Error: `%#v` not found in ptrTrckr", ptr))
   }
 }
 
@@ -57,12 +58,11 @@ func genDisposePtr() unsafe.Pointer {
 }
 
 //export ArraySize
-func ArraySize(array unsafe.Pointer) C.size_t {
-  ptr_num := uintptr(array)
-  if val, ok := ptrTrckr[ptr_num]; ok {
+func ArraySize(ptr unsafe.Pointer) C.size_t {
+  if val, ok := ptrTrckr[ptr]; ok {
     return val
   }
-  panic(fmt.Sprintf("Error: pointer `%d` not found in ptrTrckr", ptr_num))
+  panic(fmt.Sprintf("Error: `%#v` not found in ptrTrckr", ptr))
 }
 
 func CFloat32(b []float32) unsafe.Pointer {
@@ -75,7 +75,7 @@ func CFloat32(b []float32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]float32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -89,7 +89,7 @@ func CFloat64(b []float64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]float64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -103,7 +103,7 @@ func CInt32(b []int32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]int32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -117,7 +117,7 @@ func CInt64(b []int64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]int64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -131,7 +131,7 @@ func CUint32(b []uint32) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]uint32)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -145,7 +145,7 @@ func CUint64(b []uint64) unsafe.Pointer {
   }{p, arr_len, arr_len}
   s := *(*[]uint64)(unsafe.Pointer(&sliceHeader))
   copy(s, b)
-  ptrTrckr[uintptr(p)] = C.size_t(arr_len)
+  ptrTrckr[p] = C.size_t(arr_len)
   return p
 }
 
@@ -257,11 +257,8 @@ func encodeJSON(x interface{}) []byte {
 }
 
 //export _TestStruct
- func _TestStruct () *C.char {
-  _temp_res_val := encodeJSON(abstract.TestStruct())
-  _returned_value := C.CString(string(_temp_res_val))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+ func _TestStruct () unsafe.Pointer {
+   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.TestStruct())))
 }
 
 //export _TestMap
@@ -270,6 +267,49 @@ func encodeJSON(x interface{}) []byte {
   _returned_value := C.CString(string(_temp_res_val))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
+}
+
+//export StructField
+func StructField(handle C.uintptr_t) *C.char {
+	h := cgo.Handle(handle)
+	s := h.Value().(*abstract.StructBar)
+	_returned_value := C.CString(string(s.Field))
+	return _returned_value
+}
+
+//export StructFieldWithWeirdJSONTag
+func StructFieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
+	h := cgo.Handle(handle)
+	s := h.Value().(*abstract.StructBar)
+	_returned_value := C.int64_t(s.FieldWithWeirdJSONTag)
+	return _returned_value
+}
+
+//export StructFieldThatShouldBeOptional
+func StructFieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
+	h := cgo.Handle(handle)
+	s := h.Value().(*abstract.StructBar)
+	if s.FieldThatShouldBeOptional == nil {
+		return nil
+	}
+	_returned_value := C.CString(*s.FieldThatShouldBeOptional)
+	return _returned_value
+}
+
+//export StructFieldThatShouldNotBeOptional
+func StructFieldThatShouldNotBeOptional(handle C.uintptr_t)  *C.char {
+	h := cgo.Handle(handle)
+	s := h.Value().(*abstract.StructBar)
+	_returned_value := C.CString(*s.FieldThatShouldNotBeOptional)
+	return _returned_value
+}
+
+//export StructFieldThatShouldBeReadonly
+func StructFieldThatShouldBeReadonly(handle C.uintptr_t)  *C.char {
+	h := cgo.Handle(handle)
+	s := h.Value().(*abstract.StructBar)
+	_returned_value := C.CString(s.FieldThatShouldBeReadonly)
+	return _returned_value
 }
 
 func main() {} // Required but ignored

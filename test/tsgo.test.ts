@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
+import { genDisposePtr, StructBarTest, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo', () => {
@@ -82,36 +82,13 @@ describe('tsgo', () => {
   })
 
   it('returns Go struct as JSON (`json.Marshal` struct)', () => {
-    const struct = <StructBar>JSON.parse(_TestStruct().toString())
-    expect(typeof struct).toBe('object')
-    const keys = Object.keys(struct)
-    for (let i = 0; i < keys.length; i++) {
-      switch (keys[i]) {
-        case 'field':
-          expect(typeof struct.field).toBe('string')
-          expect(struct.field).toBe('foo')
-          break
-        case 'weird':
-          expect(typeof struct.weird).toBe('number')
-          expect(struct.weird).toBe(123)
-          break
-        case 'field_that_should_be_optional': 
-          if (struct.field_that_should_be_optional) {
-            expect(typeof struct.field_that_should_be_optional).toBe('string')
-          }
-          break
-        case 'field_that_should_not_be_optional':
-          expect(typeof struct.field_that_should_not_be_optional).toBe('string')
-          expect(struct.field_that_should_not_be_optional).toBe('bar')
-          break
-        case 'field_that_should_be_readonly':
-          expect(typeof struct.field_that_should_be_readonly).toBe('string')
-          expect(struct.field_that_should_be_readonly).toBe('readonly')
-          break
-        default:
-          console.error(`Error: field ${keys[i]} not found in struct')}`)
-      }
-    }
+    const StructBar = new StructBarTest(_TestStruct())
+    expect(typeof StructBar).toBe('object')
+    expect(typeof StructBar.Field).toBe('string')
+    expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
+    expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
+    expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
+    expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
   })
 
   it('returns string (as cstring)', () => {
