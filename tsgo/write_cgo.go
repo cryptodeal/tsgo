@@ -427,6 +427,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		if test_func_parser.fieldAccessors != nil {
 			for _, field := range test_func_parser.fieldAccessors {
+				fmt.Println("field: ", *field.name)
+
 				for _, a := range field.args {
 					fmt.Println("arg: ", a)
 				}

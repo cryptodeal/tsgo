@@ -66,7 +66,7 @@ func getFFIIdent(s string) string {
 	case "string":
 		return "FFIType.cstring"
 	}
-	return "FFIType.pointer"
+	return "FFIType.ptr"
 }
 
 // TODO:
@@ -140,7 +140,7 @@ func getCGoTypeHandler(s string) string {
 	case "string":
 		return "C.CString"
 	}
-	return "*C.void"
+	return "unsafe.Pointer"
 
 }
 
@@ -613,7 +613,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		readonly := false
 
 		var ptr_arg = &ArgHelpers{
-			Name:        "name",
+			Name:        "ptr",
 			FFIType:     "FFIType.ptr",
 			CGoWrapType: "unsafe.Pointer",
 			OGGoType:    "unsafe.Pointer",

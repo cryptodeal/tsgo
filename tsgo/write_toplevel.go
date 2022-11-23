@@ -254,9 +254,9 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
-	if g.ffi.FFIHelpers["ArraySize"] {
+	if g.ffi.FFIHelpers["arraySize"] {
 		g.writeIndent(s, 2)
-		s.WriteString("ArraySize,\n")
+		s.WriteString("arraySize,\n")
 	}
 	if g.ffi.FFIHelpers["genDisposePtr"] {
 		g.writeIndent(s, 2)
@@ -278,9 +278,9 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString(path)
 	s.WriteString("/gen_bindings")
 	s.WriteString(".dylib', {\n")
-	if g.ffi.FFIHelpers["ArraySize"] {
+	if g.ffi.FFIHelpers["arraySize"] {
 		g.writeIndent(s, 1)
-		s.WriteString("ArraySize: {\n")
+		s.WriteString("arraySize: {\n")
 		g.writeIndent(s, 2)
 		s.WriteString("args: [FFIType.ptr],\n")
 		g.writeIndent(s, 2)
