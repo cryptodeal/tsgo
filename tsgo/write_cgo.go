@@ -162,11 +162,13 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 
 	if !g.ffi.FFIHelpers["genDisposePtr"] {
 		name := "genDisposePtr"
+		var res_helper = &ResHelpers{
+			FFIType:     "FFIType.ptr",
+			CGoWrapType: "unsafe.Pointer",
+		}
 		var ffi_func = &FFIFunc{
-			wrap_args:      []string{},
-			args:           []string{},
-			wrap_returns:   []string{"FFIType.ptr"},
-			returns:        []string{"unsafe.Pointer"},
+			args:           []*ArgHelpers{},
+			returns:        []*ResHelpers{res_helper},
 			isHandleFn:     false,
 			name:           &name,
 			fieldAccessors: []*FFIFunc{},
@@ -264,9 +266,19 @@ func (g *PackageGenerator) addJSONEncoder(s *strings.Builder, gi *strings.Builde
 func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder) {
 	name := "arraySize"
 	if !g.ffi.FFIHelpers[name] {
+		var arg_helper = &ArgHelpers{
+			FFIType:     "FFIType.ptr",
+			CGoWrapType: "unsafe.Pointer",
+			OGGoType:    "unsafe.Pointer",
+			Name:        name,
+		}
+		var res_helper = &ResHelpers{
+			FFIType:     "FFIType.u64_fast",
+			CGoWrapType: "C.size_t",
+		}
 		var ffi_func = &FFIFunc{
-			args:       []string{"unsafe.Pointer"},
-			returns:    []string{"C.size_t"},
+			args:       []*ArgHelpers{arg_helper},
+			returns:    []*ResHelpers{res_helper},
 			isHandleFn: false,
 			name:       &name,
 		}
@@ -351,15 +363,21 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 
 func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	var ffi_func = &FFIFunc{
-		args:       []string{},
-		returns:    []string{},
+		args:       []*ArgHelpers{},
+		returns:    []*ResHelpers{},
 		isHandleFn: false,
 	}
 
 	for _, param := range f.Type.Params.List {
 		var tempSB strings.Builder
 		g.writeCGoType(&tempSB, param.Type, 0, true)
-		ffi_func.args = append(ffi_func.args, tempSB.String())
+		var arg_helper = &ArgHelpers{
+			FFIType:     getFFIIdent(tempSB.String()),
+			CGoWrapType: tempSB.String(),
+			OGGoType:    tempSB.String(),
+			Name:        param.Names[0].Name,
+		}
+		ffi_func.args = append(ffi_func.args, arg_helper)
 	}
 
 	for i, res := range f.Type.Results.List {
@@ -372,7 +390,13 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 		}
 		var tempSB strings.Builder
 		g.writeCGoType(&tempSB, res.Type, 0, true)
-		ffi_func.returns = append(ffi_func.returns, tempSB.String())
+
+		var res_helper = &ResHelpers{
+			CGoWrapType: tempSB.String(),
+			OGGoType:    tempSB.String(),
+			FFIType:     getIdent(tempSB.String()),
+		}
+		ffi_func.returns = append(ffi_func.returns, res_helper)
 	}
 
 	if ffi_func.isHandleFn {
@@ -401,15 +425,12 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		if test_func_parser.name != nil {
 			fmt.Println("name: ", *test_func_parser.name)
 		}
-		fmt.Println("test_func_parser:", test_func_parser)
-		tempName := ""
-		var ffi_func = &FFIFunc{
-			args:           []string{},
-			returns:        []string{},
-			isHandleFn:     false,
-			name:           &tempName,
-			fieldAccessors: []*FFIFunc{},
+		if test_func_parser.fieldAccessors != nil {
+			for _, field := range test_func_parser.fieldAccessors {
+				fmt.Println("field: ", field)
+			}
 		}
+		fmt.Println("test_func_parser:", test_func_parser)
 		fn_str.WriteString("//export _")
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("\n func _")
@@ -423,12 +444,10 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			g.writeCGoType(&tempSB, param.Type, 0, true)
 			type_str := tempSB.String()
 			fn_str.WriteString(type_str)
-			ffi_func.args = append(ffi_func.args, type_str)
 			if type_str == "unsafe.Pointer" {
 				g.addGoImport(&goImportsSB, "unsafe")
 				arr_dat_type := g.getArrayType(param.Type)
 				if arr_dat_type != "byte" {
-					ffi_func.args = append(ffi_func.args, "int")
 					fn_str.WriteString(", _len int")
 				}
 			}
@@ -442,14 +461,10 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			var is_struct strings.Builder
 			g.writeCGoResType(&is_struct, &goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
 			if is_struct.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
-				ffi_func.returns = append(ffi_func.returns, "unsafe.Pointer")
-				ffi_func.isHandleFn = true
 				fn_str.WriteString("unsafe.Pointer")
-				ffi_func.args = append(ffi_func.returns, "unsafe.Pointer")
 			} else {
 				g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
 				res_type := resSB.String()
-				ffi_func.args = append(ffi_func.returns, res_type)
 				fn_str.WriteString(res_type)
 			}
 		}

@@ -20,11 +20,22 @@ type TSGo struct {
 	packageGenerators map[string]*PackageGenerator
 }
 
+type ArgHelpers struct {
+	FFIType     string
+	CGoWrapType string
+	OGGoType    string
+	Name        string
+}
+
+type ResHelpers struct {
+	FFIType     string
+	CGoWrapType string
+	OGGoType    string
+}
+
 type FFIFunc struct {
-	wrap_args      []string
-	wrap_returns   []string
-	args           []string
-	returns        []string
+	args           []*ArgHelpers
+	returns        []*ResHelpers
 	isHandleFn     bool
 	name           *string
 	fieldAccessors []*FFIFunc

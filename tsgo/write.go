@@ -612,9 +612,16 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		required := false
 		readonly := false
 
+		var ptr_arg = &ArgHelpers{
+			Name:        "name",
+			FFIType:     "FFIType.ptr",
+			CGoWrapType: "unsafe.Pointer",
+			OGGoType:    "unsafe.Pointer",
+		}
+
 		var field_func = &FFIFunc{
-			args:    []string{"unsafe.Pointer"},
-			returns: make([]string, 0),
+			args:    []*ArgHelpers{ptr_arg},
+			returns: []*ResHelpers{},
 		}
 
 		var fieldName string
@@ -689,7 +696,12 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			g.writeType(s, f.Type, depth, false)
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
-			field_func.returns = append(field_func.returns, tempSB.String())
+			var res_helper = &ResHelpers{
+				FFIType:     getFFIIdent(tempSB.String()),
+				CGoWrapType: tempSB.String(),
+				OGGoType:    tempSB.String(),
+			}
+			field_func.returns = append(field_func.returns, res_helper)
 		} else {
 			s.WriteString(tstype)
 		}
