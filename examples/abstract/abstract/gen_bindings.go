@@ -55,8 +55,8 @@ func genDisposePtr() unsafe.Pointer {
   return C.disposePtr
 }
 
-//export ArraySize
-func ArraySize(ptr unsafe.Pointer) C.size_t {
+//export arraySize
+func arraySize(ptr unsafe.Pointer) C.size_t {
   if val, ok := ptrTrckr[ptr]; ok {
     return val
   }

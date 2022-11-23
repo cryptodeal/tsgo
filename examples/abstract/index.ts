@@ -66,7 +66,6 @@ export interface StructBar {
 
 export const {
   symbols: {
-    ArraySize,
     genDisposePtr,
     _IntTest,
     _Float32ArrayTest,
@@ -86,10 +85,6 @@ export const {
     _TestMap
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  ArraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
   genDisposePtr: {
     returns: FFIType.ptr
   },

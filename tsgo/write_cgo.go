@@ -1,6 +1,7 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"io/ioutil"
 	"log"
@@ -336,14 +337,12 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 			isHandle = true
 			structName = struct_name
 		}
-		break
 	case *ast.Ident:
 		struct_name := g.getStructName(t)
 		if g.IsWrappedEnum(struct_name) {
 			isHandle = true
 			structName = struct_name
 		}
-		break
 	}
 	return isHandle, structName
 }
@@ -392,6 +391,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	var fn_str strings.Builder
 	// iterate through all function declarations
 	for _, f := range fd {
+		test_func_parser := g.parseFn(f)
+		fmt.Println(test_func_parser)
 		tempName := ""
 		var ffi_func = &FFIFunc{
 			args:           []string{},
