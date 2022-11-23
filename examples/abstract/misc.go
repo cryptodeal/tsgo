@@ -39,9 +39,9 @@ type StructBar struct {
 
 // DROPPED: Floating comment at the end
 
-func TestStruct() *StructBar {
+func TestStruct() StructBar {
 	str := "bar"
-	structBar := &StructBar{
+	structBar := StructBar{
 		Field:                        "foo",
 		FieldWithWeirdJSONTag:        123,
 		FieldThatShouldNotBeOptional: &str,

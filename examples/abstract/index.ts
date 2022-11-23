@@ -149,7 +149,7 @@ export const {
     returns: FFIType.ptr
   },
   _TestStruct: {
-    returns: FFIType.cstring
+    returns: FFIType.pointer
   },
   _TestMap: {
     returns: FFIType.cstring

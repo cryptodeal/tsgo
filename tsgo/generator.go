@@ -20,11 +20,20 @@ type TSGo struct {
 	packageGenerators map[string]*PackageGenerator
 }
 
+type FFIFunc struct {
+	args           []string
+	returns        []string
+	isHandleFn     bool
+	name           *string
+	fieldAccessors map[string]*FFIFunc
+}
+
 type FFIState struct {
 	GoImports  map[string]bool
 	CImports   map[string]bool
 	FFIHelpers map[string]bool
 	CHelpers   map[string]bool
+	FFIFuncs   map[string]*FFIFunc
 }
 
 // Responsible for generating the code for an input package

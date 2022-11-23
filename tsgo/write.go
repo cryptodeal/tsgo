@@ -438,7 +438,8 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
 	if v, ok := t.(*ast.Ident); ok {
-		return v.Name
+		fmt.Println(v)
+		return v.String()
 	}
 	return ""
 }

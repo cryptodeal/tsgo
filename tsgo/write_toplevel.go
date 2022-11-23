@@ -328,6 +328,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("returns: ")
 			tempSB := &strings.Builder{}
 			res := f.Type.Results.List[0]
+			// TODO need to update logic here to handle wrapping structs
 			g.writeFFIType(tempSB, res.Type, 0, true)
 			s.WriteString(tempSB.String())
 
