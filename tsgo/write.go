@@ -37,6 +37,8 @@ func getIdent(s string) string {
 func getFFIIdent(s string) string {
 	// fmt.Println(s)
 	switch s {
+	case "*C.char":
+		return "FFIType.cstring"
 	case "bool":
 		return "FFIType.bool"
 	case "int":

@@ -254,12 +254,6 @@ func encodeJSON(x interface{}) []byte {
   return _returned_value
 }
 
-//export _TestStruct
- func _TestStruct() unsafe.Pointer {
-  _returned_value := unsafe.Pointer(abstract.TestStruct())
-  return _returned_value
-}
-
 //export _TestMap
  func _TestMap() *C.char {
   _temp_res_val := encodeJSON(abstract.TestMap())

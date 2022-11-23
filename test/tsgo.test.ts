@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { genDisposePtr, StructBarTest, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _TestStruct, _StringTest, _TestMap, ArraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
+import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _StringTest, _TestMap, arraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo', () => {
@@ -15,7 +15,7 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(bar,0, ArraySize(bar) * 4, genDisposePtr()))
+    const out = new Float32Array(toArrayBuffer(bar,0, arraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -27,7 +27,7 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
+    const out = new Float64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -39,7 +39,7 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Int32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, genDisposePtr()))
+    const out = new Int32Array(toArrayBuffer(bar, 0, arraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -51,7 +51,7 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigInt64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
+    const out = new BigInt64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
@@ -63,7 +63,7 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Uint32Array(toArrayBuffer(bar, 0, ArraySize(bar) * 4, genDisposePtr()))
+    const out = new Uint32Array(toArrayBuffer(bar, 0, arraySize(bar) * 4, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -75,21 +75,23 @@ describe('tsgo', () => {
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigUint64Array(toArrayBuffer(bar, 0, ArraySize(bar) * 8, genDisposePtr()))
+    const out = new BigUint64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
   })
 
-  it('returns Go struct as JSON (`json.Marshal` struct)', () => {
-    const StructBar = new StructBarTest(_TestStruct())
-    expect(typeof StructBar).toBe('object')
-    expect(typeof StructBar.Field).toBe('string')
-    expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
-    expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
-    expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
-    expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
-  })
+  /*
+    it('returns Go struct as JSON (`json.Marshal` struct)', () => {
+      const StructBar = new StructBarTest(_TestStruct())
+      expect(typeof StructBar).toBe('object')
+      expect(typeof StructBar.Field).toBe('string')
+      expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
+      expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
+      expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
+      expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
+    })
+  */
 
   it('returns string (as cstring)', () => {
     const str = _StringTest().toString()
@@ -111,7 +113,7 @@ describe('tsgo', () => {
     const res = _Float32ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    const out = new Float32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -123,7 +125,7 @@ describe('tsgo', () => {
     const res = _Float64ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
+    const out = new Float64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -135,7 +137,7 @@ describe('tsgo', () => {
     const res = _Int32ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Int32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    const out = new Int32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -147,7 +149,7 @@ describe('tsgo', () => {
     const res = _Int64ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigInt64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
+    const out = new BigInt64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -159,7 +161,7 @@ describe('tsgo', () => {
     const res = _Uint32ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Uint32Array(toArrayBuffer(res, 0, ArraySize(res) * 4, genDisposePtr()))
+    const out = new Uint32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -171,7 +173,7 @@ describe('tsgo', () => {
     const res = _Uint64ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigUint64Array(toArrayBuffer(res, 0, ArraySize(res) * 8, genDisposePtr()))
+    const out = new BigUint64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
