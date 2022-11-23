@@ -277,78 +277,55 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString(path)
 	s.WriteString("/gen_bindings")
 	s.WriteString(".dylib', {\n")
-	if g.ffi.FFIHelpers["arraySize"] {
+	visited = 0
+	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 1)
-		s.WriteString("arraySize: {\n")
-		g.writeIndent(s, 2)
-		s.WriteString("args: [FFIType.ptr],\n")
-		g.writeIndent(s, 2)
-		s.WriteString("returns: FFIType.u64_fast\n")
-		g.writeIndent(s, 1)
-		s.WriteString("},\n")
-	}
-
-	if g.ffi.FFIHelpers["genDisposePtr"] {
-		g.writeIndent(s, 1)
-		s.WriteString("genDisposePtr: {\n")
-		g.writeIndent(s, 2)
-		s.WriteString("returns: FFIType.ptr\n")
-		g.writeIndent(s, 1)
-		s.WriteString("},\n")
-	}
-
-	for i, f := range fd {
-		g.writeIndent(s, 1)
-		s.WriteByte('_')
-		s.WriteString(f.Name.Name)
+		if !g.ffi.FFIHelpers[k] {
+			s.WriteByte('_')
+		}
+		s.WriteString(k)
 		s.WriteString(": {\n")
-		// parse parameters/types
-		if len(f.Type.Params.List) > 0 {
+		argLen := len(v.args) - 1
+		resLen := len(v.returns) - 1
+		if argLen > 0 {
 			g.writeIndent(s, 2)
 			s.WriteString("args: [")
-			for j, param := range f.Type.Params.List {
-				tempSB := &strings.Builder{}
-				g.writeFFIType(tempSB, param.Type, 0, true)
-				s.WriteString(tempSB.String())
-				if j < len(f.Type.Params.List)-1 {
+			for i, arg := range v.args {
+				s.WriteString(arg.FFIType)
+				if i < argLen {
 					s.WriteString(", ")
 				}
-				if tempSB.String() == "FFIType.ptr" && g.getArrayType(param.Type) != "byte" {
-					s.WriteString(", FFIType.int")
-					if j < len(f.Type.Params.List)-1 {
-						s.WriteString(", ")
-					}
-				}
 			}
-			s.WriteString("],\n")
+			s.WriteByte(']')
+			if resLen > 0 {
+				s.WriteString(",\n")
+			} else {
+				s.WriteByte('\n')
+			}
 		}
-
-		if len(f.Type.Results.List) == 1 {
+		if resLen == 1 {
 			g.writeIndent(s, 2)
 			s.WriteString("returns: ")
-			tempSB := &strings.Builder{}
-			res := f.Type.Results.List[0]
-			// TODO need to update logic here to handle wrapping structs
-			g.writeFFIType(tempSB, res.Type, 0, true)
-			s.WriteString(tempSB.String())
-
-		} else if len(f.Type.Results.List) > 1 {
+			s.WriteString(v.returns[0].FFIType)
+			s.WriteByte('\n')
+		} else if resLen > 1 {
 			var errStr strings.Builder
 			errStr.WriteString("Function `")
-			errStr.WriteString(f.Name.Name)
+			errStr.WriteString(k)
 			errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
 			errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
 			log.Fatalf("TSGo failed: %v", errStr.String())
 		}
+
 		s.WriteByte('\n')
 		g.writeIndent(s, 1)
-		s.WriteByte('}')
-		if i < len(fd)-1 {
-			s.WriteString(",\n")
-		} else {
-			s.WriteString("\n")
-		}
-	}
 
+		if visited == count {
+			s.WriteString("}\n")
+		} else {
+			s.WriteString("},\n")
+		}
+		visited++
+	}
 	s.WriteString("})\n")
 }

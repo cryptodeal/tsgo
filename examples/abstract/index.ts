@@ -66,24 +66,25 @@ export interface StructBar {
 
 export const {
   symbols: {
-    genDisposePtr,
+    _Int64ArrayTest,
+    _Uint32ArrayTest,
     _StringTest,
     _Int32ArgTest,
-    _TestMap
-    _IntTest,
-    arraySize,
-    _TestStruct,
-    _Float32ArrayTest,
-    _Int32ArrayTest,
-    _Int64ArrayTest,
-    _Uint64ArrayTest,
-    _Float32ArgTest,
-    _Float64ArgTest,
-    _Float64ArrayTest,
-    _Uint32ArrayTest,
     _Int64ArgTest,
+    _TestMap,
+    _Float32ArrayTest,
+    _Float64ArrayTest,
+    _Uint64ArrayTest,
     _Uint32ArgTest,
     _Uint64ArgTest,
+    _TestStruct,
+    genDisposePtr,
+    _Int32ArrayTest,
+    _IntTest,
+    arraySize,
+    _Float32ArgTest,
+    _Float64ArgTest
+  }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
   arraySize: {
     args: [FFIType.ptr],
