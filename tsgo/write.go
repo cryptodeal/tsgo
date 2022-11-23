@@ -37,35 +37,33 @@ func getIdent(s string) string {
 func getFFIIdent(s string) string {
 	// fmt.Println(s)
 	switch s {
-	case "*C.char":
-		return "FFIType.cstring"
 	case "bool":
 		return "FFIType.bool"
-	case "int":
+	case "int", "C.int":
 		return "FFIType.int"
-	case "int8":
+	case "int8", "C.int8_t":
 		return "FFIType.i8"
-	case "int16":
+	case "int16", "C.int16_t":
 		return "FFIType.i16"
-	case "int32":
+	case "int32", "C.int32_t":
 		return "FFIType.i32"
-	case "int64":
+	case "int64", "C.int64_t":
 		return "FFIType.i64_fast"
-	case "uint":
+	case "uint", "C.uint":
 		return "FFIType.u64_fast"
-	case "uint8":
+	case "uint8", "C.uint8_t":
 		return "FFIType.u8"
-	case "uint16":
+	case "uint16", "C.uint16_t":
 		return "FFIType.u16"
-	case "uint32":
+	case "uint32", "C.uint32_t":
 		return "FFIType.u32"
-	case "uint64":
+	case "uint64", "C.uint64_t":
 		return "FFIType.u64_fast"
-	case "float32":
+	case "float32", "C.float":
 		return "FFIType.f32"
-	case "float64":
+	case "float64", "C.double":
 		return "FFIType.f64"
-	case "string":
+	case "string", "*C.char":
 		return "FFIType.cstring"
 	}
 	return "FFIType.ptr"
