@@ -256,7 +256,7 @@ func encodeJSON(x interface{}) []byte {
 
 //export _TestStruct
  func _TestStruct() unsafe.Pointer {
-  _returned_value := *C.void(abstract.TestStruct())
+  _returned_value := unsafe.Pointer(abstract.TestStruct())
   return _returned_value
 }
 

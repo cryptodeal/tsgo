@@ -254,14 +254,21 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
-	if g.ffi.FFIHelpers["arraySize"] {
+
+	lastFunc := g.LastFFIFunc()
+	for k := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
-		s.WriteString("arraySize,\n")
+		if !g.ffi.FFIHelpers[k] {
+			s.WriteByte('_')
+		}
+		s.WriteString(k)
+		if k == lastFunc {
+			s.WriteString("\n")
+		} else {
+			s.WriteString(",\n")
+		}
 	}
-	if g.ffi.FFIHelpers["genDisposePtr"] {
-		g.writeIndent(s, 2)
-		s.WriteString("genDisposePtr,\n")
-	}
+
 	for i, f := range fd {
 		g.writeIndent(s, 2)
 		s.WriteByte('_')

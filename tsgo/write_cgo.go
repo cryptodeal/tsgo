@@ -421,12 +421,13 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	var fn_str strings.Builder
 	// iterate through all function declarations
 	for _, f := range fd {
-		test_func_parser := g.parseFn(f)
-		if test_func_parser.name != nil {
-			fmt.Println("name: ", *test_func_parser.name)
+		func_data := g.parseFn(f)
+		fmt.Println("test_func_parser:", func_data)
+		if func_data.name != nil {
+			fmt.Println("name: ", *func_data.name)
 		}
-		if test_func_parser.fieldAccessors != nil {
-			for _, field := range test_func_parser.fieldAccessors {
+		if func_data.fieldAccessors != nil {
+			for _, field := range func_data.fieldAccessors {
 				fmt.Println("field: ", *field.name)
 
 				for _, a := range field.args {
@@ -438,7 +439,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				}
 			}
 		}
-		fmt.Println("test_func_parser:", test_func_parser)
+		g.ffi.FFIFuncs[f.Name.Name] = func_data
+
 		fn_str.WriteString("//export _")
 		fn_str.WriteString(f.Name.Name)
 		fn_str.WriteString("\n func _")

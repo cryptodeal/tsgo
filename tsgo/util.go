@@ -19,3 +19,11 @@ func (g *PackageGenerator) IsWrappedEnum(name string) bool {
 	}
 	return false
 }
+
+func (g *PackageGenerator) LastFFIFunc() string {
+	var lastKey string
+	for k, _ := range g.ffi.FFIFuncs {
+		lastKey = k
+	}
+	return lastKey
+}
