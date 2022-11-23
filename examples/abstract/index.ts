@@ -66,8 +66,24 @@ export interface StructBar {
 
 export const {
   symbols: {
+    _Float64ArgTest,
+    _Int32ArgTest,
+    _IntTest,
+    _Float32ArrayTest,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Uint64ArrayTest,
+    _Float32ArgTest,
+    _TestStruct,
+    _Int64ArgTest,
+    _Uint64ArgTest,
+    _TestMap,
     arraySize,
+    _Uint32ArrayTest
+    _Uint32ArgTest,
     genDisposePtr,
+    _Float64ArrayTest,
+    _StringTest,
     _IntTest,
     _Float32ArrayTest,
     _Float64ArrayTest,
