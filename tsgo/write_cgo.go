@@ -373,6 +373,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 		g.writeCGoType(&tempSB, res.Type, 0, true)
 		ffi_func.returns = append(ffi_func.returns, tempSB.String())
 	}
+	return ffi_func
 }
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
