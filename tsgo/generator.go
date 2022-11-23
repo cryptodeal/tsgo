@@ -81,6 +81,7 @@ func (g *TSGo) Generate() error {
 			CImports:   make(map[string]bool),
 			FFIHelpers: make(map[string]bool),
 			CHelpers:   make(map[string]bool),
+			FFIFuncs:   make(map[string]*FFIFunc),
 		}
 
 		pkgGen := &PackageGenerator{
