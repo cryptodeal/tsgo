@@ -29,11 +29,12 @@ type FFIFunc struct {
 }
 
 type FFIState struct {
-	GoImports  map[string]bool
-	CImports   map[string]bool
-	FFIHelpers map[string]bool
-	CHelpers   map[string]bool
-	FFIFuncs   map[string]*FFIFunc
+	GoImports       map[string]bool
+	CImports        map[string]bool
+	FFIHelpers      map[string]bool
+	CHelpers        map[string]bool
+	FFIFuncs        map[string]*FFIFunc
+	StructAccessors map[string][]*FFIFunc
 }
 
 // Responsible for generating the code for an input package
@@ -77,11 +78,12 @@ func (g *TSGo) Generate() error {
 		pkgConfig := g.conf.PackageConfig(pkg.ID)
 
 		ffi := &FFIState{
-			GoImports:  make(map[string]bool),
-			CImports:   make(map[string]bool),
-			FFIHelpers: make(map[string]bool),
-			CHelpers:   make(map[string]bool),
-			FFIFuncs:   make(map[string]*FFIFunc),
+			GoImports:       make(map[string]bool),
+			CImports:        make(map[string]bool),
+			FFIHelpers:      make(map[string]bool),
+			CHelpers:        make(map[string]bool),
+			FFIFuncs:        make(map[string]*FFIFunc),
+			StructAccessors: make(map[string][]*FFIFunc),
 		}
 
 		pkgGen := &PackageGenerator{

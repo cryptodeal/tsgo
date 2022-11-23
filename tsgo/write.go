@@ -105,7 +105,7 @@ func getCGoIdent(s string) string {
 	case "string":
 		return "*C.char"
 	}
-	return "*C.void"
+	return "unsafe.Pointer"
 }
 
 func getCGoTypeHandler(s string) string {
