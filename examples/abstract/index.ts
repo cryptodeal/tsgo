@@ -66,78 +66,92 @@ export interface StructBar {
 
 export const {
   symbols: {
-    _IntTest,
-    arraySize,
-    _Float64ArrayTest,
-    _Int32ArgTest,
-    _Uint32ArgTest,
-    _TestMap,
-    _Int64ArrayTest,
-    _Uint32ArrayTest,
     _TestStruct,
-    _Float32ArrayTest,
-    genDisposePtr,
+    _TestMap,
+    _Uint64ArrayTest,
     _Float64ArgTest,
+    _Uint32ArrayTest,
     _Int64ArgTest,
     _Uint64ArgTest,
+    _IntTest,
+    _Int64ArrayTest,
     _Int32ArrayTest,
-    _Uint64ArrayTest,
     _StringTest,
-    _Float32ArgTest
+    _Int32ArgTest,
+    arraySize,
+    _Float64ArrayTest,
+    _Float32ArgTest,
+    _Uint32ArgTest,
+    _Float32ArrayTest,
+    genDisposePtr
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Uint32ArrayTest: {
-
-  },
-  _TestStruct: {
+  _IntTest: {
+    args: [FFIType.ptr]
 
   },
   _Int64ArrayTest: {
+    args: [FFIType.ptr]
 
   },
-  genDisposePtr: {
-
-  },
-  _Float64ArgTest: {
+  _Uint32ArrayTest: {
+    args: [FFIType.ptr]
 
   },
   _Int64ArgTest: {
+    args: [FFIType.ptr]
 
   },
   _Uint64ArgTest: {
+    args: [FFIType.ptr]
 
   },
-  _Float32ArrayTest: {
+  arraySize: {
+    args: [FFIType.ptr]
 
   },
-  _Uint64ArrayTest: {
+  _Float64ArrayTest: {
+    args: [FFIType.ptr]
+
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.ptr]
 
   },
   _StringTest: {
 
   },
-  _Float32ArgTest: {
-
-  },
-  _Int32ArrayTest: {
-
-  },
-  arraySize: {
-
-  },
-  _Float64ArrayTest: {
-
-  },
   _Int32ArgTest: {
+    args: [FFIType.ptr]
+
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.ptr]
+
+  },
+  genDisposePtr: {
+
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr]
 
   },
   _Uint32ArgTest: {
+    args: [FFIType.ptr]
+
+  },
+  _Uint64ArrayTest: {
+    args: [FFIType.ptr]
+
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr]
+
+  },
+  _TestStruct: {
 
   },
   _TestMap: {
-
-  },
-  _IntTest: {
 
   }
 })

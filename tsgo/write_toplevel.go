@@ -285,14 +285,14 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		}
 		s.WriteString(k)
 		s.WriteString(": {\n")
-		argLen := len(v.args) - 1
-		resLen := len(v.returns) - 1
+		argLen := len(v.args)
+		resLen := len(v.returns)
 		if len(v.args) > 0 {
 			g.writeIndent(s, 2)
 			s.WriteString("args: [")
 			for i, arg := range v.args {
 				s.WriteString(arg.FFIType)
-				if i < argLen {
+				if i < argLen-1 {
 					s.WriteString(", ")
 				}
 			}
