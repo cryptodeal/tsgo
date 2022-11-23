@@ -255,18 +255,22 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
 
-	lastFunc := g.LastFFIFunc()
+	count := len(g.ffi.FFIFuncs) - 1
+	visited := 0
 	for k := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
 		if !g.ffi.FFIHelpers[k] {
 			s.WriteByte('_')
 		}
 		s.WriteString(k)
-		if k == lastFunc {
-			s.WriteString("\n")
+		if visited == count {
+			s.WriteByte('\n')
+			g.writeIndent(s, 1)
+			s.WriteString("}\n")
 		} else {
 			s.WriteString(",\n")
 		}
+		visited++
 	}
 
 	s.WriteString("} = dlopen(import.meta.dir + '/")

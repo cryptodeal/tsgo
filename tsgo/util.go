@@ -22,7 +22,7 @@ func (g *PackageGenerator) IsWrappedEnum(name string) bool {
 
 func (g *PackageGenerator) LastFFIFunc() string {
 	var lastKey string
-	for k, _ := range g.ffi.FFIFuncs {
+	for k := range g.ffi.FFIFuncs {
 		lastKey = k
 	}
 	return lastKey
