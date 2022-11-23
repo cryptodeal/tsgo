@@ -317,9 +317,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			log.Fatalf("TSGo failed: %v", errStr.String())
 		}
 
-		s.WriteByte('\n')
 		g.writeIndent(s, 1)
-
 		if visited == count-1 {
 			s.WriteString("}\n")
 		} else {

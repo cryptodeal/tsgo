@@ -394,7 +394,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 		var res_helper = &ResHelpers{
 			CGoWrapType: tempSB.String(),
 			OGGoType:    tempSB.String(),
-			FFIType:     getIdent(tempSB.String()),
+			FFIType:     getFFIIdent(tempSB.String()),
 		}
 		ffi_func.returns = append(ffi_func.returns, res_helper)
 	}
