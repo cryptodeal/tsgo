@@ -398,6 +398,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	// iterate through all function declarations
 	for _, f := range fd {
 		test_func_parser := g.parseFn(f)
+		if test_func_parser.name != nil {
+			fmt.Println("name: ", *test_func_parser.name)
+		}
 		fmt.Println(test_func_parser, "test struct_name:", *test_func_parser.name)
 		tempName := ""
 		var ffi_func = &FFIFunc{
