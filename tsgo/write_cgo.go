@@ -163,11 +163,13 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 	if !g.ffi.FFIHelpers["genDisposePtr"] {
 		name := "genDisposePtr"
 		var ffi_func = &FFIFunc{
+			wrap_args:      []string{},
 			args:           []string{},
+			wrap_returns:   []string{"FFIType.ptr"},
 			returns:        []string{"unsafe.Pointer"},
 			isHandleFn:     false,
 			name:           &name,
-			fieldAccessors: make(map[string]*FFIFunc),
+			fieldAccessors: []*FFIFunc{},
 		}
 		s.WriteString("//export genDisposePtr\n")
 		s.WriteString("func genDisposePtr() unsafe.Pointer {\n")
@@ -372,6 +374,10 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 		g.writeCGoType(&tempSB, res.Type, 0, true)
 		ffi_func.returns = append(ffi_func.returns, tempSB.String())
 	}
+
+	if ffi_func.isHandleFn {
+		ffi_func.fieldAccessors = g.ffi.StructHelpers[*ffi_func.name]
+	}
 	return ffi_func
 }
 
@@ -399,7 +405,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			returns:        []string{},
 			isHandleFn:     false,
 			name:           &tempName,
-			fieldAccessors: make(map[string]*FFIFunc),
+			fieldAccessors: []*FFIFunc{},
 		}
 		fn_str.WriteString("//export _")
 		fn_str.WriteString(f.Name.Name)

@@ -84,6 +84,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString("export interface ")
 		s.WriteString(ts.Name.Name)
 
+		g.ffi.StructHelpers[ts.Name.Name] = []*FFIFunc{}
+
 		if ts.TypeParams != nil {
 			g.writeTypeParamsFields(s, ts.TypeParams.List)
 		}

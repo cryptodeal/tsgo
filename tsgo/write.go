@@ -597,9 +597,15 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		required := false
 		readonly := false
 
+		var field_func = &FFIFunc{
+			args:    []string{"unsafe.Pointer"},
+			returns: make([]string, 0),
+		}
+
 		var fieldName string
 		if len(f.Names) != 0 && f.Names[0] != nil && len(f.Names[0].Name) != 0 {
 			fieldName = f.Names[0].Name
+			field_func.name = &fieldName
 		}
 		if len(fieldName) == 0 || 'A' > fieldName[0] || fieldName[0] > 'Z' {
 			continue
@@ -666,6 +672,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 
 		if tstype == "" {
 			g.writeType(s, f.Type, depth, false)
+			var tempSB strings.Builder
+			g.writeCGoType(&tempSB, f.Type, depth, false)
+			field_func.returns = append(field_func.returns, tempSB.String())
 		} else {
 			s.WriteString(tstype)
 		}
