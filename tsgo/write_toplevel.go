@@ -255,7 +255,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
 
-	count := len(g.ffi.FFIFuncs) - 1
+	count := len(g.ffi.FFIFuncs)
 	visited := 0
 	for k := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
@@ -263,7 +263,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteByte('_')
 		}
 		s.WriteString(k)
-		if visited == count {
+		if visited == count-1 {
 			s.WriteByte('\n')
 			g.writeIndent(s, 1)
 			s.WriteString("}\n")
@@ -287,7 +287,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(": {\n")
 		argLen := len(v.args) - 1
 		resLen := len(v.returns) - 1
-		if argLen > 0 {
+		if len(v.args) > 0 {
 			g.writeIndent(s, 2)
 			s.WriteString("args: [")
 			for i, arg := range v.args {
@@ -320,7 +320,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteByte('\n')
 		g.writeIndent(s, 1)
 
-		if visited == count {
+		if visited == count-1 {
 			s.WriteString("}\n")
 		} else {
 			s.WriteString("},\n")
