@@ -43,6 +43,9 @@ type PackageConfig struct {
 	// If true, will also generate Bun FFI Bindings for the package
 	FFIBindings bool `yaml:"ffi_bindings"`
 
+	// FFIFallbackType defines the Bun FFI config fallback type used as default
+	FFIFallbackType string `yaml:"ffi_fallback_type"`
+
 	// FFIBindings will shim an ES6 class wrapper for the `structs` defined here
 	WrapStructs []string `yaml:"wrap_structs"`
 
