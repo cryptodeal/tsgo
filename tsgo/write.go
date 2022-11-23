@@ -242,7 +242,7 @@ func (g *PackageGenerator) writeFFIType(s *strings.Builder, t ast.Expr, depth in
 func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool, pkgName string) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		fmt.Println("writeCGoResType - *ast.StarExpr", t)
+		// fmt.Println("writeCGoResType - *ast.StarExpr", t)
 		struct_name := g.getStructName(t.X)
 		if g.IsWrappedEnum(struct_name) {
 			g.addCImport(ci, "stdint.h")
@@ -253,7 +253,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			s.WriteString("encodeJSON")
 		}
 	case *ast.ArrayType:
-		fmt.Println("writeCGoResType - *ast.ArrayType", t)
+		// fmt.Println("writeCGoResType - *ast.ArrayType", t)
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
 			s.WriteString("C.CString")
 			break
@@ -267,49 +267,49 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			handler := g.writeCArrayHandler(gh, ec, dat_type, fmtr)
 			s.WriteString(handler)
 		} else {
-			fmt.Println("unknown ptr type; returning as unsafe.Pointer (void*)")
+			// fmt.Println("unknown ptr type; returning as unsafe.Pointer (void*)")
 			s.WriteString("unsafe.Pointer")
 		}
 	case *ast.StructType:
-		fmt.Println("writeCGoResType - *ast.StructType", t)
+		// fmt.Println("writeCGoResType - *ast.StructType", t)
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
 		g.writeIndent(s, depth+1)
 		s.WriteByte('}')
 	case *ast.Ident:
-		fmt.Println("writeCGoResType - *ast.Ident", t)
+		// fmt.Println("writeCGoResType - *ast.Ident", t)
 		if t.String() == "any" {
 			s.WriteString(getCGoTypeHandler(g.conf.FallbackType))
 		} else {
 			s.WriteString(getCGoTypeHandler(t.String()))
 		}
 	case *ast.MapType:
-		fmt.Println("writeCGoResType - *ast.MapType", t)
+		// fmt.Println("writeCGoResType - *ast.MapType", t)
 		g.addJSONEncoder(gh, cg)
 		s.WriteString("encodeJSON")
 	case *ast.BasicLit:
-		fmt.Println("writeCGoResType - *ast.BasicLit", t)
+		// fmt.Println("writeCGoResType - *ast.BasicLit", t)
 		s.WriteString(t.Value)
 	case *ast.ParenExpr:
-		fmt.Println("writeCGoResType - *ast.ParenExpr", t)
+		// fmt.Println("writeCGoResType - *ast.ParenExpr", t)
 		s.WriteByte('(')
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte(')')
 	case *ast.BinaryExpr:
-		fmt.Println("writeCGoResType - *ast.BinaryExpr", t)
+		// fmt.Println("writeCGoResType - *ast.BinaryExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte(' ')
 		s.WriteString(t.Op.String())
 		s.WriteByte(' ')
 		g.writeType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
-		fmt.Println("writeCGoResType - *ast.InterfaceType", t)
+		// fmt.Println("writeCGoResType - *ast.InterfaceType", t)
 		g.writeInterfaceFields(s, t.Methods.List, depth+1)
 	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
-		fmt.Println("writeCGoResType - *ast.CallExpr, *ast.FuncType, *ast.ChanType", t)
+		// fmt.Println("writeCGoResType - *ast.CallExpr, *ast.FuncType, *ast.ChanType", t)
 		s.WriteString(g.conf.FallbackType)
 	case *ast.UnaryExpr:
-		fmt.Println("writeCGoResType - *ast.UnaryExpr", t)
+		// fmt.Println("writeCGoResType - *ast.UnaryExpr", t)
 		if t.Op == token.TILDE {
 			// We just ignore the tilde token, in Typescript extended types are
 			// put into the generic typing itself, which we can't support yet.
@@ -320,7 +320,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			panic(err)
 		}
 	case *ast.IndexListExpr:
-		fmt.Println("writeCGoResType - *ast.IndexListExpr", t)
+		// fmt.Println("writeCGoResType - *ast.IndexListExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte('<')
 		for i, index := range t.Indices {
@@ -331,7 +331,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		}
 		s.WriteByte('>')
 	case *ast.IndexExpr:
-		fmt.Println("writeCGoResType - *ast.IndexExpr", t)
+		// fmt.Println("writeCGoResType - *ast.IndexExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte('<')
 		g.writeType(s, t.Index, depth, false)
@@ -367,7 +367,7 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		}
 
 	case *ast.SelectorExpr:
-		fmt.Println("writeType - *ast.SelectorExpr", t)
+		// fmt.Println("writeType - *ast.SelectorExpr", t)
 		// e.g. `time.Time`
 		longType := fmt.Sprintf("%s.%s", t.X, t.Sel)
 		mappedTsType, ok := g.conf.FFITypeMappings[longType]
@@ -436,7 +436,7 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 	switch t := t.(type) {
 	case *ast.ArrayType:
-		fmt.Println("writeCGoResType - *ast.ArrayType")
+		// fmt.Println("writeCGoResType - *ast.ArrayType")
 		if v, ok := t.Elt.(*ast.Ident); ok {
 			return v.String()
 		}
@@ -452,7 +452,7 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
 	if v, ok := t.(*ast.Ident); ok {
-		fmt.Println(v)
+		// fmt.Println(v)
 		return v.String()
 	}
 	return ""
@@ -461,7 +461,7 @@ func (g *PackageGenerator) getStructName(t ast.Expr) string {
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		fmt.Println("writeType - *ast.StarExpr", t)
+		// fmt.Println("writeType - *ast.StarExpr", t)
 		if optionalParens {
 			s.WriteByte('(')
 		}
@@ -471,7 +471,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			s.WriteByte(')')
 		}
 	case *ast.ArrayType:
-		fmt.Println("writeType - *ast.ArrayType", t)
+		// fmt.Println("writeType - *ast.ArrayType", t)
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
 			s.WriteString("string")
 			break
@@ -479,20 +479,20 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		g.writeType(s, t.Elt, depth, true)
 		s.WriteString("[]")
 	case *ast.StructType:
-		fmt.Println("writeType - *ast.StructType", t)
+		// fmt.Println("writeType - *ast.StructType", t)
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
 		g.writeIndent(s, depth+1)
 		s.WriteByte('}')
 	case *ast.Ident:
-		fmt.Println("writeType - *ast.Ident", t)
+		// fmt.Println("writeType - *ast.Ident", t)
 		if t.String() == "any" {
 			s.WriteString(getIdent(g.conf.FallbackType))
 		} else {
 			s.WriteString(getIdent(t.String()))
 		}
 	case *ast.SelectorExpr:
-		fmt.Println("writeType - *ast.SelectorExpr", t)
+		// fmt.Println("writeType - *ast.SelectorExpr", t)
 		// e.g. `time.Time`
 		longType := fmt.Sprintf("%s.%s", t.X, t.Sel)
 		mappedTsType, ok := g.conf.TypeMappings[longType]
@@ -505,35 +505,35 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			s.WriteString(" */")
 		}
 	case *ast.MapType:
-		fmt.Println("writeType - *ast.MapType", t)
+		// fmt.Println("writeType - *ast.MapType", t)
 		s.WriteString("{ [key: ")
 		g.writeType(s, t.Key, depth, false)
 		s.WriteString("]: ")
 		g.writeType(s, t.Value, depth, false)
 		s.WriteByte('}')
 	case *ast.BasicLit:
-		fmt.Println("writeType - *ast.BasicLit", t)
+		// fmt.Println("writeType - *ast.BasicLit", t)
 		s.WriteString(t.Value)
 	case *ast.ParenExpr:
-		fmt.Println("writeType - *ast.ParenExpr", t)
+		// fmt.Println("writeType - *ast.ParenExpr", t)
 		s.WriteByte('(')
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte(')')
 	case *ast.BinaryExpr:
-		fmt.Println("writeType - *ast.BinaryExpr", t)
+		// fmt.Println("writeType - *ast.BinaryExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte(' ')
 		s.WriteString(t.Op.String())
 		s.WriteByte(' ')
 		g.writeType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
-		fmt.Println("writeType - *ast.InterfaceType", t)
+		// fmt.Println("writeType - *ast.InterfaceType", t)
 		g.writeInterfaceFields(s, t.Methods.List, depth+1)
 	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
-		fmt.Println("writeType - *ast.CallExpr, *ast.FuncType, *ast.ChanType", t)
+		// fmt.Println("writeType - *ast.CallExpr, *ast.FuncType, *ast.ChanType", t)
 		s.WriteString(g.conf.FallbackType)
 	case *ast.UnaryExpr:
-		fmt.Println("writeType - *ast.UnaryExpr", t)
+		// fmt.Println("writeType - *ast.UnaryExpr", t)
 		if t.Op == token.TILDE {
 			// We just ignore the tilde token, in Typescript extended types are
 			// put into the generic typing itself, which we can't support yet.
@@ -544,7 +544,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			panic(err)
 		}
 	case *ast.IndexListExpr:
-		fmt.Println("writeType - *ast.IndexListExpr", t)
+		// fmt.Println("writeType - *ast.IndexListExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte('<')
 		for i, index := range t.Indices {
@@ -555,7 +555,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		}
 		s.WriteByte('>')
 	case *ast.IndexExpr:
-		fmt.Println("writeType - *ast.IndexExpr", t)
+		// fmt.Println("writeType - *ast.IndexExpr", t)
 		g.writeType(s, t.X, depth, false)
 		s.WriteByte('<')
 		g.writeType(s, t.Index, depth, false)

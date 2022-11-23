@@ -401,7 +401,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		if test_func_parser.name != nil {
 			fmt.Println("name: ", *test_func_parser.name)
 		}
-		fmt.Println(test_func_parser, "test struct_name:", *test_func_parser.name)
+		fmt.Println("test_func_parser:", test_func_parser)
 		tempName := ""
 		var ffi_func = &FFIFunc{
 			args:           []string{},
