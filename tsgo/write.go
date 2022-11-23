@@ -604,7 +604,8 @@ func (g *PackageGenerator) writeInterfaceFields(s *strings.Builder, fields []*as
 	}
 }
 
-func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.Field, depth int) {
+func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.Field, depth int) []*FFIFunc {
+	struct_fields := []*FFIFunc{}
 	for _, f := range fields {
 		// fmt.Println(f.Type)
 		optional := false
@@ -702,5 +703,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			s.WriteByte('\n')
 		}
 
+		struct_fields = append(struct_fields, field_func)
 	}
+	return struct_fields
 }
