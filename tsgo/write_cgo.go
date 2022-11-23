@@ -361,6 +361,18 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 	return isHandle, structName
 }
 
+// bulk of parsing the function is done here
+func (g *PackageGenerator) isTypedArray(t ast.Expr) (bool, string) {
+	isArray := false
+	var dType string
+	switch t := t.(type) {
+	case *ast.ArrayType:
+		dType = g.getArrayType(t)
+
+	}
+	return isArray, dType
+}
+
 func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	var ffi_func = &FFIFunc{
 		args:       []*ArgHelpers{},
@@ -377,7 +389,26 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 			OGGoType:    tempSB.String(),
 			Name:        param.Names[0].Name,
 		}
+		isArray, dType := g.isTypedArray(param.Type)
+		if isArray {
+			var tempTypeSB strings.Builder
+			tempTypeSB.WriteString("[]")
+			tempTypeSB.WriteString(dType)
+			arg_helper.OGGoType = tempTypeSB.String()
+		}
 		ffi_func.args = append(ffi_func.args, arg_helper)
+		if isArray {
+			var lenName strings.Builder
+			lenName.WriteString(param.Names[0].Name)
+			lenName.WriteString("_len")
+			var len_helper = &ArgHelpers{
+				FFIType:     "FFIType.u64_fast",
+				CGoWrapType: "uint64",
+				OGGoType:    "C.size_t",
+				Name:        lenName.String(),
+			}
+			ffi_func.args = append(ffi_func.args, len_helper)
+		}
 	}
 
 	for i, res := range f.Type.Results.List {

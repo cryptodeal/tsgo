@@ -66,110 +66,92 @@ export interface StructBar {
 
 export const {
   symbols: {
-    _Int64ArrayTest,
-    _StringTest,
-    _Int64ArgTest,
-    _Float32ArrayTest,
     arraySize,
+    genDisposePtr,
+    _Uint32ArrayTest,
+    _IntTest,
+    _Float32ArrayTest,
+    _Float64ArrayTest,
     _Int32ArrayTest,
     _Float32ArgTest,
-    genDisposePtr,
-    _Float64ArrayTest,
+    _TestStruct,
     _TestMap,
+    _Uint64ArgTest,
+    _Int64ArrayTest,
     _Uint64ArrayTest,
+    _StringTest,
     _Float64ArgTest,
     _Int32ArgTest,
-    _Uint32ArgTest,
-    _Uint64ArgTest,
-    _TestStruct,
-    _IntTest,
-    _Uint32ArrayTest
+    _Int64ArgTest,
+    _Uint32ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Uint32ArgTest: {
+  _Float64ArgTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
-  },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
-  },
-  _TestStruct: {
-    returns: unsafe.Pointer
-
-  },
-  _IntTest: {
-    args: [FFIType.ptr],
-    returns: C.int
-
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
   },
   _Int32ArgTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
-  },
-  _StringTest: {
-    returns: *C.char
-
+    returns: FFIType.ptr
   },
   _Int64ArgTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
+  _Uint32ArgTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
+  },
+  _Uint64ArrayTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.ptr
   },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
-
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
   },
   genDisposePtr: {
     returns: FFIType.ptr
-
   },
-  _Float64ArrayTest: {
+  _Uint32ArrayTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
   },
   _Int32ArrayTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
   },
-  _Uint64ArrayTest: {
+  _Float32ArgTest: {
     args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+    returns: FFIType.ptr
   },
-  _Float64ArgTest: {
-    args: [FFIType.ptr],
-    returns: unsafe.Pointer
-
+  _TestStruct: {
+    returns: FFIType.ptr
   },
   _TestMap: {
-    returns: *C.char
-
+    returns: FFIType.ptr
+  },
+  _IntTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
   }
 })
