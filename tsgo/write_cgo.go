@@ -367,8 +367,8 @@ func (g *PackageGenerator) isTypedArray(t ast.Expr) (bool, string) {
 	var dType string
 	switch t := t.(type) {
 	case *ast.ArrayType:
+		isArray = true
 		dType = g.getArrayType(t)
-
 	}
 	return isArray, dType
 }
