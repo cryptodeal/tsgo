@@ -40,7 +40,16 @@ type FFIFunc struct {
 	returns        []*ResHelpers
 	isHandleFn     bool
 	name           *string
-	fieldAccessors []*FFIFunc
+	fieldAccessors []*StructAccessor
+}
+
+type StructAccessor struct {
+	args           []*ArgHelpers
+	returns        []*ResHelpers
+	isHandleFn     bool
+	isStarExpr     bool
+	name           *string
+	fieldAccessors []*StructAccessor
 }
 
 type FFIState struct {
@@ -49,7 +58,7 @@ type FFIState struct {
 	FFIHelpers    map[string]bool
 	CHelpers      map[string]bool
 	FFIFuncs      map[string]*FFIFunc
-	StructHelpers map[string][]*FFIFunc
+	StructHelpers map[string][]*StructAccessor
 }
 
 // Responsible for generating the code for an input package
@@ -98,7 +107,7 @@ func (g *TSGo) Generate() error {
 			FFIHelpers:    make(map[string]bool),
 			CHelpers:      make(map[string]bool),
 			FFIFuncs:      make(map[string]*FFIFunc),
-			StructHelpers: make(map[string][]*FFIFunc),
+			StructHelpers: make(map[string][]*StructAccessor),
 		}
 
 		pkgGen := &PackageGenerator{

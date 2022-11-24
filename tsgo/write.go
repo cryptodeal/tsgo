@@ -362,6 +362,15 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 	}
 }
 
+func (g *PackageGenerator) isStarExpr(t ast.Expr) bool {
+	switch t.(type) {
+	case *ast.StarExpr:
+		return true
+	default:
+		return false
+	}
+}
+
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
 	if v, ok := t.(*ast.Ident); ok {
 		// fmt.Println(v)
@@ -516,8 +525,8 @@ func (g *PackageGenerator) writeInterfaceFields(s *strings.Builder, fields []*as
 	}
 }
 
-func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.Field, depth int) []*FFIFunc {
-	struct_fields := []*FFIFunc{}
+func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.Field, depth int) []*StructAccessor {
+	struct_fields := []*StructAccessor{}
 	for _, f := range fields {
 		// fmt.Println(f.Type)
 		optional := false
@@ -532,7 +541,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			ASTField:    f,
 		}
 
-		var field_func = &FFIFunc{
+		var field_func = &StructAccessor{
 			args:    []*ArgHelpers{ptr_arg},
 			returns: []*ResHelpers{},
 		}
@@ -615,6 +624,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				OGGoType:    tempSB.String(),
 				ASTType:     &f.Type,
 			}
+
+			field_func.isStarExpr = g.isStarExpr(f.Type)
+
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
 			s.WriteString(tstype)

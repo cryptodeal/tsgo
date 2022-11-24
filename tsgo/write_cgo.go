@@ -179,7 +179,7 @@ func (g *PackageGenerator) addDisposePtr(s *strings.Builder, gi *strings.Builder
 			returns:        []*ResHelpers{res_helper},
 			isHandleFn:     false,
 			name:           &name,
-			fieldAccessors: []*FFIFunc{},
+			fieldAccessors: []*StructAccessor{},
 		}
 		s.WriteString("//export genDisposePtr\n")
 		s.WriteString("func genDisposePtr() unsafe.Pointer {\n")
@@ -448,7 +448,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	return ffi_func
 }
 
-func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string, structName string) string {
+func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, name string, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
 	fnSB.WriteString("//export _")
@@ -509,6 +509,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	// write returned value (or intermediary, if necessary)
 
 	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
+	g.writeIndent(&fnSB, 1)
 	if tempResType.String() == "encodeJSON" {
 		fnSB.WriteString("_temp_res_val := ")
 	} else {
@@ -518,6 +519,9 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 
 	fnSB.WriteByte('(')
 	fnSB.WriteString("s.")
+	if f.isStarExpr {
+		fnSB.WriteByte('*')
+	}
 	fnSB.WriteString(*f.name)
 
 	fnSB.WriteString(")\n")
