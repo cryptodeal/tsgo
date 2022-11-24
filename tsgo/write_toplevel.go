@@ -99,14 +99,15 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent && g.IsEnumStruct(ts.Name.Name) {
+
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
 		if enumName == "" {
 			enumName = ts.Name.Name + "Enum"
 		}
 		if !strings.EqualFold(enumName, ts.Name.Name) {
+			g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 			// add to TypeHelpers
-			g.ffi.TypeHelpers[ts.Name.Name] = getFFIIdent(id.Name)
 			// keeps the original type
 			s.WriteString("export type ")
 			s.WriteString(ts.Name.Name)
@@ -119,6 +120,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(enumName)
 		s.WriteString(" {")
 	} else if isIdent {
+		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
+
 		s.WriteString("export type ")
 		s.WriteString(ts.Name.Name)
 		s.WriteString(" = ")
@@ -127,6 +130,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	if !isStruct && !isIdent {
+		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 		s.WriteString("export type ")
 		s.WriteString(ts.Name.Name)
 		s.WriteString(" = ")

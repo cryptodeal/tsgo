@@ -679,7 +679,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		if func_data.isHandleFn {
 			for _, field := range func_data.fieldAccessors {
 				var accessorSB strings.Builder
-				accessorSB.WriteString("_GET_")
+				accessorSB.WriteString("GET_")
 				accessorSB.WriteString(*func_data.name)
 				accessorSB.WriteString("_")
 				accessorSB.WriteString(*field.name)
