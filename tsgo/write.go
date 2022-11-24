@@ -529,6 +529,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			FFIType:     "FFIType.ptr",
 			CGoWrapType: "C.uintptr_t",
 			OGGoType:    "unsafe.Pointer",
+			ASTField:    f,
 		}
 
 		var field_func = &FFIFunc{
