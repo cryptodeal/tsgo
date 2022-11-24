@@ -613,6 +613,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				FFIType:     getFFIIdent(tempSB.String()),
 				CGoWrapType: tempSB.String(),
 				OGGoType:    tempSB.String(),
+				ASTType:     &f.Type,
 			}
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {

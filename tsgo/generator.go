@@ -32,7 +32,7 @@ type ResHelpers struct {
 	FFIType     string
 	CGoWrapType string
 	OGGoType    string
-	ASTField    *ast.Field
+	ASTType     *ast.Expr
 }
 
 type FFIFunc struct {

@@ -283,6 +283,7 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder)
 		var res_helper = &ResHelpers{
 			FFIType:     "FFIType.u64_fast",
 			CGoWrapType: "C.size_t",
+			OGGoType:    "uint64",
 		}
 		var ffi_func = &FFIFunc{
 			args:       []*ArgHelpers{arg_helper},
@@ -436,7 +437,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 			CGoWrapType: tempSB.String(),
 			OGGoType:    tempSB.String(),
 			FFIType:     getFFIIdent(tempSB.String()),
-			ASTField:    res,
+			ASTType:     &res.Type,
 		}
 		ffi_func.returns = append(ffi_func.returns, res_helper)
 	}
@@ -507,7 +508,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	var tempResType strings.Builder
 	// write returned value (or intermediary, if necessary)
 
-	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, f.returns[0].ASTField.Type, 0, true, pkgName)
+	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
 	if tempResType.String() == "encodeJSON" {
 		fnSB.WriteString("_temp_res_val := ")
 	} else {
@@ -591,7 +592,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 		fnSB.WriteString("_returned_value := ")
 		fnSB.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
 	} else {
-		g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, f.returns[0].ASTField.Type, 0, true, pkgName)
+		g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
 		if tempResType.String() == "encodeJSON" {
 			fnSB.WriteString("_temp_res_val := ")
 		} else {
