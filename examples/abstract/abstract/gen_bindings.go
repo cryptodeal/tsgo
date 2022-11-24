@@ -263,32 +263,45 @@ func _TestStruct() unsafe.Pointer {
 }
 
 //export __GET_StructBar_Field
-func __GET_StructBar_Field() unsafe.Pointer {
-_returned_value := unsafe.Pointer(s.StructBar)
+func __GET_StructBar_Field(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.Field)
+_returned_value := unsafe.Pointer(s.Field)
   return _returned_value
 }
 
 //export __GET_StructBar_FieldWithWeirdJSONTag
-func __GET_StructBar_FieldWithWeirdJSONTag() unsafe.Pointer {
-_returned_value := unsafe.Pointer(s.StructBar)
+func __GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.FieldWithWeirdJSONTag)
+_returned_value := C.int64_t(s.FieldWithWeirdJSONTag)
   return _returned_value
 }
 
 //export __GET_StructBar_FieldThatShouldBeOptional
-func __GET_StructBar_FieldThatShouldBeOptional() unsafe.Pointer {
-_returned_value := unsafe.Pointer(s.StructBar)
+func __GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.FieldThatShouldBeOptional)
+_returned_value := C.CString(s.FieldThatShouldBeOptional)
+  defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
 
 //export __GET_StructBar_FieldThatShouldNotBeOptional
-func __GET_StructBar_FieldThatShouldNotBeOptional() unsafe.Pointer {
-_returned_value := unsafe.Pointer(s.StructBar)
+func __GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.FieldThatShouldNotBeOptional)
+_returned_value := C.CString(s.FieldThatShouldNotBeOptional)
+  defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
 
 //export __GET_StructBar_FieldThatShouldBeReadonly
-func __GET_StructBar_FieldThatShouldBeReadonly() unsafe.Pointer {
-_returned_value := unsafe.Pointer(s.StructBar)
+func __GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.FieldThatShouldBeReadonly)
+_returned_value := C.CString(s.FieldThatShouldBeReadonly)
+  defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
 

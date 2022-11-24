@@ -448,7 +448,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	return ffi_func
 }
 
-func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
+func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
 	fnSB.WriteString("//export _")
@@ -495,7 +495,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 				fnSB.WriteString("s := h.Value().(")
 				fnSB.WriteString(pkgName)
 				fnSB.WriteByte('.')
-				fnSB.WriteString(*f.name)
+				fnSB.WriteString(structName)
 				fnSB.WriteString(")\n")
 			} else {
 				// if `arg.ASTField == nil`, it's a helper arg like `len`, which isn't passed to wrapped Go func
@@ -681,7 +681,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				accessorSB.WriteString("_")
 				accessorSB.WriteString(*field.name)
 				name := accessorSB.String()
-				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, name, pkgName))
+				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, name, pkgName, *func_data.name))
 			}
 		}
 	}
