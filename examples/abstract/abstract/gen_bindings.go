@@ -282,7 +282,7 @@ func __GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 func __GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(s.FieldThatShouldBeOptional)
+  _returned_value := C.CString(s.*FieldThatShouldBeOptional)
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
@@ -291,7 +291,7 @@ func __GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
 func __GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(s.FieldThatShouldNotBeOptional)
+  _returned_value := C.CString(s.*FieldThatShouldNotBeOptional)
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }

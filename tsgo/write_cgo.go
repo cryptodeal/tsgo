@@ -518,12 +518,11 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString(tempResType.String())
 
 	fnSB.WriteByte('(')
-	fnSB.WriteString("s.")
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
 	}
+	fnSB.WriteString("s.")
 	fnSB.WriteString(*f.name)
-
 	fnSB.WriteString(")\n")
 
 	// TODO: need to improve API so this code is simplified/handles more edge cases
