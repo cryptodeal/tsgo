@@ -612,10 +612,14 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			g.writeType(s, f.Type, depth, false)
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
+			cgoType := tempSB.String()
+			if val, ok := g.ffi.TypeHelpers[cgoType]; ok {
+				cgoType = val
+			}
 			var res_helper = &ResHelpers{
-				FFIType:     getFFIIdent(tempSB.String()),
-				CGoWrapType: tempSB.String(),
-				OGGoType:    tempSB.String(),
+				FFIType:     getFFIIdent(cgoType),
+				CGoWrapType: cgoType,
+				OGGoType:    cgoType,
 				ASTType:     &f.Type,
 			}
 

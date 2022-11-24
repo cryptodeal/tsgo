@@ -105,6 +105,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 			enumName = ts.Name.Name + "Enum"
 		}
 		if !strings.EqualFold(enumName, ts.Name.Name) {
+			// add to TypeHelpers
+			g.ffi.TypeHelpers[ts.Name.Name] = getFFIIdent(id.Name)
 			// keeps the original type
 			s.WriteString("export type ")
 			s.WriteString(ts.Name.Name)

@@ -59,6 +59,7 @@ type FFIState struct {
 	CHelpers      map[string]bool
 	FFIFuncs      map[string]*FFIFunc
 	StructHelpers map[string][]*StructAccessor
+	TypeHelpers   map[string]string
 }
 
 // Responsible for generating the code for an input package
@@ -108,6 +109,7 @@ func (g *TSGo) Generate() error {
 			CHelpers:      make(map[string]bool),
 			FFIFuncs:      make(map[string]*FFIFunc),
 			StructHelpers: make(map[string][]*StructAccessor),
+			TypeHelpers:   make(map[string]string),
 		}
 
 		pkgGen := &PackageGenerator{
