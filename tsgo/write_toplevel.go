@@ -145,6 +145,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(" // " + ts.Comment.Text())
 	}
 	s.WriteString("\n")
+
+	fmt.Println("g.ffi.TypeHelpers[ts.Name.Name]", g.ffi.TypeHelpers[ts.Name.Name])
 }
 
 // Writing of value specs, which are exported const expressions like

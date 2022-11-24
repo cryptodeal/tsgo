@@ -66,42 +66,31 @@ export interface StructBar {
 
 export const {
   symbols: {
-    _Float32ArgTest,
-    _TestStruct,
-    _Uint32ArrayTest,
-    _Float32ArrayTest,
+    _Int64ArgTest,
+    genDisposePtr,
     arraySize,
     _StringTest,
     _Float64ArgTest,
     _Int32ArgTest,
-    _Int64ArgTest,
-    _Uint64ArgTest,
+    _Float32ArrayTest,
+    _Uint32ArrayTest,
     _TestMap,
     _IntTest,
-    _Float64ArrayTest,
-    _Int64ArrayTest,
+    _Int32ArrayTest,
     _Uint64ArrayTest,
     _Uint32ArgTest,
-    genDisposePtr,
-    _Int32ArrayTest
+    _Uint64ArgTest,
+    _Float64ArrayTest,
+    _Int64ArrayTest,
+    _Float32ArgTest,
+    _TestStruct
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  _Int32ArrayTest: {
+  _Float64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -112,28 +101,34 @@ export const {
   _TestStruct: {
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  genDisposePtr: {
     returns: FFIType.ptr
   },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _TestMap: {
@@ -143,14 +138,19 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.int
   },
-  _Float64ArrayTest: {
+  _Int32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _StringTest: {
-    returns: FFIType.cstring
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
   },
-  _Float64ArgTest: {
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   }
