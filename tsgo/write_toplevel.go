@@ -130,7 +130,10 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	if !isStruct && !isIdent {
-		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
+		var tempSB = &strings.Builder{}
+		g.writeCGoType(tempSB, ts.Type, 0, false)
+		// TODO: might not be correct?
+		g.ffi.TypeHelpers[ts.Name.Name] = tempSB.String()
 		s.WriteString("export type ")
 		s.WriteString(ts.Name.Name)
 		s.WriteString(" = ")
