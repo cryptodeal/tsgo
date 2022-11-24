@@ -164,89 +164,134 @@ func _IntTest(foo *C.char) C.int {
   _returned_value := C.int(abstract.IntTest(_foo))
   return _returned_value
 }
+
 //export _Float32ArrayTest
 func _Float32ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CFloat32(abstract.Float32ArrayTest(_foo))
   return _returned_value
 }
+
 //export _Float64ArrayTest
 func _Float64ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CFloat64(abstract.Float64ArrayTest(_foo))
   return _returned_value
 }
+
 //export _Int32ArrayTest
 func _Int32ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CInt32(abstract.Int32ArrayTest(_foo))
   return _returned_value
 }
+
 //export _Int64ArrayTest
 func _Int64ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CInt64(abstract.Int64ArrayTest(_foo))
   return _returned_value
 }
+
 //export _Uint32ArrayTest
 func _Uint32ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CUint32(abstract.Uint32ArrayTest(_foo))
   return _returned_value
 }
+
 //export _Uint64ArrayTest
 func _Uint64ArrayTest(foo *C.char) unsafe.Pointer {
   _foo := C.GoString(foo)
   _returned_value := CUint64(abstract.Uint64ArrayTest(_foo))
   return _returned_value
 }
+
 //export _StringTest
 func _StringTest() *C.char {
   _returned_value := C.CString(abstract.StringTest())
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
+
 //export _Float32ArgTest
 func _Float32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*float32)(foo), foo_len)
   _returned_value := CFloat32(abstract.Float32ArgTest(_foo))
   return _returned_value
 }
+
 //export _Float64ArgTest
 func _Float64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*float64)(foo), foo_len)
   _returned_value := CFloat64(abstract.Float64ArgTest(_foo))
   return _returned_value
 }
+
 //export _Int32ArgTest
 func _Int32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*int32)(foo), foo_len)
   _returned_value := CInt32(abstract.Int32ArgTest(_foo))
   return _returned_value
 }
+
 //export _Int64ArgTest
 func _Int64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*int64)(foo), foo_len)
   _returned_value := CInt64(abstract.Int64ArgTest(_foo))
   return _returned_value
 }
+
 //export _Uint32ArgTest
 func _Uint32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*uint32)(foo), foo_len)
   _returned_value := CUint32(abstract.Uint32ArgTest(_foo))
   return _returned_value
 }
+
 //export _Uint64ArgTest
 func _Uint64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
   _foo := unsafe.Slice((*uint64)(foo), foo_len)
   _returned_value := CUint64(abstract.Uint64ArgTest(_foo))
   return _returned_value
 }
+
 //export _TestStruct
 func _TestStruct() unsafe.Pointer {
   _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((abstract.TestStruct()))))
   return _returned_value
 }
+
+//export __GET_StructBar_Field
+func __GET_StructBar_Field() unsafe.Pointer {
+_returned_value := unsafe.Pointer(s.StructBar)
+  return _returned_value
+}
+
+//export __GET_StructBar_FieldWithWeirdJSONTag
+func __GET_StructBar_FieldWithWeirdJSONTag() unsafe.Pointer {
+_returned_value := unsafe.Pointer(s.StructBar)
+  return _returned_value
+}
+
+//export __GET_StructBar_FieldThatShouldBeOptional
+func __GET_StructBar_FieldThatShouldBeOptional() unsafe.Pointer {
+_returned_value := unsafe.Pointer(s.StructBar)
+  return _returned_value
+}
+
+//export __GET_StructBar_FieldThatShouldNotBeOptional
+func __GET_StructBar_FieldThatShouldNotBeOptional() unsafe.Pointer {
+_returned_value := unsafe.Pointer(s.StructBar)
+  return _returned_value
+}
+
+//export __GET_StructBar_FieldThatShouldBeReadonly
+func __GET_StructBar_FieldThatShouldBeReadonly() unsafe.Pointer {
+_returned_value := unsafe.Pointer(s.StructBar)
+  return _returned_value
+}
+
 //export _TestMap
 func _TestMap() *C.char {
   _temp_res_val := encodeJSON(abstract.TestMap())
@@ -254,4 +299,5 @@ func _TestMap() *C.char {
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
+
 func main() {} // Required but ignored

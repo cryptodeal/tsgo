@@ -680,7 +680,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				accessorSB.WriteString("_")
 				accessorSB.WriteString(*field.name)
 				name := accessorSB.String()
-				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, name, pkgName))
+				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, name, pkgName))
 			}
 		}
 	}
