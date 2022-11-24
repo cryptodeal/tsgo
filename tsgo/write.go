@@ -362,15 +362,6 @@ func (g *PackageGenerator) getArrayType(t ast.Expr) string {
 	}
 }
 
-func (g *PackageGenerator) isStarExpr(t ast.Expr) bool {
-	switch t.(type) {
-	case *ast.StarExpr:
-		return true
-	default:
-		return false
-	}
-}
-
 func (g *PackageGenerator) getStructName(t ast.Expr) string {
 	if v, ok := t.(*ast.Ident); ok {
 		// fmt.Println(v)
@@ -602,8 +593,11 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			s.WriteByte('\'')
 		}
 
+		isStarExpr := false
+
 		switch t := f.Type.(type) {
 		case *ast.StarExpr:
+			isStarExpr = true
 			optional = !required
 			f.Type = t.X
 		}
@@ -625,7 +619,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				ASTType:     &f.Type,
 			}
 
-			field_func.isStarExpr = g.isStarExpr(f.Type)
+			field_func.isStarExpr = isStarExpr
 
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
