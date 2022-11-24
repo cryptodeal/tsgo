@@ -88,14 +88,23 @@ func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
 	g.ffi.GoImports[pkg] = true
 }
 
-func (g *PackageGenerator) addCImport(s *strings.Builder, pkg string) {
+func (g *PackageGenerator) addCImport(s *strings.Builder, pkg string, isLocal bool) {
 	if _, ok := g.ffi.CImports[pkg]; ok {
 		return
 	}
 	g.writeIndent(s, 1)
-	s.WriteString("#include <")
+	s.WriteString("#include ")
+	if isLocal {
+		s.WriteByte('"')
+	} else {
+		s.WriteByte('<')
+	}
 	s.WriteString(pkg)
-	s.WriteString(">\n")
+	if isLocal {
+		s.WriteString("\"\n")
+	} else {
+		s.WriteString(">\n")
+	}
 	g.ffi.CImports[pkg] = true
 }
 
@@ -388,6 +397,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 			CGoWrapType: tempSB.String(),
 			OGGoType:    tempSB.String(),
 			Name:        param.Names[0].Name,
+			ASTField:    param,
 		}
 		isArray, dType := g.isTypedArray(param.Type)
 		if isArray {
@@ -426,6 +436,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 			CGoWrapType: tempSB.String(),
 			OGGoType:    tempSB.String(),
 			FFIType:     getFFIIdent(tempSB.String()),
+			ASTField:    res,
 		}
 		ffi_func.returns = append(ffi_func.returns, res_helper)
 	}
@@ -434,6 +445,101 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 		ffi_func.fieldAccessors = g.ffi.StructHelpers[*ffi_func.name]
 	}
 	return ffi_func
+}
+
+func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
+	used_args := UsedParams{}
+	var fnSB strings.Builder
+	fnSB.WriteString("//export _")
+	fnSB.WriteString(name)
+	fnSB.WriteByte('\n')
+	fnSB.WriteString("func _")
+	fnSB.WriteString(name)
+	fnSB.WriteByte('(')
+	// iterate through fn params, generating cgo function decl line
+	argLen := len(f.args)
+	if argLen > 0 {
+		for i, arg := range f.args {
+			fnSB.WriteString(arg.Name)
+			fnSB.WriteByte(' ')
+			fnSB.WriteString(arg.CGoWrapType)
+			if i < argLen-1 {
+				fnSB.WriteString(", ")
+			}
+		}
+	}
+	fnSB.WriteString(") ")
+
+	// write return type (if any)
+	if len(f.returns) > 0 {
+		if f.isHandleFn {
+			g.addGoImport(gi, "unsafe")
+			g.addGoImport(gi, "runtime/cgo")
+			g.addCDisposeHelpers(ci, pkgName)
+			g.addCImport(ci, "stdint.h", false)
+			fnSB.WriteString("unsafe.Pointer")
+		} else {
+			fnSB.WriteString(f.returns[0].CGoWrapType)
+		}
+		fnSB.WriteByte(' ')
+	}
+	fnSB.WriteString("{\n")
+	// gen necessary type coercions (CGo C types -> Go types)
+	if argLen > 0 {
+		for _, arg := range f.args {
+			// if `arg.ASTField == nil`, it's a helper arg like `len`, which isn't passed to wrapped Go func
+			if arg.ASTField != nil {
+				g.addArgHandler(&fnSB, gi, arg.ASTField, &used_args)
+			}
+		}
+	}
+	var tempResType strings.Builder
+	// write returned value (or intermediary, if necessary)
+	g.writeIndent(&fnSB, 1)
+	if f.isHandleFn {
+		fnSB.WriteString("_returned_value := ")
+		fnSB.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
+	} else {
+		g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, f.returns[0].ASTField.Type, 0, true, pkgName)
+		if tempResType.String() == "encodeJSON" {
+			fnSB.WriteString("_temp_res_val := ")
+		} else {
+			fnSB.WriteString("_returned_value := ")
+		}
+		fnSB.WriteString(tempResType.String())
+	}
+	fnSB.WriteByte('(')
+	fnSB.WriteString(pkgName)
+	fnSB.WriteByte('.')
+	fnSB.WriteString(name)
+	fnSB.WriteString("(")
+
+	// iterate through params (and converted params), writing args passed to function call
+	for i, param := range used_args {
+		fnSB.WriteString(param)
+		if i < len(used_args)-1 {
+			fnSB.WriteString(", ")
+		}
+	}
+	if f.isHandleFn {
+		fnSB.WriteString(")))")
+	}
+	fnSB.WriteString("))\n")
+
+	if tempResType.String() == "encodeJSON" {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+	} else if tempResType.String() == "C.CString" {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+	}
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString("return _returned_value\n")
+
+	fnSB.WriteString("}\n")
+	return fnSB.String()
 }
 
 // TODO: parse to generate CGo code and/or Bun FFI Wrapper for specified functions
@@ -450,7 +556,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 
 	// writes all functions to single string builder
 	var fn_str strings.Builder
-	// iterate through all function declarations
+
+	// iterate through all function declarations, parsing into `*FFIFunc` helper struct & writing CGo/C helpers
 	for _, f := range fd {
 		func_data := g.parseFn(f)
 		fmt.Println("test_func_parser:", func_data)
@@ -472,90 +579,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		}
 		g.ffi.FFIFuncs[f.Name.Name] = func_data
 
-		fn_str.WriteString("//export _")
-		fn_str.WriteString(f.Name.Name)
-		fn_str.WriteString("\n func _")
-		fn_str.WriteString(f.Name.Name)
-		fn_str.WriteString("(")
-		// iterate through fn params, generating cgo function decl line
-		for i, param := range f.Type.Params.List {
-			fn_str.WriteString(param.Names[0].Name)
-			fn_str.WriteByte(' ')
-			var tempSB strings.Builder
-			g.writeCGoType(&tempSB, param.Type, 0, true)
-			type_str := tempSB.String()
-			fn_str.WriteString(type_str)
-			if type_str == "unsafe.Pointer" {
-				g.addGoImport(&goImportsSB, "unsafe")
-				arr_dat_type := g.getArrayType(param.Type)
-				if arr_dat_type != "byte" {
-					fn_str.WriteString(", _len int")
-				}
-			}
-			if i < len(f.Type.Params.List)-1 {
-				fn_str.WriteString(", ")
-			}
-		}
-		fn_str.WriteString(") ")
-		var resSB strings.Builder
-		if f.Type.Results != nil || f.Type.Results.List != nil || f.Type.Results.List[0] != nil || f.Type.Results.List[0].Type != nil {
-			var is_struct strings.Builder
-			g.writeCGoResType(&is_struct, &goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
-			if is_struct.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
-				fn_str.WriteString("unsafe.Pointer")
-			} else {
-				g.writeCGoType(&resSB, f.Type.Results.List[0].Type, 0, true)
-				res_type := resSB.String()
-				fn_str.WriteString(res_type)
-			}
-		}
-		fn_str.WriteString(" {\n")
-
-		// iterate through fn params, generate logic casting C type -> Go type
-		used_vars := UsedParams{}
-		for _, param := range f.Type.Params.List {
-			g.addArgHandler(&fn_str, &goHelpersSB, param, &used_vars)
-		}
-		g.writeIndent(&fn_str, 1)
-		var tempResType strings.Builder
-		g.writeCGoResType(&tempResType, &goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, f.Type.Results.List[0].Type, 0, true, pkgName)
-		if tempResType.String() == "encodeJSON" {
-			fn_str.WriteString("_temp_res_val := ")
-		} else {
-			fn_str.WriteString("_returned_value := ")
-		}
-
-		fn_str.WriteString(tempResType.String())
-
-		fn_str.WriteByte('(')
-		fn_str.WriteString(pkgName)
-		fn_str.WriteByte('.')
-		fn_str.WriteString(f.Name.Name)
-		fn_str.WriteString("(")
-		// iterate through params (and converted params), writing args passed to function call
-		for i, param := range used_vars {
-			fn_str.WriteString(param)
-			if i < len(used_vars)-1 {
-				fn_str.WriteString(", ")
-			}
-		}
-		if tempResType.String() == "C.hackyHandle(C.uintptr_t(cgo.NewHandle(" {
-			fn_str.WriteString(")))")
-		}
-		fn_str.WriteString("))\n")
-		// generate handlers for casting Go type -> C type for FFI Return value
-		if tempResType.String() == "encodeJSON" {
-			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
-			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
-		} else if tempResType.String() == "C.CString" {
-			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
-		}
-		g.writeIndent(&fn_str, 1)
-		fn_str.WriteString("return _returned_value\n")
-		fn_str.WriteString("}\n\n")
+		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
 	}
 
 	// write headers, embedded C imports/logic, and Go imports

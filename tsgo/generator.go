@@ -2,6 +2,7 @@ package tsgo
 
 import (
 	"fmt"
+	"go/ast"
 	"io/ioutil"
 	"log"
 	"os"
@@ -25,12 +26,14 @@ type ArgHelpers struct {
 	CGoWrapType string
 	OGGoType    string
 	Name        string
+	ASTField    *ast.Field
 }
 
 type ResHelpers struct {
 	FFIType     string
 	CGoWrapType string
 	OGGoType    string
+	ASTField    *ast.Field
 }
 
 type FFIFunc struct {

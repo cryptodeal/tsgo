@@ -245,7 +245,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		// fmt.Println("writeCGoResType - *ast.StarExpr", t)
 		struct_name := g.getStructName(t.X)
 		if g.IsWrappedEnum(struct_name) {
-			g.addCImport(ci, "stdint.h")
+			g.addCImport(ci, "stdint.h", false)
 			g.addGoImport(cg, "runtime/cgo")
 			s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
 		} else {
