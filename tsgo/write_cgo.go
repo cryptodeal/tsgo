@@ -3,7 +3,6 @@ package tsgo
 import (
 	"fmt"
 	"go/ast"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -214,7 +213,7 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
-		err = ioutil.WriteFile(headersPath.String(), []byte(cHelpersHeaders.String()), os.ModePerm)
+		err = os.WriteFile(headersPath.String(), []byte(cHelpersHeaders.String()), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
@@ -243,7 +242,7 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
-		err = ioutil.WriteFile(helpersPath.String(), []byte(cHelpers.String()), os.ModePerm)
+		err = os.WriteFile(helpersPath.String(), []byte(cHelpers.String()), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
@@ -527,6 +526,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 	}
 	fnSB.WriteString("))\n")
 
+	// TODO: need to improve API so this code is simplified/handles more edge cases
 	if tempResType.String() == "encodeJSON" {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
@@ -604,7 +604,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}
-	err = ioutil.WriteFile(outPath.String(), []byte(cg.String()), os.ModePerm)
+	err = os.WriteFile(outPath.String(), []byte(cg.String()), os.ModePerm)
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}

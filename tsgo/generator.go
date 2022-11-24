@@ -3,7 +3,6 @@ package tsgo
 import (
 	"fmt"
 	"go/ast"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -120,7 +119,7 @@ func (g *TSGo) Generate() error {
 			return nil
 		}
 
-		err = ioutil.WriteFile(outPath, []byte(code), os.ModePerm)
+		err = os.WriteFile(outPath, []byte(code), os.ModePerm)
 		if err != nil {
 			return nil
 		}
