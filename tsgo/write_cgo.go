@@ -315,37 +315,38 @@ func (g *PackageGenerator) addPtrTrckr(s *strings.Builder) {
 	}
 }
 
-func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder, f *ast.Field, usedVars *UsedParams) {
+func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder, f *ArgHelpers, usedVars *UsedParams) {
 	g.writeIndent(s, 1)
 	var tempSB strings.Builder
-	g.writeCGoType(&tempSB, f.Type, 0, true)
+	g.writeCGoType(&tempSB, f.ASTField.Type, 0, true)
 	type_str := tempSB.String()
 	switch type_str {
 	case "*C.char":
 		parsedSB := strings.Builder{}
 		parsedSB.WriteByte('_')
-		parsedSB.WriteString(f.Names[0].Name)
+		parsedSB.WriteString(f.Name)
 		s.WriteString(parsedSB.String())
 		s.WriteString(" := C.GoString(")
-		s.WriteString(f.Names[0].Name)
+		s.WriteString(f.Name)
 		s.WriteString(")\n")
 		*usedVars = append(*usedVars, parsedSB.String())
 	case "unsafe.Pointer":
 		parsedSB := strings.Builder{}
 		parsedSB.WriteByte('_')
-		parsedSB.WriteString(f.Names[0].Name)
+		parsedSB.WriteString(f.Name)
 		g.addGoImport(gi, "unsafe")
-		arr_dat_type := g.getArrayType(f.Type)
+		arr_dat_type := g.getArrayType(f.ASTField.Type)
 		s.WriteString(parsedSB.String())
 		s.WriteString(" := unsafe.Slice((*")
 		s.WriteString(arr_dat_type)
 		s.WriteString(")(")
-		s.WriteString(f.Names[0].Name)
-		s.WriteString("), _len")
-		s.WriteString(")\n")
+		s.WriteString(f.Name)
+		s.WriteString("), ")
+		s.WriteString(f.Name)
+		s.WriteString("_len)\n")
 		*usedVars = append(*usedVars, parsedSB.String())
 	default:
-		*usedVars = append(*usedVars, f.Names[0].Name)
+		*usedVars = append(*usedVars, f.Name)
 	}
 }
 
@@ -489,7 +490,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 		for _, arg := range f.args {
 			// if `arg.ASTField == nil`, it's a helper arg like `len`, which isn't passed to wrapped Go func
 			if arg.ASTField != nil {
-				g.addArgHandler(&fnSB, gi, arg.ASTField, &used_args)
+				g.addArgHandler(&fnSB, gi, arg, &used_args)
 			}
 		}
 	}
