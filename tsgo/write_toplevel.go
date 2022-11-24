@@ -91,6 +91,9 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(" {\n")
 
 		g.ffi.StructHelpers[ts.Name.Name] = g.writeStructFields(s, st.Fields.List, 0)
+		for _, helper := range g.ffi.StructHelpers[ts.Name.Name] {
+			helper.args[0].OGGoType = ts.Name.Name
+		}
 		s.WriteString("}")
 	}
 

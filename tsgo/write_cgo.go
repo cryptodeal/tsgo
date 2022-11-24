@@ -447,6 +447,97 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	return ffi_func
 }
 
+func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
+	used_args := UsedParams{}
+	var fnSB strings.Builder
+	fnSB.WriteString("//export _")
+	fnSB.WriteString(name)
+	fnSB.WriteByte('\n')
+	fnSB.WriteString("func _")
+	fnSB.WriteString(name)
+	fnSB.WriteByte('(')
+	// iterate through fn params, generating cgo function decl line
+	argLen := len(f.args)
+	if argLen > 0 {
+		for i, arg := range f.args {
+			fnSB.WriteString(arg.Name)
+			fnSB.WriteByte(' ')
+			fnSB.WriteString(arg.CGoWrapType)
+			if i < argLen-1 {
+				fnSB.WriteString(", ")
+			}
+		}
+	}
+	fnSB.WriteString(") ")
+
+	// write return type (if any)
+	if len(f.returns) > 0 {
+		if f.isHandleFn {
+			g.addGoImport(gi, "unsafe")
+			g.addGoImport(gi, "runtime/cgo")
+			g.addCDisposeHelpers(ci, pkgName)
+			g.addCImport(ci, "stdint.h", false)
+			fnSB.WriteString("unsafe.Pointer")
+		} else {
+			fnSB.WriteString(f.returns[0].CGoWrapType)
+		}
+		fnSB.WriteByte(' ')
+	}
+	fnSB.WriteString("{\n")
+	// gen necessary type coercions (CGo C types -> Go types)
+	if argLen > 0 {
+		for i, arg := range f.args {
+			if i == 0 {
+				g.writeIndent(&fnSB, 1)
+				fnSB.WriteString("h := cgo.Handle(handle)\n")
+				g.writeIndent(&fnSB, 1)
+				fnSB.WriteString("s := h.Value().(")
+				fnSB.WriteString(pkgName)
+				fnSB.WriteByte('.')
+				fnSB.WriteString(*f.name)
+				fnSB.WriteString(")\n")
+			} else {
+				// if `arg.ASTField == nil`, it's a helper arg like `len`, which isn't passed to wrapped Go func
+				if arg.ASTField != nil {
+					g.addArgHandler(&fnSB, gi, arg, &used_args)
+				}
+			}
+		}
+	}
+	var tempResType strings.Builder
+	// write returned value (or intermediary, if necessary)
+
+	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, f.returns[0].ASTField.Type, 0, true, pkgName)
+	if tempResType.String() == "encodeJSON" {
+		fnSB.WriteString("_temp_res_val := ")
+	} else {
+		fnSB.WriteString("_returned_value := ")
+	}
+	fnSB.WriteString(tempResType.String())
+
+	fnSB.WriteByte('(')
+	fnSB.WriteString("s.")
+	fnSB.WriteString(*f.name)
+
+	fnSB.WriteString(")\n")
+
+	// TODO: need to improve API so this code is simplified/handles more edge cases
+	if tempResType.String() == "encodeJSON" {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+	} else if tempResType.String() == "C.CString" {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+	}
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString("return _returned_value\n")
+
+	fnSB.WriteString("}\n\n")
+	return fnSB.String()
+}
+
 func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
@@ -539,7 +630,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 	g.writeIndent(&fnSB, 1)
 	fnSB.WriteString("return _returned_value\n")
 
-	fnSB.WriteString("}\n")
+	fnSB.WriteString("}\n\n")
 	return fnSB.String()
 }
 
@@ -581,6 +672,17 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		g.ffi.FFIFuncs[f.Name.Name] = func_data
 
 		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
+		if func_data.isHandleFn {
+			for _, field := range func_data.fieldAccessors {
+				var accessorSB strings.Builder
+				accessorSB.WriteString("_GET_")
+				accessorSB.WriteString(*func_data.name)
+				accessorSB.WriteString("_")
+				accessorSB.WriteString(*field.name)
+				name := accessorSB.String()
+				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, name, pkgName))
+			}
+		}
 	}
 
 	// write headers, embedded C imports/logic, and Go imports

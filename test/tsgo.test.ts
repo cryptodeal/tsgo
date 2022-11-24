@@ -5,17 +5,17 @@ import { ptr, toArrayBuffer } from 'bun:ffi'
 describe('tsgo', () => {
   it('returns `int`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _IntTest(foo)
+    const bar = _IntTest.native(foo)
     expect(typeof bar).toBe('number')
   })
 
    it('returns `*[]float32`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Float32ArrayTest(foo)
+    const bar = _Float32ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(bar,0, arraySize(bar) * 4, genDisposePtr()))
+    const out = new Float32Array(toArrayBuffer(bar,0, arraySize.native(bar) * 4, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -23,11 +23,11 @@ describe('tsgo', () => {
 
    it('returns `*[]float64`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Float64ArrayTest(foo)
+    const bar = _Float64ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
+    const out = new Float64Array(toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -35,11 +35,11 @@ describe('tsgo', () => {
 
   it('returns `*[]int32`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Int32ArrayTest(foo)
+    const bar = _Int32ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Int32Array(toArrayBuffer(bar, 0, arraySize(bar) * 4, genDisposePtr()))
+    const out = new Int32Array(toArrayBuffer(bar, 0, arraySize.native(bar) * 4, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -47,11 +47,11 @@ describe('tsgo', () => {
 
   it('returns `*[]int64`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Int32ArrayTest(foo)
+    const bar = _Int32ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigInt64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
+    const out = new BigInt64Array(toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
@@ -59,11 +59,11 @@ describe('tsgo', () => {
 
   it('returns `*[]uint32`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Uint32ArrayTest(foo)
+    const bar = _Uint32ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Uint32Array(toArrayBuffer(bar, 0, arraySize(bar) * 4, genDisposePtr()))
+    const out = new Uint32Array(toArrayBuffer(bar, 0, arraySize.native(bar) * 4, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('number')
     }
@@ -71,11 +71,11 @@ describe('tsgo', () => {
 
   it('returns `*[]uint64`', () => {
     const foo = Buffer.from(`Message that originated from Bun.js runtime as a string!\0`, 'utf8')
-    const bar = _Uint64ArrayTest(foo)
+    const bar = _Uint64ArrayTest.native(foo)
     expect(typeof bar).toBe('number')
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigUint64Array(toArrayBuffer(bar, 0, arraySize(bar) * 8, genDisposePtr()))
+    const out = new BigUint64Array(toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native()))
     for (let i = 0; i < out.length; i++) {
       expect(typeof out[i]).toBe('bigint')
     }
@@ -110,10 +110,10 @@ describe('tsgo', () => {
   it('round trip `Float32Array`; mutate underlying data', () => {
     const test = new Float32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const temp_ptr = ptr(test)
-    const res = _Float32ArgTest(temp_ptr, test.length)
+    const res = _Float32ArgTest.native(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
+    const out = new Float32Array(toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -122,10 +122,10 @@ describe('tsgo', () => {
   it('round trip `Float64Array`; mutate underlying data', () => {
     const test = new Float64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const temp_ptr = ptr(test)
-    const res = _Float64ArgTest(temp_ptr, test.length)
+    const res = _Float64ArgTest.native(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Float64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
+    const out = new Float64Array(toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -137,7 +137,7 @@ describe('tsgo', () => {
     const res = _Int32ArgTest(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Int32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
+    const out = new Int32Array(toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -146,10 +146,10 @@ describe('tsgo', () => {
   it('round trip `BigInt64Array`; mutate underlying data', () => {
     const test = new BigInt64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => BigInt(v)))
     const temp_ptr = ptr(test)
-    const res = _Int64ArgTest(temp_ptr, test.length)
+    const res = _Int64ArgTest.native(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigInt64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
+    const out = new BigInt64Array(toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -158,10 +158,10 @@ describe('tsgo', () => {
   it('round trip `Uint32Array`; mutate underlying data', () => {
     const test = new Uint32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     const temp_ptr = ptr(test)
-    const res = _Uint32ArgTest(temp_ptr, test.length)
+    const res = _Uint32ArgTest.native(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new Uint32Array(toArrayBuffer(res, 0, arraySize(res) * 4, genDisposePtr()))
+    const out = new Uint32Array(toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }
@@ -170,10 +170,10 @@ describe('tsgo', () => {
   it('round trip `Uint64Array`; mutate underlying data', () => {
     const test = new BigUint64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => BigInt(v)))
     const temp_ptr = ptr(test)
-    const res = _Uint64ArgTest(temp_ptr, test.length)
+    const res = _Uint64ArgTest.native(temp_ptr, test.length)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
-    const out = new BigUint64Array(toArrayBuffer(res, 0, arraySize(res) * 8, genDisposePtr()))
+    const out = new BigUint64Array(toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native()))
     for (let i = 0; i < test.length; i++) {
       expect(out[i]).toBe(test[i])
     }

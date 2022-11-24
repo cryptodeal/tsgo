@@ -525,9 +525,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		readonly := false
 
 		var ptr_arg = &ArgHelpers{
-			Name:        "ptr",
+			Name:        "handle",
 			FFIType:     "FFIType.ptr",
-			CGoWrapType: "unsafe.Pointer",
+			CGoWrapType: "C.uintptr_t",
 			OGGoType:    "unsafe.Pointer",
 		}
 
