@@ -267,6 +267,7 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		}
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
+
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
 		g.writeIndent(s, depth+1)
@@ -613,7 +614,10 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
 			cgoType := tempSB.String()
-			if val, ok := g.ffi.TypeHelpers[cgoType]; ok {
+
+			longType := fmt.Sprintf("%s", f.Type)
+			fmt.Println(longType)
+			if val, ok := g.ffi.TypeHelpers[longType]; ok {
 				cgoType = val
 			}
 			var res_helper = &ResHelpers{
