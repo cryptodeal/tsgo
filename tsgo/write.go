@@ -183,11 +183,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 			s.WriteString("unsafe.Pointer")
 		}
 	case *ast.StructType:
-		// fmt.Println("writeCGoResType - *ast.StructType", t)
-		s.WriteString("{\n")
-		g.writeStructFields(s, t.Fields.List, depth+1)
-		g.writeIndent(s, depth+1)
-		s.WriteByte('}')
+		s.WriteString(g.getStructName(t))
 	case *ast.Ident:
 		// fmt.Println("writeCGoResType - *ast.Ident", t)
 		if t.String() == "any" {
