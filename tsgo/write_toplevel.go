@@ -81,6 +81,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
+		fmt.Println("isStruct")
 		s.WriteString("export interface ")
 		s.WriteString(ts.Name.Name)
 
@@ -99,6 +100,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent && g.IsEnumStruct(ts.Name.Name) {
+		fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
 
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
@@ -120,6 +122,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(enumName)
 		s.WriteString(" {")
 	} else if isIdent {
+		fmt.Println("isIdent")
+
 		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 
 		s.WriteString("export type ")
@@ -130,6 +134,8 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	if !isStruct && !isIdent {
+		fmt.Println("!isStruct && !isIdent")
+
 		var tempSB = &strings.Builder{}
 		g.writeCGoType(tempSB, ts.Type, 0, false)
 		// TODO: might not be correct?

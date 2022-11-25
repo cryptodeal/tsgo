@@ -266,7 +266,7 @@ func _TestStruct() unsafe.Pointer {
 func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(string(s.Field))
+  _returned_value := C.CString(s.Field)
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
