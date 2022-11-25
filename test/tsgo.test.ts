@@ -1,5 +1,4 @@
 import {
-	type StructBar,
 	_Float32ArgTest,
 	_Float32ArrayTest,
 	_Float64ArgTest,
