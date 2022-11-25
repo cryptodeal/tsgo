@@ -294,7 +294,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			for _, fa := range v.fieldAccessors {
 				g.writeIndent(s, 2)
 				s.WriteString(*fa.fnName)
-				if fieldsVisited == fieldCount-1 {
+				if visited == count-1 && fieldsVisited == fieldCount-1 {
 					s.WriteByte('\n')
 				} else {
 					s.WriteString(",\n")
@@ -397,9 +397,9 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				}
 
 				if fieldsVisited == fieldCount-1 {
-					s.WriteByte('\n')
+					s.WriteString("}\n")
 				} else {
-					s.WriteString(",\n")
+					s.WriteString("},\n")
 				}
 				fieldsVisited++
 			}
