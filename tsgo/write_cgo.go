@@ -505,17 +505,13 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 			}
 		}
 	}
-	var tempResType strings.Builder
 	// write returned value (or intermediary, if necessary)
 
-	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
+	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
 	g.writeIndent(&fnSB, 1)
-	if tempResType.String() == "encodeJSON" {
-		fnSB.WriteString("_temp_res_val := ")
-	} else {
-		fnSB.WriteString("_returned_value := ")
-	}
-	fnSB.WriteString(tempResType.String())
+
+	fnSB.WriteString("_returned_value := ")
+	fnSB.WriteString(tempResType)
 
 	fnSB.WriteByte('(')
 	if f.isStarExpr {
@@ -526,12 +522,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString(")\n")
 
 	// TODO: need to improve API so this code is simplified/handles more edge cases
-	if tempResType.String() == "encodeJSON" {
-		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString("_returned_value := C.CString(string(_temp_res_val))\n")
-		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
-	} else if tempResType.String() == "C.CString" {
+	if tempResType == "C.CString" {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
 	}

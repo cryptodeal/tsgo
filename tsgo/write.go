@@ -72,6 +72,44 @@ func getFFIIdent(s string) string {
 // TODO:
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)
+func (g *PackageGenerator) getCgoHandler(s string) string {
+	// fmt.Println(s)
+	switch s {
+	case "int", "C.int":
+		return "C.int"
+	case "int8", "C.int8_t":
+		return "C.int8_t"
+	case "int16", "C.int16_t":
+		return "C.int16_t"
+	case "int32", "C.int32_t":
+		return "C.int32_t"
+	case "int64", "C.int64_t":
+		return "C.int64_t"
+	case "uint", "C.uint":
+		return "C.uint"
+	case "uint8", "C.uint8_t":
+		return "C.uint8_t"
+	case "uint16", "C.uint16_t":
+		return "C.uint16_t"
+	case "uint32", "C.uint32_t":
+		return "C.uint32_t"
+	case "uint64", "C.uint64_t":
+		return "C.uint64_t"
+	case "float32", "C.float":
+		return "C.float"
+	case "float64", "C.double":
+		return "C.double"
+	case "string", "*C.char":
+		return "C.Cstring"
+	case "uintptr", "C.uintptr_t":
+		return "C.uintptr_t"
+	}
+	return "unsafe.Pointer"
+}
+
+// TODO:
+// * see if we can handle `complex64` and `complex128`?
+// * perhaps do a better job of mapping (no default value??)
 func getCGoIdent(s string) string {
 	// fmt.Println(s)
 	switch s {
