@@ -96,7 +96,13 @@ describe('tsgo', () => {
     console.log(StructBar.FieldThatShouldBeReadonly)
   })
 
-  it('returns Go *struct (wrapped class)', () => {
+  it('returns string (as cstring)', () => {
+    const str = _StringTest().toString()
+    expect(typeof str).toBe('string')
+    expect(str).toBe('Hello, World!')
+  })
+
+    it('returns Go *struct (wrapped class)', () => {
     let StructBar = new _StructBar(_TestStruct2())
     expect(typeof StructBar).toBe('object')
     expect(typeof StructBar.Field).toBe('string')
@@ -109,12 +115,6 @@ describe('tsgo', () => {
     console.log(StructBar.FieldThatShouldNotBeOptional)
     expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
     console.log(StructBar.FieldThatShouldBeReadonly)
-  })
-
-  it('returns string (as cstring)', () => {
-    const str = _StringTest().toString()
-    expect(typeof str).toBe('string')
-    expect(str).toBe('Hello, World!')
   })
 
   it('returns map (Record<number, string>)', () => {

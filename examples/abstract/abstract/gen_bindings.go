@@ -258,7 +258,7 @@ func _Uint64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
 
 //export _TestStruct
 func _TestStruct() unsafe.Pointer {
-  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((abstract.TestStruct()))))
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.TestStruct())))
   return _returned_value
 }
 
@@ -318,7 +318,8 @@ func _dispose_StructBar(handle C.uintptr_t) {
 
 //export _TestStruct2
 func _TestStruct2() unsafe.Pointer {
-  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((abstract.TestStruct2()))))
+	temp_val := *abstract.TestStruct2()
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle(temp_val)))
   return _returned_value
 }
 
