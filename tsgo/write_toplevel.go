@@ -71,7 +71,7 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // or
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
-	// fmt.Println("name:", ts.Name.Name, "ts:", ts, "group:", group)
+	fmt.Println("name:", ts.Name.Name, "ts:", ts)
 
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)
