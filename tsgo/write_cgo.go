@@ -504,23 +504,8 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 			}
 		}
 	}
-	// write returned value (or intermediary, if necessary)
 
-	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
-	g.writeIndent(&fnSB, 1)
-
-	fnSB.WriteString("_returned_value := ")
-	fnSB.WriteString(tempResType)
-
-	fnSB.WriteByte('(')
-	fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
-	fnSB.WriteByte('(')
-	if f.isStarExpr {
-		fnSB.WriteByte('*')
-	}
-	fnSB.WriteString("s.")
-	fnSB.WriteString(*f.name)
-	fnSB.WriteString("))\n")
+	// return `nil` if no value @ field
 	if f.isOptional {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString("if s.")
@@ -531,6 +516,23 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString("}\n")
 	}
+
+	// write returned value (or intermediary, if necessary)
+	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
+	g.writeIndent(&fnSB, 1)
+
+	fnSB.WriteString("_returned_value := ")
+	fnSB.WriteString(tempResType)
+	fnSB.WriteByte('(')
+	fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+	fnSB.WriteByte('(')
+	if f.isStarExpr {
+		fnSB.WriteByte('*')
+	}
+	fnSB.WriteString("s.")
+	fnSB.WriteString(*f.name)
+	fnSB.WriteString("))\n")
+
 	// TODO: need to improve API so this code is simplified/handles more edge cases
 	if tempResType == "C.CString" {
 		g.writeIndent(&fnSB, 1)
