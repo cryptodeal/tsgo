@@ -467,7 +467,7 @@ func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 	g.writeIndent(&disposeSB, 1)
 	disposeSB.WriteString(fmt.Sprintf("h := cgo.Handle(%s)\n", t.args[0].Name))
 	g.writeIndent(&disposeSB, 1)
-	disposeSB.WriteString("fmt.Println(fmt.Sprintf(\"deleted handle for `%d`\n\", t.args[0].Name)")
+	disposeSB.WriteString(fmt.Sprintf("fmt.Println(\"deleted handle @ uintptr:\", %s)", t.args[0].Name))
 	g.writeIndent(&disposeSB, 1)
 	disposeSB.WriteString("h.Delete()\n")
 	disposeSB.WriteString("}\n\n")
