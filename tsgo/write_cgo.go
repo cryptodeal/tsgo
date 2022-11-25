@@ -514,12 +514,14 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString(tempResType)
 
 	fnSB.WriteByte('(')
+	fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+	fnSB.WriteByte('(')
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
 	}
 	fnSB.WriteString("s.")
 	fnSB.WriteString(*f.name)
-	fnSB.WriteString(")\n")
+	fnSB.WriteString("))\n")
 
 	// TODO: need to improve API so this code is simplified/handles more edge cases
 	if tempResType == "C.CString" {

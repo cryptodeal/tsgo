@@ -107,6 +107,41 @@ func (g *PackageGenerator) getCgoHandler(s string) string {
 	return "unsafe.Pointer"
 }
 
+func (g *PackageGenerator) getGoType(t string) string {
+	switch t {
+	case "*C.char":
+		// not valid type
+		return "string"
+	case "C.int":
+		return "int"
+	case "C.int8_t":
+		return "int8"
+	case "C.int16_t":
+		return "int16"
+	case "C.int32_t":
+		return "int32"
+	case "C.int64_t":
+		return "int64"
+	case "C.uint":
+		return "uint"
+	case "C.uint8_t":
+		return "uint8"
+	case "C.uint16_t":
+		return "uint16"
+	case "C.uint32_t":
+		return "uint32"
+	case "C.uint64_t":
+		return "uint64"
+	case "C.float":
+		return "float32"
+	case "double":
+		return "float64"
+	case "string":
+		return "*C.char"
+	}
+	return "unsafe.Pointer"
+}
+
 // TODO:
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)
