@@ -94,6 +94,7 @@ describe('tsgo', () => {
     console.log(StructBar.FieldThatShouldNotBeOptional)
     expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
     console.log(StructBar.FieldThatShouldBeReadonly)
+    expect(StructBar.ArrayField instanceof Float32Array).toBe(true)
   })
 
   it('returns string (as cstring)', () => {
@@ -115,6 +116,7 @@ describe('tsgo', () => {
     console.log(StructBar.FieldThatShouldNotBeOptional)
     expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
     console.log(StructBar.FieldThatShouldBeReadonly)
+    expect(StructBar.ArrayField instanceof Float32Array).toBe(true)
   })
 
   it('returns map (Record<number, string>)', () => {

@@ -490,12 +490,16 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				}
 				s.WriteString(" {\n")
 				g.writeIndent(s, 2)
-				s.WriteString("return ")
 				if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 					g.writeIndent(s, 2)
+					s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment")
+					g.writeIndent(s, 2)
+					s.WriteString("// @ts-ignore - overload toArrayBuffer params")
+					g.writeIndent(s, 2)
 					s.WriteString(fmt.Sprintf("return new %sArray(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native());\n", caser.String(*f.arrayType), getByteSize(*f.arrayType)))
 				} else {
+					s.WriteString("return ")
 					s.WriteString(*f.fnName)
 					s.WriteString("(this._ptr)")
 					if tempType == "string" {

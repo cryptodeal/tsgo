@@ -47,6 +47,7 @@ func TestStruct() StructBar {
 		FieldWithWeirdJSONTag:        123,
 		FieldThatShouldNotBeOptional: &str,
 		FieldThatShouldBeReadonly:    "readonly",
+		ArrayField:                   []float32{1.1, 2.2, 3.3},
 	}
 	return structBar
 }
