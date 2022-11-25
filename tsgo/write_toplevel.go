@@ -396,7 +396,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 					log.Fatalf("TSGo failed: %v", errStr.String())
 				}
 
-				if fieldsVisited == fieldCount-1 {
+				g.writeIndent(s, 1)
+				if visited == count-1 && fieldsVisited == fieldCount-1 {
 					s.WriteString("}\n")
 				} else {
 					s.WriteString("},\n")
