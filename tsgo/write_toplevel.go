@@ -443,6 +443,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 2)
 		s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", c.disposeHandle.fnName))
 		g.writeIndent(s, 1)
+		s.WriteString("}\n\n")
 
 		// write struct field `getters`
 		fieldCount := len(c.fieldAccessors)
