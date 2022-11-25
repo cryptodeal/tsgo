@@ -497,7 +497,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 					g.writeIndent(s, 2)
 					s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
 					g.writeIndent(s, 2)
-					s.WriteString(fmt.Sprintf("return new %sArray(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native());\n", caser.String(*f.arrayType), getByteSize(*f.arrayType)))
+					s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", caser.String(*f.arrayType), getByteSize(*f.arrayType)))
 				} else {
 					s.WriteString("return ")
 					s.WriteString(*f.fnName)
