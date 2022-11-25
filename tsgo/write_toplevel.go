@@ -385,7 +385,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				if resLen == 1 {
 					g.writeIndent(s, 2)
 					s.WriteString("returns: ")
-					s.WriteString(v.returns[0].FFIType)
+					s.WriteString(fa.returns[0].FFIType)
 					s.WriteByte('\n')
 				} else if resLen > 1 {
 					var errStr strings.Builder
