@@ -424,7 +424,12 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("})\n\n")
 
 	if len(class_wrappers) > 0 {
-		s.WriteString("const registry = new FinalizationRegistry((cb: () => void) => cb());\n\n")
+		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("const { cb, ptr } = disp;\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return cb(ptr);")
+		s.WriteString("});\n\n")
 	}
 
 	// Write the class wrappers
@@ -439,15 +444,15 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 2)
 		s.WriteString("this._ptr = ptr;\n")
 		g.writeIndent(s, 2)
-		s.WriteString("registry.register(this, this._gc_dispose)\n")
+		s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n\n")
 
 		// write class method that frees `Handle` + CGo mem for struct @ GC
 		g.writeIndent(s, 1)
-		s.WriteString("public _gc_dispose(): void {\n")
+		s.WriteString("public _gc_dispose(ptr: number): void {\n")
 		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", c.disposeHandle.fnName))
+		s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
 		g.writeIndent(s, 1)
 		s.WriteString("}\n\n")
 
