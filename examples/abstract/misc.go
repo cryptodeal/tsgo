@@ -36,6 +36,15 @@ type StructBar struct {
 	FieldThatShouldNotBeOptional *string `json:"field_that_should_not_be_optional" tstype:",required"`
 	FieldThatShouldBeReadonly    string  `json:"field_that_should_be_readonly" tstype:",readonly"`
 	ArrayField                   []float32
+	StructField                  *DemoStruct
+}
+
+/*
+Another example multiline comment
+for DemoStruct
+*/
+type DemoStruct struct {
+	ArrayField *[]float32
 }
 
 // DROPPED: Floating comment at the end

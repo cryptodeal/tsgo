@@ -52,16 +52,15 @@ type DisposeStructFunc struct {
 }
 
 type StructAccessor struct {
-	args       []*ArgHelpers
-	returns    []*ResHelpers
-	isHandleFn bool
-	isStarExpr bool
-	isOptional bool
-	name       *string
-	fnName     *string
-	arrayType  *string
-	// TODO: below field is needed if struct holds ref to other structs
-	// fieldAccessors []*StructAccessor
+	args           []*ArgHelpers
+	returns        []*ResHelpers
+	isHandleFn     *string
+	isStarExpr     bool
+	isOptional     bool
+	name           *string
+	fnName         *string
+	arrayType      *string
+	fieldAccessors []*StructAccessor
 }
 
 type FFIState struct {

@@ -319,6 +319,17 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   return _returned_value
 }
 
+//export _GET_StructBar_StructField
+func _GET_StructBar_StructField(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  if s. StructField == nil {
+    return nil
+  }
+  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.StructField))
+  return _returned_value
+}
+
 //export _dispose_StructBar
 func _dispose_StructBar(handle C.uintptr_t) {
   h := cgo.Handle(handle)

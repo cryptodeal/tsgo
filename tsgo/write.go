@@ -692,6 +692,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		}
 
 		isStarExpr := false
+		isHandleFn, structName := g.isResHandle(f.Type)
 
 		switch t := f.Type.(type) {
 		case *ast.StarExpr:
@@ -722,6 +723,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				CGoWrapType: cgoType,
 				OGGoType:    cgoType,
 				ASTType:     &f.Type,
+			}
+			if isHandleFn {
+				field_func.isHandleFn = &structName
 			}
 			field_func.isOptional = optional
 			field_func.isStarExpr = isStarExpr

@@ -452,6 +452,11 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 
 	if ffi_func.isHandleFn {
 		ffi_func.fieldAccessors = g.ffi.StructHelpers[*ffi_func.name]
+		for _, fa := range ffi_func.fieldAccessors {
+			if fa.isHandleFn != nil {
+				fa.fieldAccessors = g.ffi.StructHelpers[*fa.isHandleFn]
+			}
+		}
 		var ptr_arg = &ArgHelpers{
 			Name:        "handle",
 			FFIType:     "FFIType.ptr",
@@ -508,7 +513,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 
 	// write return type (if any)
 	if len(f.returns) > 0 {
-		if f.isHandleFn {
+		if f.isHandleFn != nil {
 			g.addGoImport(gi, "unsafe")
 			g.addGoImport(gi, "runtime/cgo")
 			g.addCDisposeHelpers(ci, pkgName)
@@ -580,6 +585,11 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString("return _returned_value\n")
 
 	fnSB.WriteString("}\n\n")
+
+	for _, fa := range f.fieldAccessors {
+		fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *fa.isHandleFn))
+	}
+
 	return fnSB.String()
 }
 

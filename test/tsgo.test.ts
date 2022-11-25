@@ -115,35 +115,33 @@ describe('tsgo', () => {
 	});
 
 	it('returns Go struct (wrapped class)', () => {
-		const StructBar = new _StructBar(_TestStruct());
+		let StructBar = new _StructBar(_TestStruct());
 		expect(typeof StructBar).toBe('object');
 		expect(typeof StructBar.Field).toBe('string');
-		console.log(StructBar.Field);
 		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
-		console.log(StructBar.FieldWithWeirdJSONTag);
 		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
-		console.log(StructBar.FieldThatShouldBeOptional);
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
-		console.log(StructBar.FieldThatShouldNotBeOptional);
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-		console.log(StructBar.FieldThatShouldBeReadonly);
-		expect(StructBar.ArrayField instanceof Float32Array).toBe(true);
+		const testArray = StructBar.ArrayField;
+		expect(testArray instanceof Float32Array).toBe(true);
+		for (let i = 0; i < testArray.length; i++) {
+			expect(typeof testArray[i]).toBe('number');
+		}
+		StructBar = null;
+		Bun.gc(true);
 	});
 
 	it('returns Go *struct (wrapped class)', () => {
-		const StructBar = new _StructBar(_TestStruct2());
+		let StructBar = new _StructBar(_TestStruct2());
 		expect(typeof StructBar).toBe('object');
 		expect(typeof StructBar.Field).toBe('string');
-		console.log(StructBar.Field);
 		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
-		console.log(StructBar.FieldWithWeirdJSONTag);
 		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
-		console.log(StructBar.FieldThatShouldBeOptional);
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
-		console.log(StructBar.FieldThatShouldNotBeOptional);
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-		console.log(StructBar.FieldThatShouldBeReadonly);
 		expect(typeof StructBar.ArrayField).toBe('undefined');
+		StructBar = null;
+		Bun.gc(true);
 	});
 
 	it('returns string (as cstring)', () => {
