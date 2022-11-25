@@ -279,6 +279,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 
 	count := len(g.ffi.FFIFuncs)
 	visited := 0
+
+	struct_exports := map[string]bool{}
 	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
 		if !g.ffi.FFIHelpers[k] {
@@ -290,7 +292,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		} else {
 			s.WriteString(",\n")
 		}
-		if v.isHandleFn {
+		if v.isHandleFn && !struct_exports[*v.name] {
 			class_wrappers = append(class_wrappers, v)
 			// declare export for struct dispose fn
 			g.writeIndent(s, 2)
@@ -307,6 +309,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				}
 				fieldsVisited++
 			}
+			struct_exports[*v.name] = true
 		}
 		visited++
 	}
@@ -317,6 +320,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("/gen_bindings")
 	s.WriteString(".dylib', {\n")
 	visited = 0
+	struct_config := map[string]bool{}
 	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 1)
 		if !g.ffi.FFIHelpers[k] {
@@ -363,7 +367,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("},\n")
 		}
 
-		if v.isHandleFn {
+		if v.isHandleFn && !struct_config[*v.name] {
 			// write config for struct dispose fn
 			g.writeIndent(s, 1)
 			s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
@@ -418,6 +422,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				}
 				fieldsVisited++
 			}
+			struct_config[*v.name] = true
 		}
 		visited++
 	}
@@ -433,59 +438,63 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 
 	// Write the class wrappers
+	struct_wrappers := map[string]bool{}
 	for _, c := range class_wrappers {
-		s.WriteString("export class _")
-		s.WriteString(*c.name)
-		s.WriteString(" {\n")
-		g.writeIndent(s, 1)
-		s.WriteString("private _ptr: number;\n\n")
-		g.writeIndent(s, 1)
-		s.WriteString("constructor(ptr: number) {\n")
-		g.writeIndent(s, 2)
-		s.WriteString("this._ptr = ptr;\n")
-		g.writeIndent(s, 2)
-		s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
-		g.writeIndent(s, 1)
-		s.WriteString("}\n\n")
-
-		// write class method that frees `Handle` + CGo mem for struct @ GC
-		g.writeIndent(s, 1)
-		s.WriteString("public _gc_dispose(ptr: number): void {\n")
-		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
-		g.writeIndent(s, 1)
-		s.WriteString("}\n\n")
-
-		// write struct field `getters`
-		fieldCount := len(c.fieldAccessors)
-		fieldsVisited := 0
-		for _, f := range c.fieldAccessors {
-			g.writeIndent(s, 1)
-			s.WriteString("get ")
-			s.WriteString(*f.name)
-			s.WriteString("(): ")
-			tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-			s.WriteString(tempType)
-			if f.isOptional {
-				s.WriteString(" | undefined")
-			}
+		if !struct_wrappers[*c.name] {
+			s.WriteString("export class _")
+			s.WriteString(*c.name)
 			s.WriteString(" {\n")
-			g.writeIndent(s, 2)
-			s.WriteString("return ")
-			s.WriteString(*f.fnName)
-			s.WriteString("(this._ptr)")
-			if tempType == "string" {
-				s.WriteString(".toString()")
-			}
-			s.WriteString(";\n")
 			g.writeIndent(s, 1)
-			if fieldsVisited == fieldCount-1 {
-				s.WriteString("}\n")
-			} else {
-				s.WriteString("}\n\n")
+			s.WriteString("private _ptr: number;\n\n")
+			g.writeIndent(s, 1)
+			s.WriteString("constructor(ptr: number) {\n")
+			g.writeIndent(s, 2)
+			s.WriteString("this._ptr = ptr;\n")
+			g.writeIndent(s, 2)
+			s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
+			g.writeIndent(s, 1)
+			s.WriteString("}\n\n")
+
+			// write class method that frees `Handle` + CGo mem for struct @ GC
+			g.writeIndent(s, 1)
+			s.WriteString("public _gc_dispose(ptr: number): void {\n")
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
+			g.writeIndent(s, 1)
+			s.WriteString("}\n\n")
+
+			// write struct field `getters`
+			fieldCount := len(c.fieldAccessors)
+			fieldsVisited := 0
+			for _, f := range c.fieldAccessors {
+				g.writeIndent(s, 1)
+				s.WriteString("get ")
+				s.WriteString(*f.name)
+				s.WriteString("(): ")
+				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
+				s.WriteString(tempType)
+				if f.isOptional {
+					s.WriteString(" | undefined")
+				}
+				s.WriteString(" {\n")
+				g.writeIndent(s, 2)
+				s.WriteString("return ")
+				s.WriteString(*f.fnName)
+				s.WriteString("(this._ptr)")
+				if tempType == "string" {
+					s.WriteString(".toString()")
+				}
+				s.WriteString(";\n")
+				g.writeIndent(s, 1)
+				if fieldsVisited == fieldCount-1 {
+					s.WriteString("}\n")
+				} else {
+					s.WriteString("}\n\n")
+				}
+				fieldsVisited++
 			}
-			fieldsVisited++
+			s.WriteString("}\n\n")
+			struct_wrappers[*c.name] = true
 		}
-		s.WriteString("}\n\n")
 	}
 }

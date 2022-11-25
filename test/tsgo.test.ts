@@ -83,7 +83,7 @@ describe('tsgo', () => {
 
   
     it('returns Go struct as JSON (`json.Marshal` struct)', () => {
-      let StructBar = new _StructBar(_TestStruct())
+      let StructBar = new _StructBar(_TestStruct()), bar = new _StructBar(_TestStruct())
       expect(typeof StructBar).toBe('object')
       expect(typeof StructBar.Field).toBe('string')
       console.log(StructBar.Field)
@@ -96,6 +96,7 @@ describe('tsgo', () => {
       expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
       console.log(StructBar.FieldThatShouldBeReadonly)
       StructBar = null
+      bar = null
       Bun.gc(true)
     })
   

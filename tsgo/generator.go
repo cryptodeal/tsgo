@@ -63,13 +63,14 @@ type StructAccessor struct {
 }
 
 type FFIState struct {
-	GoImports     map[string]bool
-	CImports      map[string]bool
-	FFIHelpers    map[string]bool
-	CHelpers      map[string]bool
-	FFIFuncs      map[string]*FFIFunc
-	StructHelpers map[string][]*StructAccessor
-	TypeHelpers   map[string]string
+	GoImports        map[string]bool
+	CImports         map[string]bool
+	FFIHelpers       map[string]bool
+	CHelpers         map[string]bool
+	FFIFuncs         map[string]*FFIFunc
+	StructHelpers    map[string][]*StructAccessor
+	TypeHelpers      map[string]string
+	GoWrappedStructs map[string]bool
 }
 
 // Responsible for generating the code for an input package
@@ -113,13 +114,14 @@ func (g *TSGo) Generate() error {
 		pkgConfig := g.conf.PackageConfig(pkg.ID)
 
 		ffi := &FFIState{
-			GoImports:     make(map[string]bool),
-			CImports:      make(map[string]bool),
-			FFIHelpers:    make(map[string]bool),
-			CHelpers:      make(map[string]bool),
-			FFIFuncs:      make(map[string]*FFIFunc),
-			StructHelpers: make(map[string][]*StructAccessor),
-			TypeHelpers:   make(map[string]string),
+			GoImports:        make(map[string]bool),
+			CImports:         make(map[string]bool),
+			FFIHelpers:       make(map[string]bool),
+			CHelpers:         make(map[string]bool),
+			FFIFuncs:         make(map[string]*FFIFunc),
+			StructHelpers:    make(map[string][]*StructAccessor),
+			TypeHelpers:      make(map[string]string),
+			GoWrappedStructs: make(map[string]bool),
 		}
 
 		pkgGen := &PackageGenerator{

@@ -316,6 +316,66 @@ func _dispose_StructBar(handle C.uintptr_t) {
   h.Delete()
 }
 
+//export _TestStruct2
+func _TestStruct2() unsafe.Pointer {
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((abstract.TestStruct2()))))
+  return _returned_value
+}
+
+//export _GET_StructBar_Field
+func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  _returned_value := C.CString(string(s.Field))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
+}
+
+//export _GET_StructBar_FieldWithWeirdJSONTag
+func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  _returned_value := C.int64_t(int64(s.FieldWithWeirdJSONTag))
+  return _returned_value
+}
+
+//export _GET_StructBar_FieldThatShouldBeOptional
+func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  if s. FieldThatShouldBeOptional == nil {
+    return nil
+  }
+  _returned_value := C.CString(string(*s.FieldThatShouldBeOptional))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
+}
+
+//export _GET_StructBar_FieldThatShouldNotBeOptional
+func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  _returned_value := C.CString(string(*s.FieldThatShouldNotBeOptional))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
+}
+
+//export _GET_StructBar_FieldThatShouldBeReadonly
+func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  _returned_value := C.CString(string(s.FieldThatShouldBeReadonly))
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
+}
+
+//export _dispose_StructBar
+func _dispose_StructBar(handle C.uintptr_t) {
+  h := cgo.Handle(handle)
+  fmt.Println("deleted handle @ uintptr:", handle)
+  h.Delete()
+}
+
 //export _TestMap
 func _TestMap() *C.char {
   _temp_res_val := encodeJSON(abstract.TestMap())

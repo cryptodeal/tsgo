@@ -50,6 +50,17 @@ func TestStruct() StructBar {
 	return structBar
 }
 
+func TestStruct2() *StructBar {
+	str := "bar"
+	structBar := &StructBar{
+		Field:                        "foo",
+		FieldWithWeirdJSONTag:        123,
+		FieldThatShouldNotBeOptional: &str,
+		FieldThatShouldBeReadonly:    "readonly",
+	}
+	return structBar
+}
+
 func TestMap() *map[int]string {
 	m := map[int]string{
 		1: "foo",

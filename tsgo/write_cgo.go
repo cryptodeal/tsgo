@@ -707,7 +707,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		g.ffi.FFIFuncs[f.Name.Name] = func_data
 
 		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
-		if func_data.isHandleFn {
+		if func_data.isHandleFn && !g.ffi.GoWrappedStructs[*func_data.name] {
 			for _, field := range func_data.fieldAccessors {
 				var accessorSB strings.Builder
 				accessorSB.WriteString("_GET_")
@@ -718,8 +718,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				field.fnName = &name
 				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
 			}
-
 			fn_str.WriteString(g.writeDisposeStruct(func_data.disposeHandle))
+			g.ffi.GoWrappedStructs[*func_data.name] = true
 		}
 	}
 
