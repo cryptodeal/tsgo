@@ -560,14 +560,20 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
 	g.writeIndent(&fnSB, 1)
 
-	fnSB.WriteString("_returned_value := ")
-	fnSB.WriteString(tempResType)
-	fnSB.WriteByte('(')
-	if *f.arrayType != "" {
-		fnSB.WriteString(g.writeCArrayHandler(gh, ec, *f.arrayType, fmtr))
+	if f.isHandleFn != nil {
+		fnSB.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle")
 	} else {
-		fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+
+		fnSB.WriteString("_returned_value := ")
+		fnSB.WriteString(tempResType)
+		fnSB.WriteByte('(')
+		if *f.arrayType != "" {
+			fnSB.WriteString(g.writeCArrayHandler(gh, ec, *f.arrayType, fmtr))
+		} else {
+			fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+		}
 	}
+
 	fnSB.WriteByte('(')
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
@@ -576,13 +582,15 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString(*f.name)
 	fnSB.WriteString("))\n")
 
-	// TODO: need to improve API so this code is simplified/handles more edge cases
-	if tempResType == "C.CString" {
+	if f.isHandleFn == nil {
+		// TODO: need to improve API so this code is simplified/handles more edge cases
+		if tempResType == "C.CString" {
+			g.writeIndent(&fnSB, 1)
+			fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+		}
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString("defer C.free(unsafe.Pointer(_returned_value))\n")
+		fnSB.WriteString("return _returned_value\n")
 	}
-	g.writeIndent(&fnSB, 1)
-	fnSB.WriteString("return _returned_value\n")
 
 	fnSB.WriteString("}\n\n")
 
