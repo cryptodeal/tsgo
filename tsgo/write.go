@@ -100,7 +100,7 @@ func (g *PackageGenerator) getCgoHandler(s string) string {
 	case "float64", "C.double":
 		return "C.double"
 	case "string", "*C.char":
-		return "C.Cstring"
+		return "C.CString"
 	case "uintptr", "C.uintptr_t":
 		return "C.uintptr_t"
 	}
