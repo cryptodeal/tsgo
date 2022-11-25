@@ -424,7 +424,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString("})\n\n")
 
 	if len(class_wrappers) > 0 {
-		s.WriteString("const registry = new FinalizationRegistry(cb => cb());\n\n")
+		s.WriteString("const registry = new FinalizationRegistry((cb: () => void) => cb());\n\n")
 	}
 
 	// Write the class wrappers
