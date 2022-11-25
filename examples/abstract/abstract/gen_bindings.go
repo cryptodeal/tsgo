@@ -317,7 +317,7 @@ func _dispose_StructBar(handle C.uintptr_t) {
 
 //export _TestStruct2
 func _TestStruct2() unsafe.Pointer {
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*abstract.TestStruct2())))
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.TestStruct2())))
 }
 
 //export _TestMap

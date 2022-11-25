@@ -384,10 +384,18 @@ func (g *PackageGenerator) isTypedArray(t ast.Expr) (bool, string) {
 }
 
 func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
+
+	isStarExpr := false
+	switch f.Type.Results.List[0].Type.(type) {
+	case *ast.StarExpr:
+		isStarExpr = true
+	}
+
 	var ffi_func = &FFIFunc{
 		args:       []*ArgHelpers{},
 		returns:    []*ResHelpers{},
 		isHandleFn: false,
+		isStarExpr: isStarExpr,
 	}
 
 	for _, param := range f.Type.Params.List {
@@ -632,6 +640,9 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 		fnSB.WriteString(tempResType.String())
 	}
 	fnSB.WriteByte('(')
+	if f.isStarExpr {
+		fnSB.WriteByte('*')
+	}
 	fnSB.WriteString(pkgName)
 	fnSB.WriteByte('.')
 	fnSB.WriteString(name)

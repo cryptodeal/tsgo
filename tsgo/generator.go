@@ -39,6 +39,7 @@ type FFIFunc struct {
 	args           []*ArgHelpers
 	returns        []*ResHelpers
 	isHandleFn     bool
+	isStarExpr     bool
 	name           *string
 	fieldAccessors []*StructAccessor
 	disposeHandle  *DisposeStructFunc
