@@ -49,6 +49,7 @@ func (g *PackageGenerator) Generate() (string, error) {
 
 	// write headers for generated file for specific package
 	g.writeFileCodegenHeader(s)
+	g.writeESLintIgnore(s)
 	if has_func {
 		g.writeFFIHeaders(s)
 	}

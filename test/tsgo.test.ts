@@ -36,8 +36,8 @@ describe('tsgo', () => {
 		const bar = _Float32ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new Float32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -50,8 +50,8 @@ describe('tsgo', () => {
 		const bar = _Float64ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new Float64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -64,8 +64,8 @@ describe('tsgo', () => {
 		const bar = _Int32ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new Int32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -78,8 +78,8 @@ describe('tsgo', () => {
 		const bar = _Int32ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new BigInt64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -92,8 +92,8 @@ describe('tsgo', () => {
 		const bar = _Uint32ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new Uint32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -106,8 +106,8 @@ describe('tsgo', () => {
 		const bar = _Uint64ArrayTest.native(foo);
 		expect(typeof bar).toBe('number');
 		const out = new BigUint64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(bar, 0, arraySize.native(bar) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < out.length; i++) {
@@ -166,8 +166,8 @@ describe('tsgo', () => {
 		const temp_ptr = ptr(test);
 		const res = _Float32ArgTest.native(temp_ptr, test.length);
 		const out = new Float32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
@@ -180,8 +180,8 @@ describe('tsgo', () => {
 		const temp_ptr = ptr(test);
 		const res = _Float64ArgTest.native(temp_ptr, test.length);
 		const out = new Float64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
@@ -195,8 +195,8 @@ describe('tsgo', () => {
 		const res = _Int32ArgTest(temp_ptr, test.length);
 
 		const out = new Int32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
@@ -209,8 +209,8 @@ describe('tsgo', () => {
 		const temp_ptr = ptr(test);
 		const res = _Int64ArgTest.native(temp_ptr, test.length);
 		const out = new BigInt64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
@@ -223,8 +223,8 @@ describe('tsgo', () => {
 		const temp_ptr = ptr(test);
 		const res = _Uint32ArgTest.native(temp_ptr, test.length);
 		const out = new Uint32Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 4, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
@@ -236,10 +236,10 @@ describe('tsgo', () => {
 		const test = new BigUint64Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => BigInt(v)));
 		const temp_ptr = ptr(test);
 		const res = _Uint64ArgTest.native(temp_ptr, test.length);
-		
+
 		const out = new BigUint64Array(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		  // @ts-ignore - overload toArrayBuffer params
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore - overload toArrayBuffer params
 			toArrayBuffer(res, 0, arraySize.native(res) * 8, genDisposePtr.native())
 		);
 		for (let i = 0; i < test.length; i++) {
