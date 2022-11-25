@@ -102,7 +102,7 @@ describe('tsgo', () => {
     expect(str).toBe('Hello, World!')
   })
 
-    it('returns Go *struct (wrapped class)', () => {
+  it('returns Go *struct (wrapped class)', () => {
     let StructBar = new _StructBar(_TestStruct2())
     expect(typeof StructBar).toBe('object')
     expect(typeof StructBar.Field).toBe('string')
