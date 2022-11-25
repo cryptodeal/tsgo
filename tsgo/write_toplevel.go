@@ -301,7 +301,6 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				}
 				fieldsVisited++
 			}
-
 		}
 		visited++
 	}
@@ -321,7 +320,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(": {\n")
 		argLen := len(v.args)
 		resLen := len(v.returns)
-		if len(v.args) > 0 {
+		if argLen > 0 {
 			g.writeIndent(s, 2)
 			s.WriteString("args: [")
 			for i, arg := range v.args {
@@ -352,10 +351,58 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		}
 
 		g.writeIndent(s, 1)
-		if visited == count-1 {
+		if visited == count-1 && !v.isHandleFn {
 			s.WriteString("}\n")
 		} else {
 			s.WriteString("},\n")
+		}
+
+		if v.isHandleFn {
+			fieldCount := len(v.fieldAccessors)
+			fieldsVisited := 0
+			for _, fa := range v.fieldAccessors {
+				g.writeIndent(s, 1)
+				s.WriteString(*fa.fnName)
+				s.WriteString(": {\n")
+				fieldArgLen := len(fa.args)
+				fieldResLen := len(fa.returns)
+				if fieldArgLen > 0 {
+					g.writeIndent(s, 2)
+					s.WriteString("args: [")
+					for i, arg := range fa.args {
+						s.WriteString(arg.FFIType)
+						if i < fieldArgLen-1 {
+							s.WriteString(", ")
+						}
+					}
+					s.WriteByte(']')
+					if fieldResLen > 0 {
+						s.WriteString(",\n")
+					} else {
+						s.WriteByte('\n')
+					}
+				}
+				if resLen == 1 {
+					g.writeIndent(s, 2)
+					s.WriteString("returns: ")
+					s.WriteString(v.returns[0].FFIType)
+					s.WriteByte('\n')
+				} else if resLen > 1 {
+					var errStr strings.Builder
+					errStr.WriteString("Function `")
+					errStr.WriteString(k)
+					errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
+					errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
+					log.Fatalf("TSGo failed: %v", errStr.String())
+				}
+
+				if fieldsVisited == fieldCount-1 {
+					s.WriteByte('\n')
+				} else {
+					s.WriteString(",\n")
+				}
+				fieldsVisited++
+			}
 		}
 		visited++
 	}
