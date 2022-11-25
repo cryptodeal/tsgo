@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _StringTest, _TestMap, arraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest, _StructBar, _TestStruct } from '@tsgo/abstract'
+import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _StringTest, _TestMap, arraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest, _StructBar, _TestStruct, _TestStruct2 } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo', () => {
@@ -80,26 +80,36 @@ describe('tsgo', () => {
       expect(typeof out[i]).toBe('bigint')
     }
   })
+  
+  it('returns Go struct (wrapped class)', () => {
+    const StructBar = new _StructBar(_TestStruct())
+    expect(typeof StructBar).toBe('object')
+    expect(typeof StructBar.Field).toBe('string')
+    console.log(StructBar.Field)
+    expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
+    console.log(StructBar.FieldWithWeirdJSONTag)
+    expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
+    console.log(StructBar.FieldThatShouldBeOptional)
+    expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
+    console.log(StructBar.FieldThatShouldNotBeOptional)
+    expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
+    console.log(StructBar.FieldThatShouldBeReadonly)
+  })
 
-  
-    it('returns Go struct as JSON (`json.Marshal` struct)', () => {
-      let StructBar = new _StructBar(_TestStruct()), bar = new _StructBar(_TestStruct())
-      expect(typeof StructBar).toBe('object')
-      expect(typeof StructBar.Field).toBe('string')
-      console.log(StructBar.Field)
-      expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
-      console.log(StructBar.FieldWithWeirdJSONTag)
-      expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
-      console.log(StructBar.FieldThatShouldBeOptional)
-      expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
-      console.log(StructBar.FieldThatShouldNotBeOptional)
-      expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
-      console.log(StructBar.FieldThatShouldBeReadonly)
-      StructBar = null
-      bar = null
-      Bun.gc(true)
-    })
-  
+  it('returns Go *struct (wrapped class)', () => {
+    let StructBar = new _StructBar(_TestStruct2())
+    expect(typeof StructBar).toBe('object')
+    expect(typeof StructBar.Field).toBe('string')
+    console.log(StructBar.Field)
+    expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
+    console.log(StructBar.FieldWithWeirdJSONTag)
+    expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string')
+    console.log(StructBar.FieldThatShouldBeOptional)
+    expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
+    console.log(StructBar.FieldThatShouldNotBeOptional)
+    expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
+    console.log(StructBar.FieldThatShouldBeReadonly)
+  })
 
   it('returns string (as cstring)', () => {
     const str = _StringTest().toString()

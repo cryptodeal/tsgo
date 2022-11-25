@@ -622,7 +622,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 	g.writeIndent(&fnSB, 1)
 	if f.isHandleFn {
 		fnSB.WriteString("_returned_value := ")
-		fnSB.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
+		fnSB.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle")
 	} else {
 		g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
 		if tempResType.String() == "encodeJSON" {
@@ -646,7 +646,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 		}
 	}
 	if f.isHandleFn {
-		fnSB.WriteString(")))")
+		fnSB.WriteString("))")
 	}
 	fnSB.WriteString("))\n")
 
