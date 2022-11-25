@@ -450,10 +450,10 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
-	fnSB.WriteString("//export _")
+	fnSB.WriteString("//export ")
 	fnSB.WriteString(*f.fnName)
 	fnSB.WriteByte('\n')
-	fnSB.WriteString("func _")
+	fnSB.WriteString("func ")
 	fnSB.WriteString(*f.fnName)
 	fnSB.WriteByte('(')
 	// iterate through fn params, generating cgo function decl line
@@ -673,7 +673,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		if func_data.isHandleFn {
 			for _, field := range func_data.fieldAccessors {
 				var accessorSB strings.Builder
-				accessorSB.WriteString("GET_")
+				accessorSB.WriteString("_GET_")
 				accessorSB.WriteString(*func_data.name)
 				accessorSB.WriteString("_")
 				accessorSB.WriteString(*field.name)

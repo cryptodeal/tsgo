@@ -283,7 +283,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteByte('_')
 		}
 		s.WriteString(k)
-		if visited == count-1 {
+		if visited == count-1 && !v.isHandleFn {
 			s.WriteByte('\n')
 		} else {
 			s.WriteString(",\n")

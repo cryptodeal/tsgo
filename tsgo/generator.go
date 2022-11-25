@@ -44,13 +44,14 @@ type FFIFunc struct {
 }
 
 type StructAccessor struct {
-	args           []*ArgHelpers
-	returns        []*ResHelpers
-	isHandleFn     bool
-	isStarExpr     bool
-	name           *string
-	fnName         *string
-	fieldAccessors []*StructAccessor
+	args       []*ArgHelpers
+	returns    []*ResHelpers
+	isHandleFn bool
+	isStarExpr bool
+	name       *string
+	fnName     *string
+	// TODO: below field is needed if struct holds ref to other structs
+	// fieldAccessors []*StructAccessor
 }
 
 type FFIState struct {
