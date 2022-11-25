@@ -2,28 +2,29 @@
 # and some other packages.
 
 packages:
-  - path: "github.com/cryptodeal/tsgo/examples/bookstore"
+  - path: 'github.com/cryptodeal/tsgo/examples/bookstore'
     type_mappings:
-      time.Time: "string /* RFC 3339 formatted */"
-      null.String: "string | null"
-      uuid.UUID: "string"
-  - path: "github.com/cryptodeal/tsgo/examples/abstract"
+      time.Time: 'string /* RFC 3339 formatted */'
+      null.String: 'string | null'
+      uuid.UUID: 'string'
+  - path: 'github.com/cryptodeal/tsgo/examples/abstract'
     ffi_bindings: true
     wrap_structs:
-      - "StructBar"
-    indent: "  "
+      - 'StructBar'
+    indent: '  '
     exclude_files:
-      - "excluded.go"
-    ffi_fallback_type: "unsafe.Pointer"
-    frontmatter:
-      | # We can define some additional text to put at the start of the file.
+      - 'excluded.go'
+    ffi_fallback_type: 'unsafe.Pointer'
+    frontmatter: | # We can define some additional text to put at the start of the file.
       export type Something = string | number;
     enum_structs:
-      MyIotaType: "MyEnum"
-      FooInt64: "FooEnum"
-  - path: "github.com/cryptodeal/tsgo/examples/simple"
+      MyIotaType: 'MyEnum'
+      FooInt64: 'FooEnum'
+  - path: 'github.com/cryptodeal/tsgo/examples/simple'
+    enum_structs:
+      UserRoles: 'UserRolesEnum'
     fallback_type: unknown
-  - path: "github.com/cryptodeal/tsgo/examples/generic"
+  - path: 'github.com/cryptodeal/tsgo/examples/generic'
     fallback_type: unknown
   # Generate the "net/http" output example, note the output is in gitignore as it's pretty big
   # - path: "net/http"
