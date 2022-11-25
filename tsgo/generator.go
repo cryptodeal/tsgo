@@ -41,6 +41,13 @@ type FFIFunc struct {
 	isHandleFn     bool
 	name           *string
 	fieldAccessors []*StructAccessor
+	disposeHandle  *DisposeStructFunc
+}
+
+type DisposeStructFunc struct {
+	args   []*ArgHelpers
+	fnName string
+	name   string
 }
 
 type StructAccessor struct {

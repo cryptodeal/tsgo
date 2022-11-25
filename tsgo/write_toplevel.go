@@ -292,6 +292,9 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		}
 		if v.isHandleFn {
 			class_wrappers = append(class_wrappers, v)
+			// declare export for struct dispose fn
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("%s,\n", v.disposeHandle.fnName))
 			fieldCount := len(v.fieldAccessors)
 			fieldsVisited := 0
 			for _, fa := range v.fieldAccessors {
@@ -361,6 +364,14 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		}
 
 		if v.isHandleFn {
+			// write config for struct dispose fn
+			g.writeIndent(s, 1)
+			s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
+			g.writeIndent(s, 1)
+			s.WriteString("},\n")
+			// write config for struct field accessors
 			fieldCount := len(v.fieldAccessors)
 			fieldsVisited := 0
 			for _, fa := range v.fieldAccessors {
@@ -425,6 +436,13 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString("this._ptr = ptr;\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n\n")
+
+		// write class method that frees `Handle` + CGo mem for struct @ GC
+		g.writeIndent(s, 1)
+		s.WriteString("public _gc_dispose(): void {\n")
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", c.disposeHandle.fnName))
+		g.writeIndent(s, 1)
 
 		// write struct field `getters`
 		fieldCount := len(c.fieldAccessors)

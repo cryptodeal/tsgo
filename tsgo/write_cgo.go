@@ -1,6 +1,7 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"log"
 	"os"
@@ -443,8 +444,33 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 
 	if ffi_func.isHandleFn {
 		ffi_func.fieldAccessors = g.ffi.StructHelpers[*ffi_func.name]
+		var ptr_arg = &ArgHelpers{
+			Name:        "handle",
+			FFIType:     "FFIType.ptr",
+			CGoWrapType: "C.uintptr_t",
+			OGGoType:    "unsafe.Pointer",
+		}
+		disposeFnName := fmt.Sprintf("_dispose_%s", *ffi_func.name)
+		ffi_func.disposeHandle = &DisposeStructFunc{
+			args:   []*ArgHelpers{ptr_arg},
+			fnName: disposeFnName,
+			name:   *ffi_func.name,
+		}
 	}
 	return ffi_func
+}
+
+func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
+	var disposeSB strings.Builder
+	disposeSB.WriteString(fmt.Sprintf("//export %s\n", t.fnName))
+	disposeSB.WriteString(fmt.Sprintf("func %s(%s %s) {\n", t.fnName, t.args[0].Name, t.args[0].OGGoType))
+	g.writeIndent(&disposeSB, 1)
+	disposeSB.WriteString("h := cgo.Handle(handle)\n")
+	g.writeIndent(&disposeSB, 1)
+	disposeSB.WriteString("h.Delete()\n")
+	disposeSB.WriteString("}\n\n")
+
+	return disposeSB.String()
 }
 
 func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
@@ -508,9 +534,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	// return `nil` if no value @ field
 	if f.isOptional {
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString("if s.")
-		fnSB.WriteString(*f.name)
-		fnSB.WriteString(" == nil {\n")
+		fnSB.WriteString(fmt.Sprintf("if s. %s == nil {\n", *f.name))
 		g.writeIndent(&fnSB, 2)
 		fnSB.WriteString("return nil\n")
 		g.writeIndent(&fnSB, 1)
@@ -692,6 +716,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				field.fnName = &name
 				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
 			}
+
+			fn_str.WriteString(g.writeDisposeStruct(func_data.disposeHandle))
 		}
 	}
 
