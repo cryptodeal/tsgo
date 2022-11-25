@@ -428,7 +428,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		g.writeIndent(s, 1)
 		s.WriteString("const { cb, ptr } = disp;\n")
 		g.writeIndent(s, 1)
-		s.WriteString("return cb(ptr);")
+		s.WriteString("return cb(ptr);\n")
 		s.WriteString("});\n\n")
 	}
 
