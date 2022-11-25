@@ -22,7 +22,7 @@ packages:
       FooInt64: 'FooEnum'
   - path: 'github.com/cryptodeal/tsgo/examples/simple'
     enum_structs:
-      UserRoles: 'UserRolesEnum'
+      UserRole: 'UserRoles'
     fallback_type: unknown
   - path: 'github.com/cryptodeal/tsgo/examples/generic'
     fallback_type: unknown

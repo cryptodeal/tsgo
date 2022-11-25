@@ -136,29 +136,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(";")
 	}
 
-	if !isStruct && !isIdent && g.IsEnumStruct(ts.Name.Name) {
-		// fmt.Println("!isStruct && !isIdent")
-		enumName := g.conf.EnumStructs[ts.Name.Name]
-		// if names match, dev expects we overwrite the type as enum
-		if enumName == "" {
-			enumName = ts.Name.Name + "Enum"
-		}
-		if !strings.EqualFold(enumName, ts.Name.Name) {
-			var tempSB = &strings.Builder{}
-			g.writeCGoType(tempSB, ts.Type, 0, false)
-			// TODO: might not be correct?
-			g.ffi.TypeHelpers[ts.Name.Name] = tempSB.String()
-			s.WriteString("export type ")
-			s.WriteString(ts.Name.Name)
-			s.WriteString(" = ")
-			g.writeType(s, ts.Type, 0, true)
-			s.WriteString(";\n")
-			g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
-
-		}
-		s.WriteString("export enum ")
-		s.WriteString(enumName)
-	} else if !isStruct && !isIdent {
+	if !isStruct && !isIdent {
 		// fmt.Println("!isStruct && !isIdent")
 
 		var tempSB = &strings.Builder{}
