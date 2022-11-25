@@ -48,6 +48,7 @@ type StructAccessor struct {
 	returns    []*ResHelpers
 	isHandleFn bool
 	isStarExpr bool
+	isOptional bool
 	name       *string
 	fnName     *string
 	// TODO: below field is needed if struct holds ref to other structs

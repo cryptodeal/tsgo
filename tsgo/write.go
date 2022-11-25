@@ -709,7 +709,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				OGGoType:    cgoType,
 				ASTType:     &f.Type,
 			}
-
+			field_func.isOptional = optional
 			field_func.isStarExpr = isStarExpr
 
 			field_func.returns = append(field_func.returns, res_helper)

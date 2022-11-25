@@ -436,7 +436,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString("(): ")
 			tempType := g.getJSFromFFIType(f.returns[0].FFIType)
 			s.WriteString(tempType)
-			if f.isStarExpr {
+			if f.isOptional {
 				s.WriteString(" | undefined")
 			}
 			s.WriteString(" {\n")

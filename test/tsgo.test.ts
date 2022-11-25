@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _StringTest, _TestMap, arraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest } from '@tsgo/abstract'
+import { genDisposePtr, _IntTest, _Int32ArrayTest, _Int64ArrayTest, _Float32ArrayTest, _Float64ArrayTest, _Uint32ArrayTest, _Uint64ArrayTest, _StringTest, _TestMap, arraySize, _Float32ArgTest, _Float64ArgTest, type StructBar, _Int64ArgTest, _Uint32ArgTest, _Uint64ArgTest, _Int32ArgTest, _StructBar, _TestStruct } from '@tsgo/abstract'
 import { ptr, toArrayBuffer } from 'bun:ffi'
 
 describe('tsgo', () => {
@@ -81,9 +81,9 @@ describe('tsgo', () => {
     }
   })
 
-  /*
+  
     it('returns Go struct as JSON (`json.Marshal` struct)', () => {
-      const StructBar = new StructBarTest(_TestStruct())
+      const StructBar = new _StructBar(_TestStruct())
       expect(typeof StructBar).toBe('object')
       expect(typeof StructBar.Field).toBe('string')
       expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number')
@@ -91,7 +91,7 @@ describe('tsgo', () => {
       expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string')
       expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string')
     })
-  */
+  
 
   it('returns string (as cstring)', () => {
     const str = _StringTest().toString()
