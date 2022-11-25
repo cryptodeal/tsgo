@@ -463,7 +463,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 	var disposeSB strings.Builder
 	disposeSB.WriteString(fmt.Sprintf("//export %s\n", t.fnName))
-	disposeSB.WriteString(fmt.Sprintf("func %s(%s %s) {\n", t.fnName, t.args[0].Name, t.args[0].OGGoType))
+	disposeSB.WriteString(fmt.Sprintf("func %s(%s %s) {\n", t.fnName, t.args[0].Name, t.args[0].CGoWrapType))
 	g.writeIndent(&disposeSB, 1)
 	disposeSB.WriteString(fmt.Sprintf("h := cgo.Handle(%s)\n", t.args[0].Name))
 	g.writeIndent(&disposeSB, 1)

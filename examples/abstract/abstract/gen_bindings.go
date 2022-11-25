@@ -312,7 +312,8 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
 //export _dispose_StructBar
 func _dispose_StructBar(handle unsafe.Pointer) {
   h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)  h.Delete()
+  fmt.Println("deleted handle @ uintptr:", handle)
+  h.Delete()
 }
 
 //export _TestMap
