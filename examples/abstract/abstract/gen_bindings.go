@@ -266,7 +266,7 @@ func _TestStruct() unsafe.Pointer {
 func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(s.Field)
+  _returned_value := C.CString(string(s.Field))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
@@ -275,7 +275,7 @@ func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
 func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.int64_t(s.FieldWithWeirdJSONTag)
+  _returned_value := C.int64_t(int64(s.FieldWithWeirdJSONTag))
   return _returned_value
 }
 
@@ -283,7 +283,7 @@ func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(*s.FieldThatShouldBeOptional)
+  _returned_value := C.CString(string(*s.FieldThatShouldBeOptional))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
@@ -292,7 +292,7 @@ func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
 func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(*s.FieldThatShouldNotBeOptional)
+  _returned_value := C.CString(string(*s.FieldThatShouldNotBeOptional))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
@@ -301,7 +301,7 @@ func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
 func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(s.FieldThatShouldBeReadonly)
+  _returned_value := C.CString(string(s.FieldThatShouldBeReadonly))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }

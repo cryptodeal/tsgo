@@ -49,6 +49,7 @@ type StructAccessor struct {
 	isHandleFn     bool
 	isStarExpr     bool
 	name           *string
+	fnName         *string
 	fieldAccessors []*StructAccessor
 }
 

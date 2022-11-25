@@ -1,7 +1,6 @@
 package tsgo
 
 import (
-	"fmt"
 	"go/ast"
 	"log"
 	"os"
@@ -448,14 +447,14 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	return ffi_func
 }
 
-func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, name string, pkgName string, structName string) string {
+func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
 	fnSB.WriteString("//export _")
-	fnSB.WriteString(name)
+	fnSB.WriteString(*f.fnName)
 	fnSB.WriteByte('\n')
 	fnSB.WriteString("func _")
-	fnSB.WriteString(name)
+	fnSB.WriteString(*f.fnName)
 	fnSB.WriteByte('(')
 	// iterate through fn params, generating cgo function decl line
 	argLen := len(f.args)
@@ -649,23 +648,25 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	// iterate through all function declarations, parsing into `*FFIFunc` helper struct & writing CGo/C helpers
 	for _, f := range fd {
 		func_data := g.parseFn(f)
-		fmt.Println("test_func_parser:", func_data)
-		if func_data.name != nil {
-			fmt.Println("name: ", *func_data.name)
-		}
-		if func_data.fieldAccessors != nil {
-			for _, field := range func_data.fieldAccessors {
-				fmt.Println("field: ", *field.name)
+		/*
+			fmt.Println("test_func_parser:", func_data)
+			if func_data.name != nil {
+				fmt.Println("name: ", *func_data.name)
+			}
+			if func_data.fieldAccessors != nil {
+				for _, field := range func_data.fieldAccessors {
+					fmt.Println("field: ", *field.name)
 
-				for _, a := range field.args {
-					fmt.Println("arg: ", a)
-				}
+					for _, a := range field.args {
+						fmt.Println("arg: ", a)
+					}
 
-				for _, r := range field.returns {
-					fmt.Println("returns: ", r)
+					for _, r := range field.returns {
+						fmt.Println("returns: ", r)
+					}
 				}
 			}
-		}
+		*/
 		g.ffi.FFIFuncs[f.Name.Name] = func_data
 
 		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
@@ -677,7 +678,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				accessorSB.WriteString("_")
 				accessorSB.WriteString(*field.name)
 				name := accessorSB.String()
-				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, name, pkgName, *func_data.name))
+				field.fnName = &name
+				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
 			}
 		}
 	}

@@ -71,7 +71,7 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // or
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
-	fmt.Println("name:", ts.Name.Name, "ts:", ts)
+	// fmt.Println("name:", ts.Name.Name, "ts:", ts)
 
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)
@@ -81,7 +81,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
-		fmt.Println("isStruct")
+		// fmt.Println("isStruct")
 		s.WriteString("export interface ")
 		s.WriteString(ts.Name.Name)
 
@@ -100,7 +100,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent && g.IsEnumStruct(ts.Name.Name) {
-		fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
+		// fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
 
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
@@ -122,7 +122,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		s.WriteString(enumName)
 		s.WriteString(" {")
 	} else if isIdent {
-		fmt.Println("isIdent")
+		// fmt.Println("isIdent")
 
 		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 
@@ -134,7 +134,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	if !isStruct && !isIdent {
-		fmt.Println("!isStruct && !isIdent")
+		// fmt.Println("!isStruct && !isIdent")
 
 		var tempSB = &strings.Builder{}
 		g.writeCGoType(tempSB, ts.Type, 0, false)
@@ -152,7 +152,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 	s.WriteString("\n")
 
-	fmt.Println("g.ffi.TypeHelpers[ts.Name.Name]", g.ffi.TypeHelpers[ts.Name.Name])
+	// fmt.Println("g.ffi.TypeHelpers[ts.Name.Name]", g.ffi.TypeHelpers[ts.Name.Name])
 }
 
 // Writing of value specs, which are exported const expressions like
@@ -277,7 +277,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 
 	count := len(g.ffi.FFIFuncs)
 	visited := 0
-	for k := range g.ffi.FFIFuncs {
+	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
 		if !g.ffi.FFIHelpers[k] {
 			s.WriteByte('_')
@@ -285,15 +285,29 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString(k)
 		if visited == count-1 {
 			s.WriteByte('\n')
-			g.writeIndent(s, 1)
-			s.WriteString("}\n")
 		} else {
 			s.WriteString(",\n")
+		}
+		if v.isHandleFn {
+			fieldCount := len(v.fieldAccessors)
+			fieldsVisited := 0
+			for _, fa := range v.fieldAccessors {
+				g.writeIndent(s, 2)
+				s.WriteString(*fa.fnName)
+				if fieldsVisited == fieldCount-1 {
+					s.WriteByte('\n')
+				} else {
+					s.WriteString(",\n")
+				}
+				fieldsVisited++
+			}
+
 		}
 		visited++
 	}
 
-	s.WriteString("} = dlopen(import.meta.dir + '/")
+	g.writeIndent(s, 1)
+	s.WriteString("}\n} = dlopen(import.meta.dir + '/")
 	s.WriteString(path)
 	s.WriteString("/gen_bindings")
 	s.WriteString(".dylib', {\n")

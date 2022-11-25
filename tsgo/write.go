@@ -685,7 +685,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			cgoType := tempSB.String()
 
 			longType := fmt.Sprintf("%s", f.Type)
-			fmt.Println(longType)
+			// fmt.Println(longType)
 			if val, ok := g.ffi.TypeHelpers[longType]; ok {
 				cgoType = val
 			}
