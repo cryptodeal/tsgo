@@ -59,6 +59,7 @@ type StructAccessor struct {
 	isOptional bool
 	name       *string
 	fnName     *string
+	arrayType  *string
 	// TODO: below field is needed if struct holds ref to other structs
 	// fieldAccessors []*StructAccessor
 }

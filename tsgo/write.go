@@ -607,6 +607,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		optional := false
 		required := false
 		readonly := false
+		_, dType := g.isTypedArray(f.Type)
 
 		var ptr_arg = &ArgHelpers{
 			Name:        "handle",
@@ -617,8 +618,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		}
 
 		var field_func = &StructAccessor{
-			args:    []*ArgHelpers{ptr_arg},
-			returns: []*ResHelpers{},
+			args:      []*ArgHelpers{ptr_arg},
+			returns:   []*ResHelpers{},
+			arrayType: &dType,
 		}
 
 		var fieldName string

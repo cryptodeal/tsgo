@@ -308,6 +308,14 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
   return _returned_value
 }
 
+//export _GET_StructBar_ArrayField
+func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.StructBar)
+  _returned_value := unsafe.Pointer(unsafe.Pointer(s.ArrayField))
+  return _returned_value
+}
+
 //export _dispose_StructBar
 func _dispose_StructBar(handle C.uintptr_t) {
   h := cgo.Handle(handle)

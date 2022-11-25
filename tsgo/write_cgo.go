@@ -558,7 +558,11 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString("_returned_value := ")
 	fnSB.WriteString(tempResType)
 	fnSB.WriteByte('(')
-	fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+	if *f.arrayType != "" {
+		fnSB.WriteString(g.writeCArrayHandler(gh, ec, *f.arrayType, fmtr))
+	} else {
+		fnSB.WriteString(g.getGoType(f.returns[0].CGoWrapType))
+	}
 	fnSB.WriteByte('(')
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
