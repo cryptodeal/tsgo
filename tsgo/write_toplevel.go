@@ -481,7 +481,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				s.WriteString("(): ")
 				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
 				if *f.arrayType != "" {
-					s.WriteString(fmt.Sprintf("%sArray", caser.String(*f.arrayType)))
+					s.WriteString(fmt.Sprintf("%sArray | undefined", caser.String(*f.arrayType)))
 				} else {
 					s.WriteString(tempType)
 					if f.isOptional {
@@ -492,6 +492,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				g.writeIndent(s, 2)
 				if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+					g.writeIndent(s, 2)
+					s.WriteString("if (!ptr) return undefined;\n")
 					g.writeIndent(s, 2)
 					s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n")
 					g.writeIndent(s, 2)
