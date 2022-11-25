@@ -407,5 +407,5 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		}
 		visited++
 	}
-	s.WriteString("})\n")
+	s.WriteString("})\n\n")
 }
