@@ -267,6 +267,8 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 }
 
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
+	var class_wrappers = []*FFIFunc{}
+
 	s.WriteString("\n//////////\n")
 	// source: misc.go
 	s.WriteString("// Generated config for Bun FFI\n")
@@ -289,6 +291,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 			s.WriteString(",\n")
 		}
 		if v.isHandleFn {
+			class_wrappers = append(class_wrappers, v)
 			fieldCount := len(v.fieldAccessors)
 			fieldsVisited := 0
 			for _, fa := range v.fieldAccessors {
@@ -408,4 +411,50 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		visited++
 	}
 	s.WriteString("})\n\n")
+
+	// Write the class wrappers
+	for _, c := range class_wrappers {
+		s.WriteString("export class _")
+		s.WriteString(*c.name)
+		s.WriteString(" {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("private _ptr: number;\n\n")
+		g.writeIndent(s, 1)
+		s.WriteString("constructor(ptr: number) {\n")
+		g.writeIndent(s, 2)
+		s.WriteString("this._ptr = ptr;\n")
+		g.writeIndent(s, 1)
+		s.WriteString("}\n\n")
+
+		// write struct field `getters`
+		fieldCount := len(c.fieldAccessors)
+		fieldsVisited := 0
+		for _, f := range c.fieldAccessors {
+			g.writeIndent(s, 1)
+			s.WriteString("get ")
+			s.WriteString(*f.name)
+			s.WriteString("(): ")
+			tempType := g.getJSFromFFIType(f.returns[0].FFIType)
+			s.WriteString(tempType)
+			if f.isStarExpr {
+				s.WriteString(" | undefined")
+			}
+			s.WriteString(" {\n")
+			g.writeIndent(s, 2)
+			s.WriteString("return ")
+			s.WriteString(*f.fnName)
+			s.WriteString("(this._ptr)")
+			if tempType == "string" {
+				s.WriteString(".toString()")
+			}
+			s.WriteString(";\n")
+			g.writeIndent(s, 1)
+			if fieldsVisited == fieldCount-1 {
+				s.WriteString("}\n")
+			} else {
+				s.WriteString("}\n\n")
+			}
+			fieldsVisited++
+		}
+	}
 }

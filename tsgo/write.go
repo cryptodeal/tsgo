@@ -107,6 +107,20 @@ func (g *PackageGenerator) getCgoHandler(s string) string {
 	return "unsafe.Pointer"
 }
 
+func (g *PackageGenerator) getJSFromFFIType(t string) string {
+	switch t {
+	case "FFIType.bool":
+		return "boolean"
+	case "FFIType.int", "FFIType.i8", "FFIType.i16", "FFIType.i32", "FFIType.i64_fast", "FFIType.u8", "FFIType.u16", "FFIType.u32", "FFIType.u64_fast", "FFIType.f32", "FFIType.f64":
+		return "number"
+	case "FFIType.cstring":
+		return "string"
+	case "FFIType.ptr":
+		return "any"
+	}
+	return t
+}
+
 func (g *PackageGenerator) getGoType(t string) string {
 	switch t {
 	case "*C.char":
