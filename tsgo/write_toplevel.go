@@ -423,6 +423,10 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 	s.WriteString("})\n\n")
 
+	if len(class_wrappers) > 0 {
+		s.WriteString("const registry = new FinalizationRegistry(cb => cb());\n\n")
+	}
+
 	// Write the class wrappers
 	for _, c := range class_wrappers {
 		s.WriteString("export class _")
@@ -434,6 +438,8 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		s.WriteString("constructor(ptr: number) {\n")
 		g.writeIndent(s, 2)
 		s.WriteString("this._ptr = ptr;\n")
+		g.writeIndent(s, 2)
+		s.WriteString("registry.register(this, this._gc_dispose)\n")
 		g.writeIndent(s, 1)
 		s.WriteString("}\n\n")
 
