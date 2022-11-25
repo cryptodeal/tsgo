@@ -312,6 +312,9 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
 func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
+  if s. ArrayField == nil {
+    return nil
+  }
   _returned_value := unsafe.Pointer(CFloat32(s.ArrayField))
   return _returned_value
 }
