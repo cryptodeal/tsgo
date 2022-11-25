@@ -31,6 +31,18 @@ func getIdent(s string) string {
 	return s
 }
 
+func getByteSize(s string) int {
+	switch s {
+	case "float16", "int16", "uint16":
+		return 2
+	case "float32", "int32", "uint32":
+		return 4
+	case "float64", "int64", "uint64":
+		return 8
+	}
+	return 1
+}
+
 // TODO:
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)

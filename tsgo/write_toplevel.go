@@ -5,6 +5,9 @@ import (
 	"go/ast"
 	"log"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type groupContext struct {
@@ -268,6 +271,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
 	var class_wrappers = []*FFIFunc{}
+	caser := cases.Title(language.AmericanEnglish)
 
 	s.WriteString("\n//////////\n")
 	// source: misc.go
@@ -476,19 +480,30 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 				s.WriteString(*f.name)
 				s.WriteString("(): ")
 				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				s.WriteString(tempType)
-				if f.isOptional {
-					s.WriteString(" | undefined")
+				if *f.arrayType != "" {
+					s.WriteString(fmt.Sprintf("%sArray", caser.String(*f.arrayType)))
+				} else {
+					s.WriteString(tempType)
+					if f.isOptional {
+						s.WriteString(" | undefined")
+					}
 				}
 				s.WriteString(" {\n")
 				g.writeIndent(s, 2)
 				s.WriteString("return ")
-				s.WriteString(*f.fnName)
-				s.WriteString("(this._ptr)")
-				if tempType == "string" {
-					s.WriteString(".toString()")
+				if *f.arrayType != "" {
+					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+					g.writeIndent(s, 2)
+					s.WriteString(fmt.Sprintf("return new %sArray(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native());\n", caser.String(*f.arrayType), getByteSize(*f.arrayType)))
+				} else {
+					s.WriteString(*f.fnName)
+					s.WriteString("(this._ptr)")
+					if tempType == "string" {
+						s.WriteString(".toString()")
+					}
+					s.WriteString(";\n")
 				}
-				s.WriteString(";\n")
+
 				g.writeIndent(s, 1)
 				if fieldsVisited == fieldCount-1 {
 					s.WriteString("}\n")
