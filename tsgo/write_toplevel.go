@@ -269,8 +269,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) writeAccessorClasses(class_wrappers *[]*FFIFunc, fmtr cases.Caser) {
-	var s = &strings.Builder{}
+func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
 
 	if len(*class_wrappers) > 0 {
 		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
@@ -360,8 +359,84 @@ func (g *PackageGenerator) writeAccessorClasses(class_wrappers *[]*FFIFunc, fmtr
 	}
 }
 
+func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *StructAccessor, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper) {
+	if v.isHandleFn != nil && !struct_exports[*v.name] {
+		var ptr_arg = &ArgHelpers{
+			Name:        "handle",
+			FFIType:     "FFIType.ptr",
+			CGoWrapType: "C.uintptr_t",
+			OGGoType:    "unsafe.Pointer",
+		}
+		disposeFnName := fmt.Sprintf("_dispose_%s", *v.name)
+		disposeHandle := &DisposeStructFunc{
+			args:   []*ArgHelpers{ptr_arg},
+			fnName: disposeFnName,
+			name:   *v.name,
+		}
+		var classWrapper = &ClassWrapper{
+			name:           v.name,
+			fieldAccessors: v.fieldAccessors,
+			disposeHandle:  disposeHandle,
+			args:           v.args,
+			returns:        v.returns,
+		}
+		*class_wrappers = append(*class_wrappers, classWrapper)
+		// declare export for struct dispose fn
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
+		fieldCount := len(classWrapper.fieldAccessors)
+		fieldsVisited := 0
+		for _, fa := range classWrapper.fieldAccessors {
+			g.writeIndent(s, 2)
+			s.WriteString(*fa.fnName)
+			if fieldsVisited == fieldCount-1 {
+				s.WriteByte('\n')
+			} else {
+				s.WriteString(",\n")
+			}
+			if fa.isHandleFn != nil {
+				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers)
+			}
+			fieldsVisited++
+		}
+		struct_exports[*v.name] = true
+	}
+}
+
+func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIFunc, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper) {
+	if v.isHandleFn && !struct_exports[*v.name] {
+		var classWrapper = &ClassWrapper{
+			name:           v.name,
+			fieldAccessors: v.fieldAccessors,
+			disposeHandle:  v.disposeHandle,
+			args:           v.args,
+			returns:        v.returns,
+		}
+		*class_wrappers = append(*class_wrappers, classWrapper)
+		// declare export for struct dispose fn
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
+		fieldCount := len(classWrapper.fieldAccessors)
+		fieldsVisited := 0
+		for _, fa := range classWrapper.fieldAccessors {
+			g.writeIndent(s, 2)
+			s.WriteString(*fa.fnName)
+			if fieldsVisited == fieldCount-1 {
+				s.WriteByte('\n')
+			} else {
+				s.WriteString(",\n")
+			}
+			if fa.isHandleFn != nil {
+				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers)
+			}
+			fieldsVisited++
+		}
+		struct_exports[*v.name] = true
+	}
+}
+
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
-	var class_wrappers = []*FFIFunc{}
+	var class_wrappers = []*ClassWrapper{}
 	caser := cases.Title(language.AmericanEnglish)
 
 	s.WriteString("\n//////////\n")
@@ -387,25 +462,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		} else {
 			s.WriteString(",\n")
 		}
-		if v.isHandleFn && !struct_exports[*v.name] {
-			class_wrappers = append(class_wrappers, v)
-			// declare export for struct dispose fn
-			g.writeIndent(s, 2)
-			s.WriteString(fmt.Sprintf("%s,\n", v.disposeHandle.fnName))
-			fieldCount := len(v.fieldAccessors)
-			fieldsVisited := 0
-			for _, fa := range v.fieldAccessors {
-				g.writeIndent(s, 2)
-				s.WriteString(*fa.fnName)
-				if visited == count-1 && fieldsVisited == fieldCount-1 {
-					s.WriteByte('\n')
-				} else {
-					s.WriteString(",\n")
-				}
-				fieldsVisited++
-			}
-			struct_exports[*v.name] = true
-		}
+		g.writeAccessorFieldExports(s, v, struct_exports, &class_wrappers)
 		visited++
 	}
 
@@ -527,5 +584,5 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 	s.WriteString("})\n\n")
 
-	g.writeAccessorClasses(&class_wrappers, caser)
+	g.writeAccessorClasses(s, &class_wrappers, caser)
 }

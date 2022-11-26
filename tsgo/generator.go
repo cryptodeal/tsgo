@@ -63,6 +63,17 @@ type StructAccessor struct {
 	fieldAccessors []*StructAccessor
 }
 
+type ClassWrapper struct {
+	args           []*ArgHelpers
+	returns        []*ResHelpers
+	isHandleFn     *string
+	isStarExpr     bool
+	isOptional     bool
+	name           *string
+	fieldAccessors []*StructAccessor
+	disposeHandle  *DisposeStructFunc
+}
+
 type FFIState struct {
 	GoImports        map[string]bool
 	CImports         map[string]bool
