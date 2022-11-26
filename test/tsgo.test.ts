@@ -115,23 +115,7 @@ describe('tsgo', () => {
 		}
 	});
 
-	it('returns Go struct (wrapped class); contains field w ref to dif struct', () => {
-		let StructBar = new _StructBar(_TestStruct());
-		expect(typeof StructBar).toBe('object');
-		expect(typeof StructBar.Field).toBe('string');
-		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
-		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-		const testArray = StructBar.ArrayField;
-		expect(testArray instanceof Float32Array).toBe(true);
-		for (let i = 0; i < testArray.length; i++) {
-			expect(typeof testArray[i]).toBe('number');
-		}
-    expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
-	});
-
-	it('returns Go *struct (wrapped class)', () => {
+  	it('returns Go *struct (wrapped class)', () => {
 		let StructBar = new _StructBar(_TestStruct2());
 		expect(typeof StructBar).toBe('object');
 		expect(typeof StructBar.Field).toBe('string');
@@ -140,6 +124,17 @@ describe('tsgo', () => {
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
 		expect(typeof StructBar.ArrayField).toBe('undefined');
+	});
+  
+	it('returns Go struct (wrapped class); contains field w ref to dif struct', () => {
+		let StructBar = new _StructBar(_TestStruct());
+		expect(typeof StructBar).toBe('object');
+		expect(typeof StructBar.Field).toBe('string');
+		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
+		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
+	
 	});
 
 	it('returns string (as cstring)', () => {

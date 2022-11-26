@@ -91,7 +91,6 @@ func (g *PackageGenerator) addCImport(s *strings.Builder, pkg string, isLocal bo
 	if _, ok := g.ffi.CImports[pkg]; ok {
 		return
 	}
-	g.writeIndent(s, 1)
 	s.WriteString("#include ")
 	if isLocal {
 		s.WriteByte('"')

@@ -269,17 +269,6 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) isStaticType(t string, class_wrappers *[]*ClassWrapper) bool {
-	if v, ok := g.ffi.StructHelpers[t]; ok && v != nil {
-		if len(v) > 0 {
-			return true
-		} else {
-			return false
-		}
-	}
-	return false
-}
-
 func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
 
 	if len(*class_wrappers) > 0 {
