@@ -238,6 +238,7 @@ describe('tsgo', () => {
     expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
     expect(StructBar.StructField.ArrayField instanceof Float32Array).toBe(true);
     expect(StructBar.StructField.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
-    // expect(StructBar.StructField.FieldToAnotherStruct.ArrayField instanceof Float32Array).toBe(true);
+    expect(StructBar.StructField.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
+    expect(StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct instanceof _StructBar).toBe(true);
 	});
 });
