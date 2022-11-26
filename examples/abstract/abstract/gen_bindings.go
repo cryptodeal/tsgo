@@ -265,7 +265,7 @@ func _TestStruct() unsafe.Pointer {
 func _GET_StructBar_Field(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.Field)))
+  _returned_value := C.CString(string(s.Field)))
 }
 
 //export _DISPOSE_Struct
