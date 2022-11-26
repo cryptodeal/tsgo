@@ -701,6 +701,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		}
 
 		isHandleFn, structName := g.isResHandle(f.Type)
+		fmt.Println(isHandleFn, structName)
 
 		if optional {
 			s.WriteByte('?')
