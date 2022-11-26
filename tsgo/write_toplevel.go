@@ -423,6 +423,132 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 	}
 }
 
+func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int) {
+	if v.isHandleFn != nil && !struct_config[*v.name] {
+		// write config for struct dispose fn
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
+		// write config for struct field accessors
+		fieldCount := len(v.fieldAccessors)
+		fieldsVisited := 0
+		for _, fa := range v.fieldAccessors {
+			g.writeIndent(s, 1)
+			s.WriteString(*fa.fnName)
+			s.WriteString(": {\n")
+			fieldArgLen := len(fa.args)
+			fieldResLen := len(fa.returns)
+			if fieldArgLen > 0 {
+				g.writeIndent(s, 2)
+				s.WriteString("args: [")
+				for i, arg := range fa.args {
+					s.WriteString(arg.FFIType)
+					if i < fieldArgLen-1 {
+						s.WriteString(", ")
+					}
+				}
+				s.WriteByte(']')
+				if fieldResLen > 0 {
+					s.WriteString(",\n")
+				} else {
+					s.WriteByte('\n')
+				}
+			}
+			if resLen == 1 {
+				g.writeIndent(s, 2)
+				s.WriteString("returns: ")
+				s.WriteString(fa.returns[0].FFIType)
+				s.WriteByte('\n')
+			} else if resLen > 1 {
+				var errStr strings.Builder
+				errStr.WriteString("Function `")
+				errStr.WriteString(k)
+				errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
+				errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
+				log.Fatalf("TSGo failed: %v", errStr.String())
+			}
+
+			g.writeIndent(s, 1)
+			if visited == count-1 && fieldsVisited == fieldCount-1 {
+				s.WriteString("}\n")
+			} else {
+				s.WriteString("},\n")
+			}
+			if fa.isHandleFn != nil {
+				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen)
+			}
+			fieldsVisited++
+		}
+		struct_config[*v.name] = true
+	}
+}
+
+func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFunc, struct_config map[string]bool, k string, visited int, count int, resLen int) {
+	if v.isHandleFn && !struct_config[*v.name] {
+		// write config for struct dispose fn
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
+		// write config for struct field accessors
+		fieldCount := len(v.fieldAccessors)
+		fieldsVisited := 0
+		for _, fa := range v.fieldAccessors {
+			g.writeIndent(s, 1)
+			s.WriteString(*fa.fnName)
+			s.WriteString(": {\n")
+			fieldArgLen := len(fa.args)
+			fieldResLen := len(fa.returns)
+			if fieldArgLen > 0 {
+				g.writeIndent(s, 2)
+				s.WriteString("args: [")
+				for i, arg := range fa.args {
+					s.WriteString(arg.FFIType)
+					if i < fieldArgLen-1 {
+						s.WriteString(", ")
+					}
+				}
+				s.WriteByte(']')
+				if fieldResLen > 0 {
+					s.WriteString(",\n")
+				} else {
+					s.WriteByte('\n')
+				}
+			}
+			if resLen == 1 {
+				g.writeIndent(s, 2)
+				s.WriteString("returns: ")
+				s.WriteString(fa.returns[0].FFIType)
+				s.WriteByte('\n')
+			} else if resLen > 1 {
+				var errStr strings.Builder
+				errStr.WriteString("Function `")
+				errStr.WriteString(k)
+				errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
+				errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
+				log.Fatalf("TSGo failed: %v", errStr.String())
+			}
+
+			g.writeIndent(s, 1)
+			if visited == count-1 && fieldsVisited == fieldCount-1 {
+				s.WriteString("}\n")
+			} else {
+				s.WriteString("},\n")
+			}
+			if fa.isHandleFn != nil {
+				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen)
+			}
+			fieldsVisited++
+		}
+		struct_config[*v.name] = true
+	}
+}
+
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
 	var class_wrappers = []*ClassWrapper{}
 	caser := cases.Title(language.AmericanEnglish)
@@ -510,64 +636,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		} else {
 			s.WriteString("},\n")
 		}
-
-		if v.isHandleFn && !struct_config[*v.name] {
-			// write config for struct dispose fn
-			g.writeIndent(s, 1)
-			s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
-			g.writeIndent(s, 2)
-			s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
-			g.writeIndent(s, 1)
-			s.WriteString("},\n")
-			// write config for struct field accessors
-			fieldCount := len(v.fieldAccessors)
-			fieldsVisited := 0
-			for _, fa := range v.fieldAccessors {
-				g.writeIndent(s, 1)
-				s.WriteString(*fa.fnName)
-				s.WriteString(": {\n")
-				fieldArgLen := len(fa.args)
-				fieldResLen := len(fa.returns)
-				if fieldArgLen > 0 {
-					g.writeIndent(s, 2)
-					s.WriteString("args: [")
-					for i, arg := range fa.args {
-						s.WriteString(arg.FFIType)
-						if i < fieldArgLen-1 {
-							s.WriteString(", ")
-						}
-					}
-					s.WriteByte(']')
-					if fieldResLen > 0 {
-						s.WriteString(",\n")
-					} else {
-						s.WriteByte('\n')
-					}
-				}
-				if resLen == 1 {
-					g.writeIndent(s, 2)
-					s.WriteString("returns: ")
-					s.WriteString(fa.returns[0].FFIType)
-					s.WriteByte('\n')
-				} else if resLen > 1 {
-					var errStr strings.Builder
-					errStr.WriteString("Function `")
-					errStr.WriteString(k)
-					errStr.WriteString("` has more than one return value, which is not supported by Bun FFI...\n")
-					errStr.WriteString("Consider adjusting your `tsgo.yaml` config file to inject code before/after the function call in the CGo wrapper fn as you can coerce to a single return value in Go.\n")
-					log.Fatalf("TSGo failed: %v", errStr.String())
-				}
-
-				g.writeIndent(s, 1)
-				if visited == count-1 && fieldsVisited == fieldCount-1 {
-					s.WriteString("}\n")
-				} else {
-					s.WriteString("},\n")
-				}
-				fieldsVisited++
-			}
-			struct_config[*v.name] = true
-		}
+		g.writeAccessorFieldConfig(s, v, struct_config, k, visited, count, resLen)
 		visited++
 	}
 	s.WriteString("})\n\n")

@@ -473,6 +473,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	return ffi_func
 }
 
+// TODO: think 1 fn can handle disposing all structs
 func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 	var disposeSB strings.Builder
 	disposeSB.WriteString(fmt.Sprintf("//export %s\n", t.fnName))
