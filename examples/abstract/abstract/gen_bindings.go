@@ -341,8 +341,9 @@ func _TestStruct2() unsafe.Pointer {
 }
 
 //export _TestMap
-func _TestMap() unsafe.Pointer {
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*abstract.TestMap())))
+func _TestMap() *C.char {
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((*abstract.TestMap())
+  return _returned_value
 }
 
 func main() {} // Required but ignored
