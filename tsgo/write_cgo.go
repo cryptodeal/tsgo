@@ -356,9 +356,7 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 	structName := ""
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		struct_name := g.getStructName(t.X)
-		isHandle = true
-		structName = struct_name
+		return g.isResHandle(t.X)
 
 	case *ast.Ident:
 		struct_name := g.getStructName(t)

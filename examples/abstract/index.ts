@@ -81,17 +81,14 @@ export interface DemoStruct2 {
 
 export const {
   symbols: {
-    genDisposePtr,
-    arraySize,
-    _Uint64ArrayTest,
-    _Uint64ArgTest,
-    _TestMap,
-    _Int32ArrayTest,
-    _Int64ArrayTest,
-    _Float32ArgTest,
-    _Uint32ArgTest,
-    _TestStruct2,
+    _Float64ArgTest,
+    _Int32ArgTest,
+    _IntTest,
     _DISPOSE_Struct,
+    _Uint32ArrayTest,
+    _Uint64ArrayTest,
+    _Float32ArgTest,
+    _TestStruct2,
     _GET_StructBar_Field,
     _GET_StructBar_FieldWithWeirdJSONTag,
     _GET_StructBar_FieldThatShouldBeOptional,
@@ -101,55 +98,40 @@ export const {
     _GET_StructBar_StructField,
     _GET_DemoStruct_ArrayField,
     _GET_DemoStruct_FieldToAnotherStruct,
+    _TestMap,
+    arraySize,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Int64ArgTest,
+    _Uint64ArgTest,
+    genDisposePtr,
     _Float64ArrayTest,
-    _Uint32ArrayTest,
-    _Float64ArgTest,
-    _TestStruct,
-    _IntTest,
-    _Float32ArrayTest,
     _StringTest,
-    _Int32ArgTest,
-    _Int64ArgTest
+    _Float32ArrayTest,
+    _Uint32ArgTest,
+    _TestStruct,
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Float32ArrayTest: {
+  _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _StringTest: {
-    returns: FFIType.cstring
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
   },
   _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _Uint64ArrayTest: {
+  _IntTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
+  _DISPOSE_Struct: {
+    args: [FFIType.ptr]
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  _Int32ArrayTest: {
+  _Uint32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -161,15 +143,8 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
   _TestStruct2: {
     returns: FFIType.ptr
-  },
-  _DISPOSE_Struct: {
-    args: [FFIType.ptr]
   },
   _GET_StructBar_Field: {
     args: [FFIType.ptr],
@@ -207,27 +182,66 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
+  _TestMap: {
+    returns: FFIType.ptr
+  },
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
   _Float64ArrayTest: {
     args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _TestStruct: {
     returns: FFIType.ptr
   },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
   const { cb, ptr } = disp;
   return cb(ptr);
 });
+
+export class _int {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
+}
 
 export class _StructBar {
   private _ptr: number;
@@ -241,24 +255,34 @@ export class _StructBar {
     return _DISPOSE_Struct(ptr);
   }
 
-  get Field(): string {
-    return _GET_StructBar_Field(this._ptr).toString();
+  get Field(): _Foo | undefined {
+    const ptr = _GET_StructBar_Field(this._ptr);
+    if (!ptr) return undefined;
+    return new _Foo(ptr);
   }
 
-  get FieldWithWeirdJSONTag(): number {
-    return _GET_StructBar_FieldWithWeirdJSONTag(this._ptr);
+  get FieldWithWeirdJSONTag(): _int64 | undefined {
+    const ptr = _GET_StructBar_FieldWithWeirdJSONTag(this._ptr);
+    if (!ptr) return undefined;
+    return new _int64(ptr);
   }
 
-  get FieldThatShouldBeOptional(): string | undefined {
-    return _GET_StructBar_FieldThatShouldBeOptional(this._ptr).toString();
+  get FieldThatShouldBeOptional(): _string | undefined {
+    const ptr = _GET_StructBar_FieldThatShouldBeOptional(this._ptr);
+    if (!ptr) return undefined;
+    return new _string(ptr);
   }
 
-  get FieldThatShouldNotBeOptional(): string {
-    return _GET_StructBar_FieldThatShouldNotBeOptional(this._ptr).toString();
+  get FieldThatShouldNotBeOptional(): _string | undefined {
+    const ptr = _GET_StructBar_FieldThatShouldNotBeOptional(this._ptr);
+    if (!ptr) return undefined;
+    return new _string(ptr);
   }
 
-  get FieldThatShouldBeReadonly(): string {
-    return _GET_StructBar_FieldThatShouldBeReadonly(this._ptr).toString();
+  get FieldThatShouldBeReadonly(): _string | undefined {
+    const ptr = _GET_StructBar_FieldThatShouldBeReadonly(this._ptr);
+    if (!ptr) return undefined;
+    return new _string(ptr);
   }
 
   get ArrayField(): Float32Array | undefined {
@@ -274,6 +298,48 @@ export class _StructBar {
     if (!ptr) return undefined;
     return new _DemoStruct(ptr);
   }
+}
+
+export class _Foo {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
+}
+
+export class _int64 {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
+}
+
+export class _string {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 
 export class _DemoStruct {
@@ -296,8 +362,38 @@ export class _DemoStruct {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize(ptr) * 4, genDisposePtr.native()));
   }
 
-  get FieldToAnotherStruct(): any | undefined {
-    return _GET_DemoStruct_FieldToAnotherStruct(this._ptr);
+  get FieldToAnotherStruct(): _DemoStruct2 | undefined {
+    const ptr = _GET_DemoStruct_FieldToAnotherStruct(this._ptr);
+    if (!ptr) return undefined;
+    return new _DemoStruct2(ptr);
   }
+}
+
+export class _DemoStruct2 {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
+}
+
+export class _ {
+  private _ptr: number;
+
+  constructor(ptr: number) {
+    this._ptr = ptr;
+    registry.register(this, { cb: this._gc_dispose, ptr });
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 

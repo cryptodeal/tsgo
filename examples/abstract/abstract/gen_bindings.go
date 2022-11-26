@@ -35,9 +35,8 @@ import "C"
 import (
   "github.com/cryptodeal/tsgo/examples/abstract"
   "unsafe"
-  "fmt"
   "runtime/cgo"
-  "encoding/json"
+  "fmt"
 )
 
 var ptrTrckr = make(map[unsafe.Pointer]C.size_t)
@@ -149,20 +148,17 @@ func CUint64(b []uint64) unsafe.Pointer {
   return p
 }
 
-func encodeJSON(x interface{}) []byte {
-  res, err := json.Marshal(x)
-  if err != nil {
-    fmt.Println(err)
-    panic(err)
-  }
-  return res
+//export _IntTest
+func _IntTest(foo *C.char) unsafe.Pointer {
+  _foo := C.GoString(foo)
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.IntTest(_foo))))
 }
 
-//export _IntTest
-func _IntTest(foo *C.char) C.int {
-  _foo := C.GoString(foo)
-  _returned_value := C.int(abstract.IntTest(_foo))
-  return _returned_value
+//export _DISPOSE_Struct
+func _DISPOSE_Struct(handle C.uintptr_t) {
+  h := cgo.Handle(handle)
+  fmt.Println("deleted handle @ uintptr:", handle)
+  h.Delete()
 }
 
 //export _Float32ArrayTest
@@ -208,10 +204,8 @@ func _Uint64ArrayTest(foo *C.char) unsafe.Pointer {
 }
 
 //export _StringTest
-func _StringTest() *C.char {
-  _returned_value := C.CString(abstract.StringTest())
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+func _StringTest() unsafe.Pointer {
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.StringTest())))
 }
 
 //export _Float32ArgTest
@@ -262,50 +256,41 @@ func _TestStruct() unsafe.Pointer {
 }
 
 //export _GET_StructBar_Field
-func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
+func _GET_StructBar_Field(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(string(s.Field))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.Field)))
 }
 
 //export _GET_StructBar_FieldWithWeirdJSONTag
-func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
+func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.int64_t(int64(s.FieldWithWeirdJSONTag))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.FieldWithWeirdJSONTag)))
 }
 
 //export _GET_StructBar_FieldThatShouldBeOptional
-func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
+func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   if s.FieldThatShouldBeOptional == nil {
     return nil
   }
-  _returned_value := C.CString(string(*s.FieldThatShouldBeOptional))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldThatShouldBeOptional)))
 }
 
 //export _GET_StructBar_FieldThatShouldNotBeOptional
-func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
+func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(string(*s.FieldThatShouldNotBeOptional))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldThatShouldNotBeOptional)))
 }
 
 //export _GET_StructBar_FieldThatShouldBeReadonly
-func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
+func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(string(s.FieldThatShouldBeReadonly))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.FieldThatShouldBeReadonly)))
 }
 
 //export _GET_StructBar_ArrayField
@@ -347,15 +332,7 @@ func _GET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
   if s.FieldToAnotherStruct == nil {
     return nil
   }
-  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.FieldToAnotherStruct))
-  return _returned_value
-}
-
-//export _DISPOSE_Struct
-func _DISPOSE_Struct(handle C.uintptr_t) {
-  h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)
-  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldToAnotherStruct)))
 }
 
 //export _TestStruct2
@@ -364,11 +341,8 @@ func _TestStruct2() unsafe.Pointer {
 }
 
 //export _TestMap
-func _TestMap() *C.char {
-  _temp_res_val := encodeJSON(*abstract.TestMap())
-  _returned_value := C.CString(string(_temp_res_val))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+func _TestMap() unsafe.Pointer {
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*abstract.TestMap())))
 }
 
 func main() {} // Required but ignored
