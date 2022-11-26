@@ -85,8 +85,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
 		// fmt.Println("isStruct")
-		s.WriteString("export interface ")
-		s.WriteString(ts.Name.Name)
+		s.WriteString(fmt.Sprintf("export interface %s", ts.Name.Name))
 
 		if ts.TypeParams != nil {
 			g.writeTypeParamsFields(s, ts.TypeParams.List)
@@ -98,7 +97,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		for _, helper := range g.ffi.StructHelpers[ts.Name.Name] {
 			helper.args[0].OGGoType = ts.Name.Name
 		}
-		s.WriteString("}")
+		s.WriteByte('}')
 	}
 
 	id, isIdent := ts.Type.(*ast.Ident)
@@ -108,54 +107,36 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
 		if enumName == "" {
-			enumName = ts.Name.Name + "Enum"
+			enumName = fmt.Sprintf("%sEnum", ts.Name.Name)
 		}
 		if !strings.EqualFold(enumName, ts.Name.Name) {
 			g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 			// add to TypeHelpers
 			// keeps the original type
-			s.WriteString("export type ")
-			s.WriteString(ts.Name.Name)
-			s.WriteString(" = ")
-			s.WriteString(getIdent(id.Name))
-			s.WriteString(";")
-			s.WriteByte('\n')
+			s.WriteString(fmt.Sprintf("export type %s = %s;\n", ts.Name.Name, getIdent(id.Name)))
 		}
-		s.WriteString("export enum ")
-		s.WriteString(enumName)
-		s.WriteString(" {")
+		s.WriteString(fmt.Sprintf("export enum %s {", enumName))
 	} else if isIdent {
 		// fmt.Println("isIdent")
-
 		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
-
-		s.WriteString("export type ")
-		s.WriteString(ts.Name.Name)
-		s.WriteString(" = ")
-		s.WriteString(getIdent(id.Name))
-		s.WriteString(";")
+		s.WriteString(fmt.Sprintf("export type %s = %s;", ts.Name.Name, getIdent(id.Name)))
 	}
 
 	if !isStruct && !isIdent {
 		// fmt.Println("!isStruct && !isIdent")
-
 		var tempSB = &strings.Builder{}
 		g.writeCGoType(tempSB, ts.Type, 0, false)
 		// TODO: might not be correct?
 		g.ffi.TypeHelpers[ts.Name.Name] = tempSB.String()
-		s.WriteString("export type ")
-		s.WriteString(ts.Name.Name)
-		s.WriteString(" = ")
+		s.WriteString(fmt.Sprintf("export type %s = ", ts.Name.Name))
 		g.writeType(s, ts.Type, 0, true)
-		s.WriteString(";")
+		s.WriteByte(';')
 	}
 
 	if ts.Comment != nil {
-		s.WriteString(" // " + ts.Comment.Text())
+		s.WriteString(fmt.Sprintf(" // %s", ts.Comment.Text()))
 	}
-	s.WriteString("\n")
-
-	// fmt.Println("g.ffi.TypeHelpers[ts.Name.Name]", g.ffi.TypeHelpers[ts.Name.Name])
+	s.WriteByte('\n')
 }
 
 // Writing of value specs, which are exported const expressions like
@@ -211,11 +192,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			if g.IsEnumStruct(group.groupType) {
 				s.WriteString(name.Name)
 			} else {
-				s.WriteString("export const ")
-				s.WriteString(name.Name)
-
-				s.WriteString(": ")
-				s.WriteString(group.groupType)
+				s.WriteString(fmt.Sprintf("export const %s: %s", name.Name, group.groupType))
 			}
 		} else {
 			if !group.isGroupedDeclaration {
@@ -258,7 +235,7 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		}
 
 		if vs.Comment != nil {
-			s.WriteString(" // " + vs.Comment.Text())
+			s.WriteString(fmt.Sprintf(" // %s", vs.Comment.Text()))
 		} else {
 			s.WriteByte('\n')
 		}
@@ -270,7 +247,6 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 }
 
 func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
-
 	if len(*class_wrappers) > 0 {
 		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
 		g.writeIndent(s, 1)
@@ -285,9 +261,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 	for _, c := range *class_wrappers {
 		if v, ok := g.ffi.StructHelpers[*c.name]; ok && len(v) > 0 {
 			if !struct_wrappers[*c.name] {
-				s.WriteString("export class _")
-				s.WriteString(*c.name)
-				s.WriteString(" {\n")
+				s.WriteString(fmt.Sprintf("export class _%s {\n", *c.name))
 				g.writeIndent(s, 1)
 				s.WriteString("private _ptr: number;\n\n")
 				g.writeIndent(s, 1)
@@ -312,9 +286,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				fieldsVisited := 0
 				for _, f := range c.fieldAccessors {
 					g.writeIndent(s, 1)
-					s.WriteString("get ")
-					s.WriteString(*f.name)
-					s.WriteString("(): ")
+					s.WriteString(fmt.Sprintf("get %s(): ", *f.name))
 					tempType := g.getJSFromFFIType(f.returns[0].FFIType)
 					if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
 						s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
@@ -353,9 +325,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
-						s.WriteString("return ")
-						s.WriteString(*f.fnName)
-						s.WriteString("(this._ptr)")
+						s.WriteString(fmt.Sprintf("return %s(this._ptr)", *f.fnName))
 						if tempType == "string" {
 							s.WriteString(".toString()")
 						}
@@ -451,8 +421,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		fieldsVisited := 0
 		for _, fa := range v.fieldAccessors {
 			g.writeIndent(s, 1)
-			s.WriteString(*fa.fnName)
-			s.WriteString(": {\n")
+			s.WriteString(fmt.Sprintf("%s: {\n", *fa.fnName))
 			fieldArgLen := len(fa.args)
 			fieldResLen := len(fa.returns)
 			if fieldArgLen > 0 {
@@ -473,9 +442,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 			}
 			if resLen == 1 {
 				g.writeIndent(s, 2)
-				s.WriteString("returns: ")
-				s.WriteString(fa.returns[0].FFIType)
-				s.WriteByte('\n')
+				s.WriteString(fmt.Sprintf("returns: %s\n", fa.returns[0].FFIType))
 			} else if resLen > 1 {
 				var errStr strings.Builder
 				errStr.WriteString("Function `")
@@ -517,8 +484,7 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 		fieldsVisited := 0
 		for _, fa := range v.fieldAccessors {
 			g.writeIndent(s, 1)
-			s.WriteString(*fa.fnName)
-			s.WriteString(": {\n")
+			s.WriteString(fmt.Sprintf("%s: {\n", *fa.fnName))
 			fieldArgLen := len(fa.args)
 			fieldResLen := len(fa.returns)
 			if fieldArgLen > 0 {
@@ -539,9 +505,7 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 			}
 			if resLen == 1 {
 				g.writeIndent(s, 2)
-				s.WriteString("returns: ")
-				s.WriteString(fa.returns[0].FFIType)
-				s.WriteByte('\n')
+				s.WriteString(fmt.Sprintf("returns: %s\n", fa.returns[0].FFIType))
 			} else if resLen > 1 {
 				var errStr strings.Builder
 				errStr.WriteString("Function `")
@@ -572,15 +536,13 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 
 	s.WriteString("\n//////////\n")
 	// source: misc.go
-	s.WriteString("// Generated config for Bun FFI\n")
-	s.WriteByte('\n')
+	s.WriteString("// Generated config for Bun FFI\n\n")
 	s.WriteString("export const {\n")
 	g.writeIndent(s, 1)
 	s.WriteString("symbols: {\n")
 
 	count := len(g.ffi.FFIFuncs)
 	visited := 0
-
 	struct_exports := map[string]bool{}
 	disposeWritten := false
 	for k, v := range g.ffi.FFIFuncs {
@@ -599,10 +561,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 
 	g.writeIndent(s, 1)
-	s.WriteString("}\n} = dlopen(import.meta.dir + '/")
-	s.WriteString(path)
-	s.WriteString("/gen_bindings")
-	s.WriteString(".dylib', {\n")
+	s.WriteString(fmt.Sprintf("}\n} = dlopen(import.meta.dir + '/%s/gen_bindings.dylib', {\n", path))
 	visited = 0
 	struct_config := map[string]bool{}
 	isDisposeWritten := false
@@ -611,8 +570,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		if !g.ffi.FFIHelpers[k] {
 			s.WriteByte('_')
 		}
-		s.WriteString(k)
-		s.WriteString(": {\n")
+		s.WriteString(fmt.Sprintf("%s: {\n", k))
 		argLen := len(v.args)
 		resLen := len(v.returns)
 		if argLen > 0 {

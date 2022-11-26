@@ -1,6 +1,7 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 )
@@ -24,10 +25,7 @@ func (g *PackageGenerator) writeCommentGroup(s *strings.Builder, f *ast.CommentG
 			continue
 		}
 		g.writeIndent(s, depth)
-		s.WriteString(" * ")
-		c = strings.ReplaceAll(c, "*/", "*\\/") // An edge case: a // comment can contain */
-		s.WriteString(c)
-		s.WriteByte('\n')
+		s.WriteString(fmt.Sprintf(" * %s\n", strings.ReplaceAll(c, "*/", "*\\/")))
 	}
 	g.writeIndent(s, depth)
 	s.WriteString(" */\n")

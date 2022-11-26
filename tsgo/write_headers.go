@@ -1,6 +1,7 @@
 package tsgo
 
 import (
+	"fmt"
 	"go/ast"
 	"path/filepath"
 	"strings"
@@ -22,15 +23,12 @@ func (g *PackageGenerator) writeFileFrontmatter(w *strings.Builder) {
 
 func (g *PackageGenerator) writeFileSourceHeader(w *strings.Builder, path string, file *ast.File) {
 	w.WriteString("\n//////////\n// source: ")
-	w.WriteString(filepath.Base(path))
-	w.WriteString("\n")
+	w.WriteString(fmt.Sprintf("%s\n", filepath.Base(path)))
 
 	if file.Doc != nil {
-		w.WriteString("/*\n")
-		w.WriteString(file.Doc.Text())
-		w.WriteString("*/\n")
+		w.WriteString(fmt.Sprintf("/*\n%s*/\n", file.Doc.Text()))
 	}
-	w.WriteString("\n")
+	w.WriteByte('\n')
 }
 
 func (g *PackageGenerator) writeFFIHeaders(w *strings.Builder) {

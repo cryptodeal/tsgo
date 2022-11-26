@@ -15,8 +15,7 @@ import (
 // Generator for one or more input packages, responsible for linking
 // them together if necessary.
 type TSGo struct {
-	conf *Config
-
+	conf              *Config
 	packageGenerators map[string]*PackageGenerator
 }
 
@@ -66,11 +65,12 @@ type StructAccessor struct {
 }
 
 type ClassWrapper struct {
-	args           []*ArgHelpers
-	returns        []*ResHelpers
-	isHandleFn     *string
-	isStarExpr     bool
-	isOptional     bool
+	args    []*ArgHelpers
+	returns []*ResHelpers
+	// TODO: might be useful in future?
+	// isHandleFn     *string
+	// isStarExpr     bool
+	// isOptional     bool
 	structType     *string
 	name           *string
 	fieldAccessors []*StructAccessor
