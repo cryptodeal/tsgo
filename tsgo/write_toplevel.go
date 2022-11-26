@@ -331,7 +331,11 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					s.WriteString(" {\n")
 					g.writeIndent(s, 2)
 					if f.structType != nil {
-						s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.structType, *f.fnName))
+						s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr)", *f.structType, *f.fnName))
+						if f.returns[0].FFIType == "FFIType.cstring" {
+							s.WriteString(".toString()")
+						}
+						s.WriteString(";\n")
 					} else if f.isHandleFn != nil {
 						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
