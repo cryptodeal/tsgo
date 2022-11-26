@@ -361,22 +361,10 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 
 func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *StructAccessor, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper, visited int, count int, isLast bool) {
 	if v.isHandleFn != nil && !struct_exports[*v.name] {
-		var ptr_arg = &ArgHelpers{
-			Name:        "handle",
-			FFIType:     "FFIType.ptr",
-			CGoWrapType: "C.uintptr_t",
-			OGGoType:    "unsafe.Pointer",
-		}
-		disposeFnName := fmt.Sprintf("_dispose_%s", *v.isHandleFn)
-		disposeHandle := &DisposeStructFunc{
-			args:   []*ArgHelpers{ptr_arg},
-			fnName: disposeFnName,
-			name:   *v.name,
-		}
 		var classWrapper = &ClassWrapper{
 			name:           v.isHandleFn,
 			fieldAccessors: v.fieldAccessors,
-			disposeHandle:  disposeHandle,
+			disposeHandle:  v.disposeHandle,
 			args:           v.args,
 			returns:        v.returns,
 		}

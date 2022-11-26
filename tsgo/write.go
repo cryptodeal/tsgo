@@ -702,6 +702,19 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		_, dType := g.isTypedArray(f.Type)
 		if isHandleFn {
 			field_func.isHandleFn = &structName
+			var ptr_arg = &ArgHelpers{
+				Name:        "handle",
+				FFIType:     "FFIType.ptr",
+				CGoWrapType: "C.uintptr_t",
+				OGGoType:    "unsafe.Pointer",
+			}
+			disposeFnName := fmt.Sprintf("_dispose_%s", structName)
+			disposeHandle := &DisposeStructFunc{
+				args:   []*ArgHelpers{ptr_arg},
+				fnName: disposeFnName,
+				name:   structName,
+			}
+			field_func.disposeHandle = disposeHandle
 		}
 		field_func.arrayType = &dType
 		field_func.isOptional = optional

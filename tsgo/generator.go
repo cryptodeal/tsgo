@@ -61,6 +61,7 @@ type StructAccessor struct {
 	fnName         *string
 	arrayType      *string
 	fieldAccessors []*StructAccessor
+	disposeHandle  *DisposeStructFunc
 }
 
 type ClassWrapper struct {

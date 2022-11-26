@@ -605,6 +605,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 		fa.fnName = &name
 		fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
 	}
+	fnSB.WriteString(g.writeDisposeStruct(f.disposeHandle))
 
 	return fnSB.String()
 }
