@@ -90,10 +90,7 @@ func (g *PackageGenerator) addCSizeHelper(s *strings.Builder, numType string) st
 	fnNameSB.WriteString(numType)
 	fnNameSB.WriteString("Size")
 	if !g.ffi.CHelpers[fnNameSB.String()] {
-		s.WriteByte('\n')
-		s.WriteString("static inline size_t ")
-		s.WriteString(fnNameSB.String())
-		s.WriteString("() {\n")
+		s.WriteString(fmt.Sprintf("\nstatic inline size_t %s() {\n", fnNameSB.String()))
 		g.writeIndent(s, 1)
 		s.WriteString("return sizeof(")
 		switch numType {
@@ -182,22 +179,19 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		cHelpersHeaders.WriteString("void disposePtr(void *, void *);\n")
 		cHelpersHeaders.WriteString("void *hackyHandle(uintptr_t);\n")
 
-		var headersPath strings.Builder
-		headersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
-		headersPath.WriteByte('/')
-		headersPath.WriteString(pkgName)
-		headersPath.WriteString("/helpers.h")
-		err := os.MkdirAll(filepath.Dir(headersPath.String()), os.ModePerm)
+		filePathDir := filepath.Dir(g.pkg.GoFiles[0])
+		headersPath := fmt.Sprintf("%s/%s/helpers.h", filePathDir, pkgName)
+		err := os.MkdirAll(filepath.Dir(headersPath), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
-		err = os.WriteFile(headersPath.String(), []byte(cHelpersHeaders.String()), os.ModePerm)
+		err = os.WriteFile(headersPath, []byte(cHelpersHeaders.String()), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
 
 		g.writeFileCodegenHeader(&cHelpers)
-		cHelpers.WriteString("#include \"_cgo_export.h\"\n\n")
+		cHelpers.WriteString(fmt.Sprintf("#include %q\n\n", "_cgo_export.h"))
 		cHelpers.WriteString("void disposePtr(void *ptr, void *ctx)\n")
 		cHelpers.WriteString("{\n")
 		g.writeIndent(&cHelpers, 1)
@@ -210,17 +204,13 @@ func (g *PackageGenerator) addCDisposeHelpers(ci *strings.Builder, pkgName strin
 		cHelpers.WriteString("return (void *)ptr;\n")
 		cHelpers.WriteString("}\n")
 
-		var helpersPath strings.Builder
-		helpersPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
-		helpersPath.WriteByte('/')
-		helpersPath.WriteString(pkgName)
-		helpersPath.WriteString("/helpers.c")
+		helpersPath := fmt.Sprintf("%s/%s/helpers.c", filePathDir, pkgName)
 
-		err = os.MkdirAll(filepath.Dir(helpersPath.String()), os.ModePerm)
+		err = os.MkdirAll(filepath.Dir(helpersPath), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
-		err = os.WriteFile(helpersPath.String(), []byte(cHelpers.String()), os.ModePerm)
+		err = os.WriteFile(helpersPath, []byte(cHelpers.String()), os.ModePerm)
 		if err != nil {
 			log.Fatalf("TSGo failed: %v", err)
 		}
@@ -300,29 +290,15 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 	type_str := tempSB.String()
 	switch type_str {
 	case "*C.char":
-		parsedSB := strings.Builder{}
-		parsedSB.WriteByte('_')
-		parsedSB.WriteString(f.Name)
-		s.WriteString(parsedSB.String())
-		s.WriteString(" := C.GoString(")
-		s.WriteString(f.Name)
-		s.WriteString(")\n")
-		*usedVars = append(*usedVars, parsedSB.String())
+		parsedSB := fmt.Sprintf("_%s", f.Name)
+		s.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", parsedSB, f.Name))
+		*usedVars = append(*usedVars, parsedSB)
 	case "unsafe.Pointer":
-		parsedSB := strings.Builder{}
-		parsedSB.WriteByte('_')
-		parsedSB.WriteString(f.Name)
+		parsedSB := fmt.Sprintf("_%s", f.Name)
 		g.addGoImport(gi, "unsafe")
 		arr_dat_type := g.getArrayType(f.ASTField.Type)
-		s.WriteString(parsedSB.String())
-		s.WriteString(" := unsafe.Slice((*")
-		s.WriteString(arr_dat_type)
-		s.WriteString(")(")
-		s.WriteString(f.Name)
-		s.WriteString("), ")
-		s.WriteString(f.Name)
-		s.WriteString("_len)\n")
-		*usedVars = append(*usedVars, parsedSB.String())
+		s.WriteString(fmt.Sprintf("%s := unsafe.Slice((*%s)(%s), %s_len)\n", parsedSB, arr_dat_type, f.Name, f.Name))
+		*usedVars = append(*usedVars, parsedSB)
 	default:
 		*usedVars = append(*usedVars, f.Name)
 	}
@@ -332,7 +308,6 @@ func isStruct(t string) bool {
 	if strings.Contains(t, "C.") || strings.Contains(t, "map[") {
 		return false
 	}
-
 	switch t {
 	case "bool":
 		return false
@@ -396,8 +371,8 @@ func (g *PackageGenerator) parseAccessors(fields *[]*StructAccessor, name string
 		}
 	}
 }
-func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 
+func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 	isStarExpr := false
 	switch f.Type.Results.List[0].Type.(type) {
 	case *ast.StarExpr:
@@ -503,26 +478,19 @@ func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
-	fnSB.WriteString("//export ")
-	fnSB.WriteString(*f.fnName)
-	fnSB.WriteByte('\n')
-	fnSB.WriteString("func ")
-	fnSB.WriteString(*f.fnName)
-	fnSB.WriteByte('(')
+	fnSB.WriteString(fmt.Sprintf("//export %s\n", *f.fnName))
+	fnSB.WriteString(fmt.Sprintf("func %s(", *f.fnName))
 	// iterate through fn params, generating cgo function decl line
 	argLen := len(f.args)
 	if argLen > 0 {
 		for i, arg := range f.args {
-			fnSB.WriteString(arg.Name)
-			fnSB.WriteByte(' ')
-			fnSB.WriteString(arg.CGoWrapType)
+			fnSB.WriteString(fmt.Sprintf("%s %s", arg.Name, arg.CGoWrapType))
 			if i < argLen-1 {
 				fnSB.WriteString(", ")
 			}
 		}
 	}
 	fnSB.WriteString(") ")
-
 	// write return type (if any)
 	if len(f.returns) > 0 {
 		if f.isHandleFn != nil {
@@ -544,11 +512,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 				g.writeIndent(&fnSB, 1)
 				fnSB.WriteString("h := cgo.Handle(handle)\n")
 				g.writeIndent(&fnSB, 1)
-				fnSB.WriteString("s := h.Value().(")
-				fnSB.WriteString(pkgName)
-				fnSB.WriteByte('.')
-				fnSB.WriteString(structName)
-				fnSB.WriteString(")\n")
+				fnSB.WriteString(fmt.Sprintf("s := h.Value().(%s.%s)\n", pkgName, structName))
 			} else {
 				// if `arg.ASTField == nil`, it's a helper arg like `len`, which isn't passed to wrapped Go func
 				if arg.ASTField != nil {
@@ -571,13 +535,10 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	// write returned value (or intermediary, if necessary)
 	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
 	g.writeIndent(&fnSB, 1)
-
 	if f.isHandleFn != nil {
 		fnSB.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle")
 	} else {
-		fnSB.WriteString("_returned_value := ")
-		fnSB.WriteString(tempResType)
-		fnSB.WriteByte('(')
+		fnSB.WriteString(fmt.Sprintf("_returned_value := %s(", tempResType))
 		if *f.arrayType != "" {
 			fnSB.WriteString(g.writeCArrayHandler(gh, ec, *f.arrayType, fmtr))
 		} else {
@@ -589,8 +550,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
 	}
-	fnSB.WriteString("s.")
-	fnSB.WriteString(*f.name)
+	fnSB.WriteString(fmt.Sprintf("s.%s", *f.name))
 	if f.isHandleFn != nil {
 		fnSB.WriteString(")))\n")
 	} else {
@@ -608,12 +568,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 
 	if f.isHandleFn != nil {
 		for _, fa := range f.fieldAccessors {
-			var accessorSB strings.Builder
-			accessorSB.WriteString("_GET_")
-			accessorSB.WriteString(*f.isHandleFn)
-			accessorSB.WriteString("_")
-			accessorSB.WriteString(*fa.name)
-			name := accessorSB.String()
+			name := fmt.Sprintf("_GET_%s_%s", *f.isHandleFn, *fa.name)
 			fa.fnName = &name
 			fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
 		}
@@ -628,19 +583,13 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
-	fnSB.WriteString("//export _")
-	fnSB.WriteString(name)
-	fnSB.WriteByte('\n')
-	fnSB.WriteString("func _")
-	fnSB.WriteString(name)
-	fnSB.WriteByte('(')
+	fnSB.WriteString(fmt.Sprintf("//export _%s\n", name))
+	fnSB.WriteString(fmt.Sprintf("func _%s(", name))
 	// iterate through fn params, generating cgo function decl line
 	argLen := len(f.args)
 	if argLen > 0 {
 		for i, arg := range f.args {
-			fnSB.WriteString(arg.Name)
-			fnSB.WriteByte(' ')
-			fnSB.WriteString(arg.CGoWrapType)
+			fnSB.WriteString(fmt.Sprintf("%s %s", arg.Name, arg.CGoWrapType))
 			if i < argLen-1 {
 				fnSB.WriteString(", ")
 			}
@@ -662,6 +611,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 		fnSB.WriteByte(' ')
 	}
 	fnSB.WriteString("{\n")
+
 	// gen necessary type coercions (CGo C types -> Go types)
 	if argLen > 0 {
 		for _, arg := range f.args {
@@ -671,6 +621,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 			}
 		}
 	}
+
 	var tempResType strings.Builder
 	// write returned value (or intermediary, if necessary)
 	g.writeIndent(&fnSB, 1)
@@ -689,10 +640,7 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 	if f.isStarExpr {
 		fnSB.WriteByte('*')
 	}
-	fnSB.WriteString(pkgName)
-	fnSB.WriteByte('.')
-	fnSB.WriteString(name)
-	fnSB.WriteString("(")
+	fnSB.WriteString(fmt.Sprintf("%s.%s(", pkgName, name))
 
 	// iterate through params (and converted params), writing args passed to function call
 	for i, param := range used_args {
@@ -767,12 +715,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
 		if func_data.isHandleFn && !g.ffi.GoWrappedStructs[*func_data.name] {
 			for _, field := range func_data.fieldAccessors {
-				var accessorSB strings.Builder
-				accessorSB.WriteString("_GET_")
-				accessorSB.WriteString(*func_data.name)
-				accessorSB.WriteString("_")
-				accessorSB.WriteString(*field.name)
-				name := accessorSB.String()
+				name := fmt.Sprintf("_GET_%s_%s", *func_data.name, *field.name)
 				field.fnName = &name
 				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
 			}
@@ -791,18 +734,14 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	// writes required `func main()` to appease compiler
 	cg.WriteString("func main() {} // Required but ignored")
 
-	// write the generated Cgo code to file
-	var outPath strings.Builder
-	outPath.WriteString(filepath.Dir(g.pkg.GoFiles[0]))
-	outPath.WriteByte('/')
-	outPath.WriteString(pkgName)
-	outPath.WriteString("/gen_bindings.go")
+	// write generated CGo wrapper bindings to file
+	outPath := fmt.Sprintf("%s/%s/gen_bindings.go", filepath.Dir(g.pkg.GoFiles[0]), pkgName)
 
-	err := os.MkdirAll(filepath.Dir(outPath.String()), os.ModePerm)
+	err := os.MkdirAll(filepath.Dir(outPath), os.ModePerm)
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}
-	err = os.WriteFile(outPath.String(), []byte(cg.String()), os.ModePerm)
+	err = os.WriteFile(outPath, []byte(cg.String()), os.ModePerm)
 	if err != nil {
 		log.Fatalf("TSGo failed: %v", err)
 	}

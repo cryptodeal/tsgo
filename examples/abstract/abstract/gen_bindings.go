@@ -32,7 +32,7 @@ static inline size_t uint64Size() {
 */
 import "C"
 
-import (
+import(
   "github.com/cryptodeal/tsgo/examples/abstract"
   "unsafe"
   "fmt"
