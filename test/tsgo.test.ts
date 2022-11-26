@@ -115,28 +115,6 @@ describe('tsgo', () => {
 		}
 	});
 
-  	it('returns Go *struct (wrapped class)', () => {
-		let StructBar = new _StructBar(_TestStruct2());
-		expect(typeof StructBar).toBe('object');
-		expect(typeof StructBar.Field).toBe('string');
-		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
-		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-		expect(typeof StructBar.ArrayField).toBe('undefined');
-	});
-  
-	it('returns Go struct (wrapped class); contains field w ref to dif struct', () => {
-		let StructBar = new _StructBar(_TestStruct());
-		expect(typeof StructBar).toBe('object');
-		expect(typeof StructBar.Field).toBe('string');
-		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
-		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
-		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-	
-	});
-
 	it('returns string (as cstring)', () => {
 		const str = _StringTest().toString();
 		expect(typeof str).toBe('string');
@@ -235,5 +213,26 @@ describe('tsgo', () => {
 		for (let i = 0; i < test.length; i++) {
 			expect(out[i]).toBe(test[i]);
 		}
+	});
+
+  it('returns Go *struct (wrapped class)', () => {
+		const StructBar = new _StructBar(_TestStruct2());
+		expect(typeof StructBar).toBe('object');
+		expect(typeof StructBar.Field).toBe('string');
+		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
+		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
+		expect(typeof StructBar.ArrayField).toBe('undefined');
+	});
+
+	it('returns Go struct (wrapped class); contains field w ref to dif struct', () => {
+		const StructBar = new _StructBar(_TestStruct());
+		expect(typeof StructBar).toBe('object');
+		expect(typeof StructBar.Field).toBe('string');
+		expect(typeof StructBar.FieldWithWeirdJSONTag).toBe('number');
+		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
+		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
 	});
 });

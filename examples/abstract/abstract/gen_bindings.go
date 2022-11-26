@@ -4,7 +4,7 @@ package main
 /*
 #include <stdlib.h>
 #include "helpers.h"
-  #include <stdint.h>
+#include <stdint.h>
 
 static inline size_t float32Size() {
   return sizeof(float);
