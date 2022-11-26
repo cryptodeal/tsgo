@@ -136,6 +136,7 @@ func (g *TSGo) Generate() error {
 			CHelpers:         make(map[string]bool),
 			FFIFuncs:         make(map[string]*FFIFunc),
 			StructHelpers:    make(map[string][]*StructAccessor),
+			ParsedStructs:    make(map[string]bool),
 			TypeHelpers:      make(map[string]string),
 			GoWrappedStructs: make(map[string]bool),
 		}
