@@ -282,7 +282,7 @@ func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  if s. FieldThatShouldBeOptional == nil {
+  if s.FieldThatShouldBeOptional == nil {
     return nil
   }
   _returned_value := C.CString(string(*s.FieldThatShouldBeOptional))
@@ -312,7 +312,7 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
 func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  if s. ArrayField == nil {
+  if s.ArrayField == nil {
     return nil
   }
   _returned_value := unsafe.Pointer(CFloat32(s.ArrayField))
@@ -323,7 +323,7 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _GET_StructBar_StructField(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  if s. StructField == nil {
+  if s.StructField == nil {
     return nil
   }
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.StructField)))
@@ -333,7 +333,7 @@ func _GET_StructBar_StructField(handle C.uintptr_t) unsafe.Pointer {
 func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
-  if s. ArrayField == nil {
+  if s.ArrayField == nil {
     return nil
   }
   _returned_value := unsafe.Pointer(CFloat32(*s.ArrayField))

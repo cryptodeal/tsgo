@@ -128,7 +128,7 @@ describe('tsgo', () => {
 			expect(typeof testArray[i]).toBe('number');
 		}
     const DemoStruct = StructBar.StructField;
-    console.log(DemoStruct.Field);
+    console.log(DemoStruct.ArrayField);
 		StructBar = null;
 		Bun.gc(true);
 	});
