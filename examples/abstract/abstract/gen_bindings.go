@@ -340,15 +340,7 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   return _returned_value
 }
 
-//export _dispose_DemoStruct
-func _dispose_DemoStruct(handle C.uintptr_t) {
-  h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)
-  h.Delete()
-}
-
-//export _dispose_StructBar
-func _dispose_StructBar(handle C.uintptr_t) {
+//export _DISPOSE_Structfunc _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)
   fmt.Println("deleted handle @ uintptr:", handle)
   h.Delete()

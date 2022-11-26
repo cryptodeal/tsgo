@@ -76,11 +76,15 @@ export interface DemoStruct {
 
 export const {
   symbols: {
-    _Int64ArrayTest,
-    _Uint64ArrayTest,
+    _Float32ArrayTest,
+    _Float64ArrayTest,
     _Float64ArgTest,
-    _Int64ArgTest,
-    _TestStruct,
+    _Uint32ArgTest,
+    _Uint64ArgTest,
+    _IntTest,
+    _Uint64ArrayTest,
+    _Int32ArgTest,
+    _TestStruct2,
     _dispose_StructBar,
     _GET_StructBar_Field,
     _GET_StructBar_FieldWithWeirdJSONTag,
@@ -89,32 +93,23 @@ export const {
     _GET_StructBar_FieldThatShouldBeReadonly,
     _GET_StructBar_ArrayField,
     _GET_StructBar_StructField,
-    _dispose_DemoStruct,
     _GET_DemoStruct_ArrayField,
-    _TestMap,
-    _TestStruct2,
     genDisposePtr,
-    _Float64ArrayTest,
-    _Int32ArrayTest,
-    _Uint32ArrayTest,
-    _Int32ArgTest,
-    _Uint64ArgTest,
-    _IntTest,
-    _Float32ArrayTest,
-    arraySize,
     _StringTest,
+    _Int64ArgTest,
+    _TestStruct,
+    arraySize,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Uint32ArrayTest,
     _Float32ArgTest,
-    _Uint32ArgTest
+    _TestMap
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
   _TestStruct: {
     returns: FFIType.ptr
   },
-  _dispose_StructBar: {
+  _DISPOSE_Struct: {
     args: [FFIType.ptr]
   },
   _GET_StructBar_Field: {
@@ -145,36 +140,60 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _dispose_DemoStruct: {
-    args: [FFIType.ptr]
-  },
   _GET_DemoStruct_ArrayField: {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
   genDisposePtr: {
     returns: FFIType.ptr
   },
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
+  _StringTest: {
+    returns: FFIType.cstring
   },
-  _Int32ArrayTest: {
-    args: [FFIType.cstring],
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Uint32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int32ArgTest: {
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -185,34 +204,11 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.int
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
   _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Float64ArgTest: {
+  _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   }
@@ -232,7 +228,7 @@ export class _StructBar {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _dispose_StructBar(ptr);
+    return _DISPOSE_Struct(ptr);
   }
 
   get Field(): string {
@@ -279,7 +275,7 @@ export class _DemoStruct {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _dispose_DemoStruct(ptr);
+    return _DISPOSE_Struct(ptr);
   }
 
   get ArrayField(): Float32Array | undefined {
