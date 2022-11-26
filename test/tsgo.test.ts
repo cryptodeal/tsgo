@@ -18,7 +18,8 @@ import {
 	_Uint64ArgTest,
 	_Uint64ArrayTest,
 	arraySize,
-	genDisposePtr
+	genDisposePtr,
+  _DemoStruct
 } from '@tsgo/abstract';
 import { ptr, toArrayBuffer } from 'bun:ffi';
 import { describe, expect, it } from 'bun:test';
@@ -127,10 +128,7 @@ describe('tsgo', () => {
 		for (let i = 0; i < testArray.length; i++) {
 			expect(typeof testArray[i]).toBe('number');
 		}
-    const DemoStruct = StructBar.StructField;
-    console.log(DemoStruct.ArrayField);
-		StructBar = null;
-		Bun.gc(true);
+    expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
 	});
 
 	it('returns Go *struct (wrapped class)', () => {
@@ -142,8 +140,6 @@ describe('tsgo', () => {
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
 		expect(typeof StructBar.ArrayField).toBe('undefined');
-		StructBar = null;
-		Bun.gc(true);
 	});
 
 	it('returns string (as cstring)', () => {

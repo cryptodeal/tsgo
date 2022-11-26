@@ -69,6 +69,11 @@ export interface StructBar {
  */
 export interface DemoStruct {
   ArrayField?: number /* float32 */[];
+  FieldToAnotherStruct?: DemoStruct2;
+}
+export interface DemoStruct2 {
+  AnotherArray?: number /* float64 */[];
+  BacktoAnotherStruct?: StructBar;
 }
 
 //////////
@@ -76,6 +81,15 @@ export interface DemoStruct {
 
 export const {
   symbols: {
+    genDisposePtr,
+    arraySize,
+    _Uint64ArrayTest,
+    _Uint64ArgTest,
+    _TestMap,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Float32ArgTest,
+    _Uint32ArgTest,
     _TestStruct2,
     _DISPOSE_Struct,
     _GET_StructBar_Field,
@@ -86,26 +100,37 @@ export const {
     _GET_StructBar_ArrayField,
     _GET_StructBar_StructField,
     _GET_DemoStruct_ArrayField,
-    _TestMap,
-    _IntTest,
+    _GET_DemoStruct_FieldToAnotherStruct,
     _Float64ArrayTest,
-    _Int64ArgTest,
-    _Uint32ArgTest,
-    _Float64ArgTest,
-    _Int32ArgTest,
-    _Uint64ArgTest,
-    _Int32ArrayTest,
-    _Int64ArrayTest,
-    _StringTest,
-    _Float32ArgTest,
-    genDisposePtr,
-    arraySize,
-    _Uint64ArrayTest,
-    _Float32ArrayTest,
     _Uint32ArrayTest,
+    _Float64ArgTest,
     _TestStruct,
+    _IntTest,
+    _Float32ArrayTest,
+    _StringTest,
+    _Int32ArgTest,
+    _Int64ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
   genDisposePtr: {
     returns: FFIType.ptr
   },
@@ -117,15 +142,30 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  _Int32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint32ArrayTest: {
+  _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _TestStruct: {
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct2: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -163,55 +203,25 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
+  _GET_DemoStruct_FieldToAnotherStruct: {
+    args: [FFIType.ptr],
+    returns: FFIType.ptr
   },
   _Float64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestStruct2: {
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  _Int32ArrayTest: {
+  _Uint32ArrayTest: {
     args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Float64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _TestStruct: {
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -284,6 +294,10 @@ export class _DemoStruct {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize(ptr) * 4, genDisposePtr.native()));
+  }
+
+  get FieldToAnotherStruct(): any | undefined {
+    return _GET_DemoStruct_FieldToAnotherStruct(this._ptr);
   }
 }
 

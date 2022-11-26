@@ -357,16 +357,14 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		struct_name := g.getStructName(t.X)
-		if g.IsWrappedEnum(struct_name) {
-			isHandle = true
-			structName = struct_name
-		}
+		isHandle = true
+		structName = struct_name
+
 	case *ast.Ident:
 		struct_name := g.getStructName(t)
-		if g.IsWrappedEnum(struct_name) {
-			isHandle = true
-			structName = struct_name
-		}
+		isHandle = true
+		structName = struct_name
+
 	}
 	return isHandle, structName
 }

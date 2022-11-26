@@ -46,9 +46,6 @@ type PackageConfig struct {
 	// FFIFallbackType defines the Bun FFI config fallback type used as default
 	FFIFallbackType string `yaml:"ffi_fallback_type"`
 
-	// FFIBindings will shim an ES6 class wrapper for the `structs` defined here
-	WrapStructs []string `yaml:"wrap_structs"`
-
 	// Specify your own custom type translations, useful for custom FFIType mappings (mostly unnecessary)
 	FFITypeMappings map[string]string `yaml:"ffi_type_mappings"`
 

@@ -340,6 +340,17 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   return _returned_value
 }
 
+//export _GET_DemoStruct_FieldToAnotherStruct
+func _GET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.DemoStruct)
+  if s.FieldToAnotherStruct == nil {
+    return nil
+  }
+  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.FieldToAnotherStruct))
+  return _returned_value
+}
+
 //export _DISPOSE_Struct
 func _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)

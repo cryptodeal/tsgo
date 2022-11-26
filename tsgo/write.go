@@ -254,15 +254,9 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	switch t := t.(type) {
 	case *ast.StarExpr:
 		// fmt.Println("writeCGoResType - *ast.StarExpr", t)
-		struct_name := g.getStructName(t.X)
-		if g.IsWrappedEnum(struct_name) {
-			g.addCImport(ci, "stdint.h", false)
-			g.addGoImport(cg, "runtime/cgo")
-			s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
-		} else {
-			g.addJSONEncoder(gh, cg)
-			s.WriteString("encodeJSON")
-		}
+		g.addCImport(ci, "stdint.h", false)
+		g.addGoImport(cg, "runtime/cgo")
+		s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
 	case *ast.ArrayType:
 		// fmt.Println("writeCGoResType - *ast.ArrayType", t)
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
