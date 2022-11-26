@@ -294,91 +294,93 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 	// Write the class wrappers
 	struct_wrappers := map[string]bool{}
 	for _, c := range *class_wrappers {
-		if len(c.fieldAccessors) > 0 && !struct_wrappers[*c.name] {
-			s.WriteString("export class _")
-			s.WriteString(*c.name)
-			s.WriteString(" {\n")
-			g.writeIndent(s, 1)
-			s.WriteString("private _ptr: number;\n\n")
-			g.writeIndent(s, 1)
-			s.WriteString("constructor(ptr: number) {\n")
-			g.writeIndent(s, 2)
-			s.WriteString("this._ptr = ptr;\n")
-			g.writeIndent(s, 2)
-			s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
-			g.writeIndent(s, 1)
-			s.WriteString("}\n\n")
-
-			// write class method that frees `Handle` + CGo mem for struct @ GC
-			g.writeIndent(s, 1)
-			s.WriteString("public _gc_dispose(ptr: number): void {\n")
-			g.writeIndent(s, 2)
-			s.WriteString("return _DISPOSE_Struct(ptr);\n")
-			g.writeIndent(s, 1)
-			s.WriteString("}\n\n")
-
-			// write struct field `getters`
-			fieldCount := len(c.fieldAccessors)
-			fieldsVisited := 0
-			for _, f := range c.fieldAccessors {
-				g.writeIndent(s, 1)
-				s.WriteString("get ")
-				s.WriteString(*f.name)
-				s.WriteString("(): ")
-				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
-					s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
-				} else if f.isHandleFn != nil {
-					s.WriteString(fmt.Sprintf(*f.isHandleFn))
-				} else if *f.arrayType != "" {
-					s.WriteString(fmt.Sprintf("%sArray | undefined", fmtr.String(*f.arrayType)))
-				} else {
-					s.WriteString(tempType)
-					if f.isOptional {
-						s.WriteString(" | undefined")
-					}
-				}
+		if v, ok := g.ffi.StructHelpers[*c.name]; ok && len(v) > 0 {
+			if !struct_wrappers[*c.name] {
+				s.WriteString("export class _")
+				s.WriteString(*c.name)
 				s.WriteString(" {\n")
-				g.writeIndent(s, 2)
-				if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
-					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
-					g.writeIndent(s, 2)
-					s.WriteString("if (!ptr) return undefined;\n")
-					g.writeIndent(s, 2)
-					s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
-				} else if f.isHandleFn != nil {
-					s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.isHandleFn, *f.fnName))
-				} else if *f.arrayType != "" {
-					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
-					g.writeIndent(s, 2)
-					s.WriteString("if (!ptr) return undefined;\n")
-					g.writeIndent(s, 2)
-					s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n")
-					g.writeIndent(s, 2)
-					s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
-					g.writeIndent(s, 2)
-					s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
-				} else if f.returns[0].FFIType == "cstring" {
-					s.WriteString("return ")
-					s.WriteString(*f.fnName)
-					s.WriteString("(this._ptr)")
-					if tempType == "string" {
-						s.WriteString(".toString()")
-					}
-					s.WriteString(";\n")
-				} else {
-					s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", *f.fnName))
-				}
 				g.writeIndent(s, 1)
-				if fieldsVisited == fieldCount-1 {
-					s.WriteString("}\n")
-				} else {
-					s.WriteString("}\n\n")
+				s.WriteString("private _ptr: number;\n\n")
+				g.writeIndent(s, 1)
+				s.WriteString("constructor(ptr: number) {\n")
+				g.writeIndent(s, 2)
+				s.WriteString("this._ptr = ptr;\n")
+				g.writeIndent(s, 2)
+				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
+				g.writeIndent(s, 1)
+				s.WriteString("}\n\n")
+
+				// write class method that frees `Handle` + CGo mem for struct @ GC
+				g.writeIndent(s, 1)
+				s.WriteString("public _gc_dispose(ptr: number): void {\n")
+				g.writeIndent(s, 2)
+				s.WriteString("return _DISPOSE_Struct(ptr);\n")
+				g.writeIndent(s, 1)
+				s.WriteString("}\n\n")
+
+				// write struct field `getters`
+				fieldCount := len(c.fieldAccessors)
+				fieldsVisited := 0
+				for _, f := range c.fieldAccessors {
+					g.writeIndent(s, 1)
+					s.WriteString("get ")
+					s.WriteString(*f.name)
+					s.WriteString("(): ")
+					tempType := g.getJSFromFFIType(f.returns[0].FFIType)
+					if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
+						s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
+					} else if f.isHandleFn != nil {
+						s.WriteString(fmt.Sprintf(*f.isHandleFn))
+					} else if *f.arrayType != "" {
+						s.WriteString(fmt.Sprintf("%sArray | undefined", fmtr.String(*f.arrayType)))
+					} else {
+						s.WriteString(tempType)
+						if f.isOptional {
+							s.WriteString(" | undefined")
+						}
+					}
+					s.WriteString(" {\n")
+					g.writeIndent(s, 2)
+					if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
+						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+						g.writeIndent(s, 2)
+						s.WriteString("if (!ptr) return undefined;\n")
+						g.writeIndent(s, 2)
+						s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
+					} else if f.isHandleFn != nil {
+						s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.isHandleFn, *f.fnName))
+					} else if *f.arrayType != "" {
+						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+						g.writeIndent(s, 2)
+						s.WriteString("if (!ptr) return undefined;\n")
+						g.writeIndent(s, 2)
+						s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n")
+						g.writeIndent(s, 2)
+						s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
+						g.writeIndent(s, 2)
+						s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
+					} else if f.returns[0].FFIType == "cstring" {
+						s.WriteString("return ")
+						s.WriteString(*f.fnName)
+						s.WriteString("(this._ptr)")
+						if tempType == "string" {
+							s.WriteString(".toString()")
+						}
+						s.WriteString(";\n")
+					} else {
+						s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", *f.fnName))
+					}
+					g.writeIndent(s, 1)
+					if fieldsVisited == fieldCount-1 {
+						s.WriteString("}\n")
+					} else {
+						s.WriteString("}\n\n")
+					}
+					fieldsVisited++
 				}
-				fieldsVisited++
+				s.WriteString("}\n\n")
+				struct_wrappers[*c.name] = true
 			}
-			s.WriteString("}\n\n")
-			struct_wrappers[*c.name] = true
 		}
 	}
 }
