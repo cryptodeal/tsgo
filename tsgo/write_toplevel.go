@@ -472,7 +472,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 			}
 
 			g.writeIndent(s, 1)
-			if visited == count-1 && fieldsVisited == fieldCount-1 {
+			if isLast && visited == count-1 && fieldsVisited == fieldCount-1 {
 				s.WriteString("}\n")
 			} else {
 				s.WriteString("},\n")
