@@ -269,6 +269,17 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
+func (g *PackageGenerator) isStaticType(t string, class_wrappers *[]*ClassWrapper) bool {
+	if v, ok := g.ffi.StructHelpers[t]; ok && v != nil {
+		if len(v) > 0 {
+			return true
+		} else {
+			return false
+		}
+	}
+	return false
+}
+
 func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
 
 	if len(*class_wrappers) > 0 {
@@ -315,8 +326,10 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString(*f.name)
 				s.WriteString("(): ")
 				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				if f.isHandleFn != nil {
+				if f.isHandleFn != nil && !g.isStaticType(tempType, class_wrappers) {
 					s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
+				} else if f.isHandleFn != nil {
+					s.WriteString(fmt.Sprintf(*f.isHandleFn))
 				} else if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("%sArray | undefined", fmtr.String(*f.arrayType)))
 				} else {
@@ -327,12 +340,14 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				}
 				s.WriteString(" {\n")
 				g.writeIndent(s, 2)
-				if f.isHandleFn != nil {
+				if f.isHandleFn != nil && !g.isStaticType(tempType, class_wrappers) {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 					g.writeIndent(s, 2)
 					s.WriteString("if (!ptr) return undefined;\n")
 					g.writeIndent(s, 2)
 					s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
+				} else if f.isHandleFn != nil {
+					s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.isHandleFn, *f.fnName))
 				} else if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 					g.writeIndent(s, 2)
@@ -343,7 +358,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
 					g.writeIndent(s, 2)
 					s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
-				} else {
+				} else if f.returns[0].FFIType == "cstring" {
 					s.WriteString("return ")
 					s.WriteString(*f.fnName)
 					s.WriteString("(this._ptr)")
@@ -351,8 +366,9 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						s.WriteString(".toString()")
 					}
 					s.WriteString(";\n")
+				} else {
+					s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", *f.fnName))
 				}
-
 				g.writeIndent(s, 1)
 				if fieldsVisited == fieldCount-1 {
 					s.WriteString("}\n")
