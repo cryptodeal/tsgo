@@ -16,38 +16,21 @@ type UsedParams []string
 
 func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Builder, ec *strings.Builder, ci *strings.Builder) {
 	g.writeFileCodegenHeader(cg)
-	cg.WriteString("package main\n\n")
-	cg.WriteString("/*\n")
-	cg.WriteString("#include <stdlib.h>\n")
+	cg.WriteString("package main\n\n/*\n#include <stdlib.h>\n")
 	cg.WriteString(ci.String())
-
-	// not needed afaik
-	// cg.WriteString("#include <string.h>\n")
 	cg.WriteString(ec.String())
-	cg.WriteString("*/\n")
-	cg.WriteString("import \"C\"\n\n")
-	cg.WriteString("import (\n")
-	cg.WriteString(gi.String())
-	cg.WriteString(")\n\n")
+	cg.WriteString(fmt.Sprintf("*/\nimport %q\n\nimport(\n%s)\n\n", "C", gi.String()))
 }
 
 func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.Builder, t string, fmtr cases.Caser) string {
 	sizeHandler := g.addCSizeHelper(ec, t)
-	var arrTypeSB strings.Builder
-	arrTypeSB.WriteByte('C')
-	arrTypeSB.WriteString(fmtr.String(t))
-	if !g.ffi.FFIHelpers[arrTypeSB.String()] {
-		cg.WriteString("func ")
-		cg.WriteString(arrTypeSB.String())
-		cg.WriteString("(b []")
-		cg.WriteString(t)
-		cg.WriteString(") unsafe.Pointer {\n")
+	arrType := fmt.Sprintf("C%s", fmtr.String(t))
+	if !g.ffi.FFIHelpers[arrType] {
+		cg.WriteString(fmt.Sprintf("func %s(b []%s) unsafe.Pointer {\n", arrType, t))
 		g.writeIndent(cg, 1)
 		cg.WriteString("arr_len := len(b)\n")
 		g.writeIndent(cg, 1)
-		cg.WriteString("p := C.malloc(C.size_t(arr_len) * C.")
-		cg.WriteString(sizeHandler)
-		cg.WriteString("())\n")
+		cg.WriteString(fmt.Sprintf("p := C.malloc(C.size_t(arr_len) * C.%s())\n", sizeHandler))
 		g.writeIndent(cg, 1)
 		cg.WriteString("sliceHeader := struct {\n")
 		g.writeIndent(cg, 2)
@@ -59,20 +42,16 @@ func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.B
 		g.writeIndent(cg, 1)
 		cg.WriteString("}{p, arr_len, arr_len}\n")
 		g.writeIndent(cg, 1)
-		cg.WriteString("s := *(*[]")
-		cg.WriteString(t)
-		cg.WriteString(")(unsafe.Pointer(&sliceHeader))\n")
+		cg.WriteString(fmt.Sprintf("s := *(*[]%s)(unsafe.Pointer(&sliceHeader))\n", t))
 		g.writeIndent(cg, 1)
 		cg.WriteString("copy(s, b)\n")
 		g.writeIndent(cg, 1)
 		cg.WriteString("ptrTrckr[p] = C.size_t(arr_len)\n")
 		g.writeIndent(cg, 1)
-		cg.WriteString("return p\n")
-		cg.WriteString("}\n\n")
-		g.ffi.FFIHelpers[arrTypeSB.String()] = true
-
+		cg.WriteString("return p\n}\n\n")
+		g.ffi.FFIHelpers[arrType] = true
 	}
-	return arrTypeSB.String()
+	return arrType
 }
 
 func (g *PackageGenerator) addGoImport(s *strings.Builder, pkg string) {
