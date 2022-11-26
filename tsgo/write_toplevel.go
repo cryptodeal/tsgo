@@ -283,7 +283,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 	// Write the class wrappers
 	struct_wrappers := map[string]bool{}
 	for _, c := range *class_wrappers {
-		if !struct_wrappers[*c.name] {
+		if len(c.fieldAccessors) > 0 && !struct_wrappers[*c.name] {
 			s.WriteString("export class _")
 			s.WriteString(*c.name)
 			s.WriteString(" {\n")

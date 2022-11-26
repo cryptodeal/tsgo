@@ -351,9 +351,10 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 }
 
 func isStruct(t string) bool {
-	if strings.Contains(t, "C.") {
+	if strings.Contains(t, "C.") || strings.Contains(t, "map[") {
 		return false
 	}
+
 	switch t {
 	case "bool":
 		return false

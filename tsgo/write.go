@@ -253,10 +253,7 @@ func (g *PackageGenerator) writeIndent(s *strings.Builder, depth int) {
 func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, t ast.Expr, depth int, optionalParens bool, pkgName string) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		// fmt.Println("writeCGoResType - *ast.StarExpr", t)
-		g.addCImport(ci, "stdint.h", false)
-		g.addGoImport(cg, "runtime/cgo")
-		s.WriteString("C.hackyHandle(C.uintptr_t(cgo.NewHandle(")
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, optionalParens, pkgName)
 	case *ast.ArrayType:
 		// fmt.Println("writeCGoResType - *ast.ArrayType", t)
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
