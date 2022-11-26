@@ -315,7 +315,9 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString(*f.name)
 				s.WriteString("(): ")
 				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				if *f.arrayType != "" {
+				if f.isHandleFn != nil {
+					s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
+				} else if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("%sArray | undefined", fmtr.String(*f.arrayType)))
 				} else {
 					s.WriteString(tempType)
@@ -325,7 +327,13 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				}
 				s.WriteString(" {\n")
 				g.writeIndent(s, 2)
-				if *f.arrayType != "" {
+				if f.isHandleFn != nil {
+					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+					g.writeIndent(s, 2)
+					s.WriteString("if (!ptr) return undefined;\n")
+					g.writeIndent(s, 2)
+					s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
+				} else if *f.arrayType != "" {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 					g.writeIndent(s, 2)
 					s.WriteString("if (!ptr) return undefined;\n")
