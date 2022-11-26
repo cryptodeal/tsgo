@@ -476,16 +476,18 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 // TODO: think 1 fn can handle disposing all structs
 func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 	var disposeSB strings.Builder
-	disposeSB.WriteString(fmt.Sprintf("//export %s\n", t.fnName))
-	disposeSB.WriteString(fmt.Sprintf("func %s(%s %s) {\n", t.fnName, t.args[0].Name, t.args[0].CGoWrapType))
-	g.writeIndent(&disposeSB, 1)
-	disposeSB.WriteString(fmt.Sprintf("h := cgo.Handle(%s)\n", t.args[0].Name))
-	g.writeIndent(&disposeSB, 1)
-	disposeSB.WriteString(fmt.Sprintf("fmt.Println(\"deleted handle @ uintptr:\", %s)\n", t.args[0].Name))
-	g.writeIndent(&disposeSB, 1)
-	disposeSB.WriteString("h.Delete()\n")
-	disposeSB.WriteString("}\n\n")
-
+	if !g.ffi.FFIHelpers["_DISPOSE_Struct"] {
+		disposeSB.WriteString("//export _DISPOSE_Struct")
+		disposeSB.WriteString(fmt.Sprintf("func _DISPOSE_Struct(%s %s) {\n", t.args[0].Name, t.args[0].CGoWrapType))
+		g.writeIndent(&disposeSB, 1)
+		disposeSB.WriteString(fmt.Sprintf("h := cgo.Handle(%s)\n", t.args[0].Name))
+		g.writeIndent(&disposeSB, 1)
+		disposeSB.WriteString(fmt.Sprintf("fmt.Println(\"deleted handle @ uintptr:\", %s)\n", t.args[0].Name))
+		g.writeIndent(&disposeSB, 1)
+		disposeSB.WriteString("h.Delete()\n")
+		disposeSB.WriteString("}\n\n")
+		g.ffi.FFIHelpers["_DISPOSE_Struct"] = true
+	}
 	return disposeSB.String()
 }
 

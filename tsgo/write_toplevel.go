@@ -302,7 +302,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 			g.writeIndent(s, 1)
 			s.WriteString("public _gc_dispose(ptr: number): void {\n")
 			g.writeIndent(s, 2)
-			s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
+			s.WriteString("return _DISPOSE_Struct(ptr);\n")
 			g.writeIndent(s, 1)
 			s.WriteString("}\n\n")
 
@@ -378,8 +378,6 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 		}
 		*class_wrappers = append(*class_wrappers, classWrapper)
 		// declare export for struct dispose fn
-		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
 		fieldCount := len(classWrapper.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
@@ -399,7 +397,7 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 	}
 }
 
-func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIFunc, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper, visited int, count int) {
+func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIFunc, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper, visited int, count int, isDisposeWritten *bool) {
 	if v.isHandleFn && !struct_exports[*v.name] {
 		var classWrapper = &ClassWrapper{
 			name:           v.name,
@@ -410,8 +408,11 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 		}
 		*class_wrappers = append(*class_wrappers, classWrapper)
 		// declare export for struct dispose fn
-		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
+		if !*isDisposeWritten {
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
+			*isDisposeWritten = true
+		}
 		fieldCount := len(classWrapper.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
@@ -433,13 +434,6 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 
 func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int, isLast bool) {
 	if v.isHandleFn != nil && !struct_config[*v.name] {
-		// write config for struct dispose fn
-		g.writeIndent(s, 1)
-		s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
-		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
-		g.writeIndent(s, 1)
-		s.WriteString("},\n")
 		// write config for struct field accessors
 		fieldCount := len(v.fieldAccessors)
 		fieldsVisited := 0
@@ -494,15 +488,18 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 	}
 }
 
-func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFunc, struct_config map[string]bool, k string, visited int, count int, resLen int) {
+func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFunc, struct_config map[string]bool, k string, visited int, count int, resLen int, isDisposeWritten *bool) {
 	if v.isHandleFn && !struct_config[*v.name] {
 		// write config for struct dispose fn
-		g.writeIndent(s, 1)
-		s.WriteString(fmt.Sprintf("%s: {\n", v.disposeHandle.fnName))
-		g.writeIndent(s, 2)
-		s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
-		g.writeIndent(s, 1)
-		s.WriteString("},\n")
+		if !*isDisposeWritten {
+			g.writeIndent(s, 1)
+			s.WriteString("_DISPOSE_Struct: {\n")
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("args: [%s]\n", v.disposeHandle.args[0].FFIType))
+			g.writeIndent(s, 1)
+			s.WriteString("},\n")
+			*isDisposeWritten = true
+		}
 		// write config for struct field accessors
 		fieldCount := len(v.fieldAccessors)
 		fieldsVisited := 0
@@ -573,6 +570,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	visited := 0
 
 	struct_exports := map[string]bool{}
+	disposeWritten := false
 	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 2)
 		if !g.ffi.FFIHelpers[k] {
@@ -584,7 +582,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		} else {
 			s.WriteString(",\n")
 		}
-		g.writeAccessorFieldExports(s, v, struct_exports, &class_wrappers, visited, count)
+		g.writeAccessorFieldExports(s, v, struct_exports, &class_wrappers, visited, count, &disposeWritten)
 		visited++
 	}
 
@@ -595,6 +593,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	s.WriteString(".dylib', {\n")
 	visited = 0
 	struct_config := map[string]bool{}
+	isDisposeWritten := false
 	for k, v := range g.ffi.FFIFuncs {
 		g.writeIndent(s, 1)
 		if !g.ffi.FFIHelpers[k] {
@@ -644,7 +643,7 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 		} else {
 			s.WriteString("},\n")
 		}
-		g.writeAccessorFieldConfig(s, v, struct_config, k, visited, count, resLen)
+		g.writeAccessorFieldConfig(s, v, struct_config, k, visited, count, resLen, &isDisposeWritten)
 		visited++
 	}
 	s.WriteString("})\n\n")
