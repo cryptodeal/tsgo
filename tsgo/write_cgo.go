@@ -580,9 +580,10 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	}
 	fnSB.WriteString("s.")
 	fnSB.WriteString(*f.name)
-	fnSB.WriteString("))\n")
-
-	if f.isHandleFn == nil {
+	if f.isHandleFn != nil {
+		fnSB.WriteString(")))\n")
+	} else {
+		fnSB.WriteString("))\n")
 		// TODO: need to improve API so this code is simplified/handles more edge cases
 		if tempResType == "C.CString" {
 			g.writeIndent(&fnSB, 1)

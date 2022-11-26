@@ -323,10 +323,20 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _GET_StructBar_StructField(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  if s.StructField == nil {
+  if s. StructField == nil {
     return nil
   }
-  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.StructField))
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.StructField)))
+}
+
+//export _GET_DemoStruct_ArrayField
+func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.DemoStruct)
+  if s. ArrayField == nil {
+    return nil
+  }
+  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.ArrayField))
   return _returned_value
 }
 
