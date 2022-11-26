@@ -410,7 +410,7 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 		// declare export for struct dispose fn
 		if !*isDisposeWritten {
 			g.writeIndent(s, 2)
-			s.WriteString(fmt.Sprintf("%s,\n", classWrapper.disposeHandle.fnName))
+			s.WriteString("_DISPOSE_Struct\n")
 			*isDisposeWritten = true
 		}
 		fieldCount := len(classWrapper.fieldAccessors)
