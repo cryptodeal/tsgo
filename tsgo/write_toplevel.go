@@ -423,7 +423,7 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 	}
 }
 
-func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int) {
+func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int, isLast bool) {
 	if v.isHandleFn != nil && !struct_config[*v.name] {
 		// write config for struct dispose fn
 		g.writeIndent(s, 1)
@@ -478,7 +478,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 				s.WriteString("},\n")
 			}
 			if fa.isHandleFn != nil {
-				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen)
+				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen, isLast)
 			}
 			fieldsVisited++
 		}
@@ -541,7 +541,7 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 				s.WriteString("},\n")
 			}
 			if fa.isHandleFn != nil {
-				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen)
+				g.writeNestedFieldConfig(s, fa, struct_config, k, fieldsVisited, fieldCount, fieldResLen, visited == count-1)
 			}
 			fieldsVisited++
 		}
