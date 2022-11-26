@@ -586,7 +586,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	tempResType := g.getCgoHandler(f.returns[0].CGoWrapType)
 	g.writeIndent(&fnSB, 1)
 
-	if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
+	if f.isHandleFn != nil {
 		fnSB.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle")
 	} else {
 		fnSB.WriteString("_returned_value := ")

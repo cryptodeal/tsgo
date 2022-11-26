@@ -81,8 +81,15 @@ export interface DemoStruct2 {
 
 export const {
   symbols: {
+    _Uint64ArrayTest,
+    _StringTest,
+    _Uint64ArgTest,
+    _TestMap,
+    _IntTest,
+    _Float32ArrayTest,
+    _Int64ArrayTest,
     _Uint32ArrayTest,
-    _Int64ArgTest,
+    _Int32ArrayTest,
     _TestStruct,
     _DISPOSE_Struct,
     _GET_StructBar_Field,
@@ -94,44 +101,33 @@ export const {
     _GET_StructBar_StructField,
     _GET_DemoStruct_ArrayField,
     _GET_DemoStruct_FieldToAnotherStruct,
-    _Float32ArrayTest,
-    _Int32ArrayTest,
-    _Uint64ArgTest,
-    _TestMap,
-    _IntTest,
-    _StringTest,
-    _Float32ArgTest,
-    _Int32ArgTest,
-    _Uint32ArgTest,
     _TestStruct2,
     arraySize,
     _Float64ArrayTest,
-    _Uint64ArrayTest,
-    _Float64ArgTest,
+    _Int32ArgTest,
+    _Uint32ArgTest,
     genDisposePtr,
-    _Int64ArrayTest
+    _Float32ArgTest,
+    _Float64ArgTest,
+    _Int64ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
+  _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
   },
   _Float32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int32ArrayTest: {
+  _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -139,8 +135,15 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _TestStruct: {
@@ -185,20 +188,6 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
   _TestStruct2: {
     returns: FFIType.ptr
   },
@@ -210,11 +199,22 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
   _Float32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Int32ArgTest: {
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -241,8 +241,8 @@ export class _StructBar {
     return _DISPOSE_Struct(ptr);
   }
 
-  get Field(): Foo {
-    return <Foo>_GET_StructBar_Field(this._ptr);
+  get Field(): string {
+    return _GET_StructBar_Field(this._ptr);
   }
 
   get FieldWithWeirdJSONTag(): number {

@@ -60,6 +60,7 @@ type StructAccessor struct {
 	name           *string
 	fnName         *string
 	arrayType      *string
+	structType     *string
 	fieldAccessors []*StructAccessor
 	disposeHandle  *DisposeStructFunc
 }
@@ -70,6 +71,7 @@ type ClassWrapper struct {
 	isHandleFn     *string
 	isStarExpr     bool
 	isOptional     bool
+	structType     *string
 	name           *string
 	fieldAccessors []*StructAccessor
 	disposeHandle  *DisposeStructFunc

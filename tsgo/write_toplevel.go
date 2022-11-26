@@ -330,14 +330,14 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					}
 					s.WriteString(" {\n")
 					g.writeIndent(s, 2)
-					if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
+					if f.structType != nil {
+						s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.structType, *f.fnName))
+					} else if f.isHandleFn != nil {
 						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
 						s.WriteString("if (!ptr) return undefined;\n")
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
-					} else if f.isHandleFn != nil {
-						s.WriteString(fmt.Sprintf("return <%s>%s(this._ptr);\n", *f.isHandleFn, *f.fnName))
 					} else if *f.arrayType != "" {
 						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
@@ -348,7 +348,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
-					} else if f.returns[0].FFIType == "cstring" {
+					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						s.WriteString("return ")
 						s.WriteString(*f.fnName)
 						s.WriteString("(this._ptr)")
@@ -380,6 +380,7 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 			name:           v.isHandleFn,
 			fieldAccessors: v.fieldAccessors,
 			disposeHandle:  v.disposeHandle,
+			structType:     v.structType,
 			args:           v.args,
 			returns:        v.returns,
 		}
