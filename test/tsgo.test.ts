@@ -19,7 +19,8 @@ import {
 	_Uint64ArrayTest,
 	arraySize,
 	genDisposePtr,
-  _DemoStruct
+  _DemoStruct,
+  _DemoStruct2
 } from '@tsgo/abstract';
 import { ptr, toArrayBuffer } from 'bun:ffi';
 import { describe, expect, it } from 'bun:test';
@@ -234,5 +235,9 @@ describe('tsgo', () => {
 		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
+    expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
+    expect(StructBar.StructField.ArrayField instanceof Float32Array).toBe(true);
+    expect(StructBar.StructField.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
+    // expect(StructBar.StructField.FieldToAnotherStruct.ArrayField instanceof Float32Array).toBe(true);
 	});
 });
