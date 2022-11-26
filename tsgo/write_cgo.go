@@ -350,6 +350,32 @@ func (g *PackageGenerator) addArgHandler(s *strings.Builder, gi *strings.Builder
 	}
 }
 
+func isStruct(t string) bool {
+	if strings.Contains(t, "C.") {
+		return false
+	}
+	switch t {
+	case "bool":
+		return false
+	case "string":
+		return false
+	case "int", "int8", "int16", "int32", "int64":
+		return false
+	case "uint", "uint8", "uint16", "uint32", "uint64", "uintptr":
+		return false
+	case "byte":
+		return false
+	case "rune":
+		return false
+	case "float32", "float64":
+		return false
+	case "complex64", "complex128":
+		return false
+	default:
+		return true
+	}
+}
+
 // bulk of parsing the function is done here
 func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 	isHandle := false
@@ -358,11 +384,12 @@ func (g *PackageGenerator) isResHandle(t ast.Expr) (bool, string) {
 	case *ast.StarExpr:
 		return g.isResHandle(t.X)
 
-	case *ast.StructType:
+	case *ast.Ident:
 		struct_name := g.getStructName(t)
-		isHandle = true
-		structName = struct_name
-
+		if isStruct(struct_name) {
+			isHandle = true
+			structName = struct_name
+		}
 	}
 	return isHandle, structName
 }

@@ -35,8 +35,8 @@ import "C"
 import (
   "github.com/cryptodeal/tsgo/examples/abstract"
   "unsafe"
-  "runtime/cgo"
   "fmt"
+  "runtime/cgo"
 )
 
 var ptrTrckr = make(map[unsafe.Pointer]C.size_t)
@@ -149,16 +149,10 @@ func CUint64(b []uint64) unsafe.Pointer {
 }
 
 //export _IntTest
-func _IntTest(foo *C.char) unsafe.Pointer {
+func _IntTest(foo *C.char) C.int {
   _foo := C.GoString(foo)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.IntTest(_foo))))
-}
-
-//export _DISPOSE_Struct
-func _DISPOSE_Struct(handle C.uintptr_t) {
-  h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)
-  h.Delete()
+  _returned_value := C.int(abstract.IntTest(_foo))
+  return _returned_value
 }
 
 //export _Float32ArrayTest
@@ -204,8 +198,10 @@ func _Uint64ArrayTest(foo *C.char) unsafe.Pointer {
 }
 
 //export _StringTest
-func _StringTest() unsafe.Pointer {
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.StringTest())))
+func _StringTest() *C.char {
+  _returned_value := C.CString(abstract.StringTest())
+  defer C.free(unsafe.Pointer(_returned_value))
+  return _returned_value
 }
 
 //export _Float32ArgTest
@@ -252,92 +248,14 @@ func _Uint64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
 
 //export _TestStruct
 func _TestStruct() unsafe.Pointer {
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.TestStruct())))
-}
-
-//export _GET_StructBar_Field
-func _GET_StructBar_Field(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.Field)))
-}
-
-//export _GET_StructBar_FieldWithWeirdJSONTag
-func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.FieldWithWeirdJSONTag)))
-}
-
-//export _GET_StructBar_FieldThatShouldBeOptional
-func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  if s.FieldThatShouldBeOptional == nil {
-    return nil
-  }
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldThatShouldBeOptional)))
-}
-
-//export _GET_StructBar_FieldThatShouldNotBeOptional
-func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldThatShouldNotBeOptional)))
-}
-
-//export _GET_StructBar_FieldThatShouldBeReadonly
-func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.FieldThatShouldBeReadonly)))
-}
-
-//export _GET_StructBar_ArrayField
-func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  if s.ArrayField == nil {
-    return nil
-  }
-  _returned_value := unsafe.Pointer(CFloat32(s.ArrayField))
+  _returned_value := unsafe.Pointer(abstract.TestStruct())
   return _returned_value
-}
-
-//export _GET_StructBar_StructField
-func _GET_StructBar_StructField(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.StructBar)
-  if s.StructField == nil {
-    return nil
-  }
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.StructField)))
-}
-
-//export _GET_DemoStruct_ArrayField
-func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.DemoStruct)
-  if s.ArrayField == nil {
-    return nil
-  }
-  _returned_value := unsafe.Pointer(CFloat32(*s.ArrayField))
-  return _returned_value
-}
-
-//export _GET_DemoStruct_FieldToAnotherStruct
-func _GET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
-  h := cgo.Handle(handle)
-  s := h.Value().(abstract.DemoStruct)
-  if s.FieldToAnotherStruct == nil {
-    return nil
-  }
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldToAnotherStruct)))
 }
 
 //export _TestStruct2
-func _TestStruct2() unsafe.Pointer {
-  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*abstract.TestStruct2())))
+func _TestStruct2() *C.char {
+  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((*abstract.TestStruct2())
+  return _returned_value
 }
 
 //export _TestMap
