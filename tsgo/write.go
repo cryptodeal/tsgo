@@ -619,7 +619,6 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		optional := false
 		required := false
 		readonly := false
-		_, dType := g.isTypedArray(f.Type)
 
 		var ptr_arg = &ArgHelpers{
 			Name:        "handle",
@@ -630,9 +629,8 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		}
 
 		var field_func = &StructAccessor{
-			args:      []*ArgHelpers{ptr_arg},
-			returns:   []*ResHelpers{},
-			arrayType: &dType,
+			args:    []*ArgHelpers{ptr_arg},
+			returns: []*ResHelpers{},
 		}
 
 		var fieldName string
@@ -701,6 +699,13 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		}
 
 		isHandleFn, structName := g.isResHandle(f.Type)
+		_, dType := g.isTypedArray(f.Type)
+		if isHandleFn {
+			field_func.isHandleFn = &structName
+		}
+		field_func.arrayType = &dType
+		field_func.isOptional = optional
+		field_func.isStarExpr = isStarExpr
 
 		if optional {
 			s.WriteByte('?')
@@ -725,12 +730,6 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				OGGoType:    cgoType,
 				ASTType:     &f.Type,
 			}
-			if isHandleFn {
-				field_func.isHandleFn = &structName
-			}
-			field_func.isOptional = optional
-			field_func.isStarExpr = isStarExpr
-
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
 			s.WriteString(tstype)
