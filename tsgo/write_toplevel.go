@@ -326,7 +326,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString(*f.name)
 				s.WriteString("(): ")
 				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				if f.isHandleFn != nil && !g.isStaticType(tempType, class_wrappers) {
+				if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
 					s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
 				} else if f.isHandleFn != nil {
 					s.WriteString(fmt.Sprintf(*f.isHandleFn))
@@ -340,7 +340,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				}
 				s.WriteString(" {\n")
 				g.writeIndent(s, 2)
-				if f.isHandleFn != nil && !g.isStaticType(tempType, class_wrappers) {
+				if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
 					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
 					g.writeIndent(s, 2)
 					s.WriteString("if (!ptr) return undefined;\n")
