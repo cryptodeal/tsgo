@@ -37,6 +37,7 @@ import (
   "unsafe"
   "fmt"
   "runtime/cgo"
+  "encoding/json"
 )
 
 var ptrTrckr = make(map[unsafe.Pointer]C.size_t)
@@ -146,6 +147,15 @@ func CUint64(b []uint64) unsafe.Pointer {
   copy(s, b)
   ptrTrckr[p] = C.size_t(arr_len)
   return p
+}
+
+func encodeJSON(x interface{}) []byte {
+  res, err := json.Marshal(x)
+  if err != nil {
+    fmt.Println(err)
+    panic(err)
+  }
+  return res
 }
 
 //export _IntTest
@@ -352,7 +362,9 @@ func _TestStruct2() unsafe.Pointer {
 
 //export _TestMap
 func _TestMap() *C.char {
-  _returned_value := C.hackyHandle(C.uintptr_t(cgo.NewHandle((*abstract.TestMap()))
+  _temp_res_val := encodeJSON(*abstract.TestMap())
+  _returned_value := C.CString(string(_temp_res_val))
+  defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
 }
 
