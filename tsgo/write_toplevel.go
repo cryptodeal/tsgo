@@ -359,7 +359,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 	}
 }
 
-func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *StructAccessor, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper, visited int, count int) {
+func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *StructAccessor, struct_exports map[string]bool, class_wrappers *[]*ClassWrapper, visited int, count int, isLast bool) {
 	if v.isHandleFn != nil && !struct_exports[*v.name] {
 		var ptr_arg = &ArgHelpers{
 			Name:        "handle",
@@ -389,13 +389,13 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 		for _, fa := range classWrapper.fieldAccessors {
 			g.writeIndent(s, 2)
 			s.WriteString(*fa.fnName)
-			if visited == count-1 && fieldsVisited == fieldCount-1 {
+			if isLast && visited == count-1 && fieldsVisited == fieldCount-1 {
 				s.WriteByte('\n')
 			} else {
 				s.WriteString(",\n")
 			}
 			if fa.isHandleFn != nil {
-				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers, fieldsVisited, fieldCount)
+				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers, fieldsVisited, fieldCount, isLast)
 			}
 			fieldsVisited++
 		}
@@ -427,7 +427,7 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 				s.WriteString(",\n")
 			}
 			if fa.isHandleFn != nil {
-				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers, fieldsVisited, fieldCount)
+				g.writeNestedFieldExports(s, fa, struct_exports, class_wrappers, fieldsVisited, fieldCount, visited == count-1)
 			}
 			fieldsVisited++
 		}
