@@ -269,6 +269,97 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
+func (g *PackageGenerator) writeAccessorClasses(class_wrappers *[]*FFIFunc, fmtr cases.Caser) {
+	var s = &strings.Builder{}
+
+	if len(*class_wrappers) > 0 {
+		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
+		g.writeIndent(s, 1)
+		s.WriteString("const { cb, ptr } = disp;\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return cb(ptr);\n")
+		s.WriteString("});\n\n")
+	}
+
+	// Write the class wrappers
+	struct_wrappers := map[string]bool{}
+	for _, c := range *class_wrappers {
+		if !struct_wrappers[*c.name] {
+			s.WriteString("export class _")
+			s.WriteString(*c.name)
+			s.WriteString(" {\n")
+			g.writeIndent(s, 1)
+			s.WriteString("private _ptr: number;\n\n")
+			g.writeIndent(s, 1)
+			s.WriteString("constructor(ptr: number) {\n")
+			g.writeIndent(s, 2)
+			s.WriteString("this._ptr = ptr;\n")
+			g.writeIndent(s, 2)
+			s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
+			g.writeIndent(s, 1)
+			s.WriteString("}\n\n")
+
+			// write class method that frees `Handle` + CGo mem for struct @ GC
+			g.writeIndent(s, 1)
+			s.WriteString("public _gc_dispose(ptr: number): void {\n")
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
+			g.writeIndent(s, 1)
+			s.WriteString("}\n\n")
+
+			// write struct field `getters`
+			fieldCount := len(c.fieldAccessors)
+			fieldsVisited := 0
+			for _, f := range c.fieldAccessors {
+				g.writeIndent(s, 1)
+				s.WriteString("get ")
+				s.WriteString(*f.name)
+				s.WriteString("(): ")
+				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
+				if *f.arrayType != "" {
+					s.WriteString(fmt.Sprintf("%sArray | undefined", fmtr.String(*f.arrayType)))
+				} else {
+					s.WriteString(tempType)
+					if f.isOptional {
+						s.WriteString(" | undefined")
+					}
+				}
+				s.WriteString(" {\n")
+				g.writeIndent(s, 2)
+				if *f.arrayType != "" {
+					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+					g.writeIndent(s, 2)
+					s.WriteString("if (!ptr) return undefined;\n")
+					g.writeIndent(s, 2)
+					s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n")
+					g.writeIndent(s, 2)
+					s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
+					g.writeIndent(s, 2)
+					s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
+				} else {
+					s.WriteString("return ")
+					s.WriteString(*f.fnName)
+					s.WriteString("(this._ptr)")
+					if tempType == "string" {
+						s.WriteString(".toString()")
+					}
+					s.WriteString(";\n")
+				}
+
+				g.writeIndent(s, 1)
+				if fieldsVisited == fieldCount-1 {
+					s.WriteString("}\n")
+				} else {
+					s.WriteString("}\n\n")
+				}
+				fieldsVisited++
+			}
+			s.WriteString("}\n\n")
+			struct_wrappers[*c.name] = true
+		}
+	}
+}
+
 func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl, path string) {
 	var class_wrappers = []*FFIFunc{}
 	caser := cases.Title(language.AmericanEnglish)
@@ -436,90 +527,5 @@ func (g *PackageGenerator) writeFFIConfig(s *strings.Builder, fd []*ast.FuncDecl
 	}
 	s.WriteString("})\n\n")
 
-	if len(class_wrappers) > 0 {
-		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
-		g.writeIndent(s, 1)
-		s.WriteString("const { cb, ptr } = disp;\n")
-		g.writeIndent(s, 1)
-		s.WriteString("return cb(ptr);\n")
-		s.WriteString("});\n\n")
-	}
-
-	// Write the class wrappers
-	struct_wrappers := map[string]bool{}
-	for _, c := range class_wrappers {
-		if !struct_wrappers[*c.name] {
-			s.WriteString("export class _")
-			s.WriteString(*c.name)
-			s.WriteString(" {\n")
-			g.writeIndent(s, 1)
-			s.WriteString("private _ptr: number;\n\n")
-			g.writeIndent(s, 1)
-			s.WriteString("constructor(ptr: number) {\n")
-			g.writeIndent(s, 2)
-			s.WriteString("this._ptr = ptr;\n")
-			g.writeIndent(s, 2)
-			s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
-			g.writeIndent(s, 1)
-			s.WriteString("}\n\n")
-
-			// write class method that frees `Handle` + CGo mem for struct @ GC
-			g.writeIndent(s, 1)
-			s.WriteString("public _gc_dispose(ptr: number): void {\n")
-			g.writeIndent(s, 2)
-			s.WriteString(fmt.Sprintf("return %s(ptr);\n", c.disposeHandle.fnName))
-			g.writeIndent(s, 1)
-			s.WriteString("}\n\n")
-
-			// write struct field `getters`
-			fieldCount := len(c.fieldAccessors)
-			fieldsVisited := 0
-			for _, f := range c.fieldAccessors {
-				g.writeIndent(s, 1)
-				s.WriteString("get ")
-				s.WriteString(*f.name)
-				s.WriteString("(): ")
-				tempType := g.getJSFromFFIType(f.returns[0].FFIType)
-				if *f.arrayType != "" {
-					s.WriteString(fmt.Sprintf("%sArray | undefined", caser.String(*f.arrayType)))
-				} else {
-					s.WriteString(tempType)
-					if f.isOptional {
-						s.WriteString(" | undefined")
-					}
-				}
-				s.WriteString(" {\n")
-				g.writeIndent(s, 2)
-				if *f.arrayType != "" {
-					s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
-					g.writeIndent(s, 2)
-					s.WriteString("if (!ptr) return undefined;\n")
-					g.writeIndent(s, 2)
-					s.WriteString("// eslint-disable-next-line @typescript-eslint/ban-ts-comment\n")
-					g.writeIndent(s, 2)
-					s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
-					g.writeIndent(s, 2)
-					s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", caser.String(*f.arrayType), getByteSize(*f.arrayType)))
-				} else {
-					s.WriteString("return ")
-					s.WriteString(*f.fnName)
-					s.WriteString("(this._ptr)")
-					if tempType == "string" {
-						s.WriteString(".toString()")
-					}
-					s.WriteString(";\n")
-				}
-
-				g.writeIndent(s, 1)
-				if fieldsVisited == fieldCount-1 {
-					s.WriteString("}\n")
-				} else {
-					s.WriteString("}\n\n")
-				}
-				fieldsVisited++
-			}
-			s.WriteString("}\n\n")
-			struct_wrappers[*c.name] = true
-		}
-	}
+	g.writeAccessorClasses(&class_wrappers, caser)
 }
