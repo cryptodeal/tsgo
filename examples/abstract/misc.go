@@ -57,6 +57,7 @@ func TestStruct() StructBar {
 		FieldThatShouldNotBeOptional: &str,
 		FieldThatShouldBeReadonly:    "readonly",
 		ArrayField:                   []float32{1.1, 2.2, 3.3},
+		StructField:                  &DemoStruct{ArrayField: &[]float32{1, 2, 3}},
 	}
 	return structBar
 }

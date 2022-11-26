@@ -549,7 +549,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	// return `nil` if no value @ field
 	if f.isOptional || *f.arrayType != "" {
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString(fmt.Sprintf("if s. %s == nil {\n", *f.name))
+		fnSB.WriteString(fmt.Sprintf("if s.%s == nil {\n", *f.name))
 		g.writeIndent(&fnSB, 2)
 		fnSB.WriteString("return nil\n")
 		g.writeIndent(&fnSB, 1)

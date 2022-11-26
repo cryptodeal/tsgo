@@ -127,6 +127,8 @@ describe('tsgo', () => {
 		for (let i = 0; i < testArray.length; i++) {
 			expect(typeof testArray[i]).toBe('number');
 		}
+    const DemoStruct = StructBar.StructField;
+    console.log(DemoStruct.Field);
 		StructBar = null;
 		Bun.gc(true);
 	});

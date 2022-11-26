@@ -336,7 +336,7 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
   if s. ArrayField == nil {
     return nil
   }
-  _returned_value := unsafe.Pointer(unsafe.Pointer(*s.ArrayField))
+  _returned_value := unsafe.Pointer(CFloat32(*s.ArrayField))
   return _returned_value
 }
 
