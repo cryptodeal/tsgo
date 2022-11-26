@@ -406,16 +406,18 @@ func (g *PackageGenerator) isTypedArray(t ast.Expr) (bool, string) {
 	return isArray, dType
 }
 
-func (g *PackageGenerator) parseAccessors(fields *[]*StructAccessor) {
-	for _, fa := range *fields {
-		if fa.isHandleFn != nil {
-			fa.fieldAccessors = g.ffi.StructHelpers[*fa.isHandleFn]
-			if len(fa.fieldAccessors) > 0 {
-				g.parseAccessors(&fa.fieldAccessors)
+func (g *PackageGenerator) parseAccessors(fields *[]*StructAccessor, name string) {
+	if len(*fields) > 0 && !g.ffi.ParsedStructs[name] {
+		g.ffi.ParsedStructs[name] = true
+		for _, fa := range *fields {
+			if fa.isHandleFn != nil {
+				fa.fieldAccessors = g.ffi.StructHelpers[*fa.isHandleFn]
+				if len(fa.fieldAccessors) > 0 {
+					g.parseAccessors(&fa.fieldAccessors, *fa.isHandleFn)
+				}
 			}
 		}
 	}
-
 }
 func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 
@@ -486,7 +488,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 
 	if ffi_func.isHandleFn {
 		ffi_func.fieldAccessors = g.ffi.StructHelpers[*ffi_func.name]
-		g.parseAccessors(&ffi_func.fieldAccessors)
+		g.parseAccessors(&ffi_func.fieldAccessors, *ffi_func.name)
 		var ptr_arg = &ArgHelpers{
 			Name:        "handle",
 			FFIType:     "FFIType.ptr",

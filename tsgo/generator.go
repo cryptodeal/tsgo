@@ -84,6 +84,7 @@ type FFIState struct {
 	CHelpers         map[string]bool
 	FFIFuncs         map[string]*FFIFunc
 	StructHelpers    map[string][]*StructAccessor
+	ParsedStructs    map[string]bool
 	TypeHelpers      map[string]string
 	GoWrappedStructs map[string]bool
 }
