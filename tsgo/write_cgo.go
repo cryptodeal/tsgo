@@ -595,7 +595,14 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	fnSB.WriteString("}\n\n")
 
 	for _, fa := range f.fieldAccessors {
-		fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *fa.isHandleFn))
+		var accessorSB strings.Builder
+		accessorSB.WriteString("_GET_")
+		accessorSB.WriteString(*f.isHandleFn)
+		accessorSB.WriteString("_")
+		accessorSB.WriteString(*fa.name)
+		name := accessorSB.String()
+		fa.fnName = &name
+		fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
 	}
 
 	return fnSB.String()
