@@ -410,8 +410,8 @@ func (g *PackageGenerator) parseAccessors(fields *[]*StructAccessor, name string
 	if _, ok := g.ffi.StructHelpers[name]; ok && len(*fields) > 0 && !g.ffi.ParsedStructs[name] {
 		g.ffi.ParsedStructs[name] = true
 		for _, fa := range *fields {
-			fa.fieldAccessors = g.ffi.StructHelpers[name]
-			if fa.isHandleFn != nil && len(fa.fieldAccessors) > 0 {
+			if fa.isHandleFn != nil {
+				fa.fieldAccessors = g.ffi.StructHelpers[*fa.isHandleFn]
 				g.parseAccessors(&fa.fieldAccessors, *fa.isHandleFn)
 			}
 		}
@@ -639,6 +639,8 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 			fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
 		}
 		fnSB.WriteString(g.writeDisposeStruct(f.disposeHandle))
+		g.ffi.GoWrappedStructs[*f.isHandleFn] = true
+
 	}
 
 	return fnSB.String()
