@@ -367,14 +367,14 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 			CGoWrapType: "C.uintptr_t",
 			OGGoType:    "unsafe.Pointer",
 		}
-		disposeFnName := fmt.Sprintf("_dispose_%s", *v.name)
+		disposeFnName := fmt.Sprintf("_dispose_%s", *v.isHandleFn)
 		disposeHandle := &DisposeStructFunc{
 			args:   []*ArgHelpers{ptr_arg},
 			fnName: disposeFnName,
-			name:   *v.isHandleFn,
+			name:   *v.name,
 		}
 		var classWrapper = &ClassWrapper{
-			name:           v.name,
+			name:           v.isHandleFn,
 			fieldAccessors: v.fieldAccessors,
 			disposeHandle:  disposeHandle,
 			args:           v.args,
