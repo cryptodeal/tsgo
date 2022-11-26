@@ -114,7 +114,7 @@ describe('tsgo', () => {
 		}
 	});
 
-	it('returns Go struct (wrapped class)', () => {
+	it('returns Go struct (wrapped class); contains field w ref to dif struct', () => {
 		let StructBar = new _StructBar(_TestStruct());
 		expect(typeof StructBar).toBe('object');
 		expect(typeof StructBar.Field).toBe('string');
