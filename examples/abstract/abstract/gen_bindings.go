@@ -350,6 +350,17 @@ func _GET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.FieldToAnotherStruct)))
 }
 
+//export _GET_DemoStruct2_AnotherArray
+func _GET_DemoStruct2_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.DemoStruct2)
+  if s.AnotherArray == nil {
+    return nil
+  }
+  _returned_value := unsafe.Pointer(CFloat64(*s.AnotherArray))
+  return _returned_value
+}
+
 //export _DISPOSE_Struct
 func _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)
