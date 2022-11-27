@@ -213,6 +213,12 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
+				// write static method to init new Go Struct
+				g.writeIndent(s, 1)
+				s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *c.name, *c.name))
+				g.writeIndent(s, 1)
+				s.WriteString("}\n\n")
+
 				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)
 				s.WriteString("public _gc_dispose(ptr: number): void {\n")
