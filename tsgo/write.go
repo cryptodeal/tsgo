@@ -296,9 +296,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	case *ast.BinaryExpr:
 		// fmt.Println("writeCGoResType - *ast.BinaryExpr", t)
 		g.writeType(s, t.X, depth, false)
-		s.WriteByte(' ')
-		s.WriteString(t.Op.String())
-		s.WriteByte(' ')
+		s.WriteString(fmt.Sprintf(" %s ", t.Op.String()))
 		g.writeType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
 		// fmt.Println("writeCGoResType - *ast.InterfaceType", t)
@@ -345,7 +343,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		s.WriteString("*C.char")
+		g.writeCGoType(s, t.X, depth, optionalParens)
 	case *ast.ArrayType:
 		if v, ok := t.Elt.(*ast.Ident); ok && v.String() == "byte" {
 			s.WriteString("*C.char")
@@ -353,7 +351,6 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		}
 		s.WriteString("unsafe.Pointer")
 	case *ast.StructType:
-
 		s.WriteString("{\n")
 		g.writeStructFields(s, t.Fields.List, depth+1)
 		g.writeIndent(s, depth+1)
@@ -373,10 +370,7 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		if ok {
 			s.WriteString(mappedTsType)
 		} else { // For unknown types we use the fallback type
-			s.WriteString(g.conf.FFIFallbackType)
-			s.WriteString(" /* ")
-			s.WriteString(longType)
-			s.WriteString(" */")
+			s.WriteString(fmt.Sprintf("%s /* %s */", g.conf.FFIFallbackType, longType))
 		}
 	case *ast.MapType:
 		s.WriteString("{ [key: ")
@@ -392,9 +386,7 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		s.WriteByte(')')
 	case *ast.BinaryExpr:
 		g.writeType(s, t.X, depth, false)
-		s.WriteByte(' ')
-		s.WriteString(t.Op.String())
-		s.WriteByte(' ')
+		s.WriteString(fmt.Sprintf(" %s ", t.Op.String()))
 		g.writeType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
 		g.writeInterfaceFields(s, t.Methods.List, depth+1)
@@ -497,11 +489,9 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		mappedTsType, ok := g.conf.TypeMappings[longType]
 		if ok {
 			s.WriteString(mappedTsType)
-		} else { // For unknown types we use the fallback type
-			s.WriteString(g.conf.FallbackType)
-			s.WriteString(" /* ")
-			s.WriteString(longType)
-			s.WriteString(" */")
+		} else {
+			// For unknown types we use the fallback type
+			s.WriteString(fmt.Sprintf("%s /* %s */", g.conf.FFIFallbackType, longType))
 		}
 	case *ast.MapType:
 		// fmt.Println("writeType - *ast.MapType", t)
@@ -521,9 +511,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 	case *ast.BinaryExpr:
 		// fmt.Println("writeType - *ast.BinaryExpr", t)
 		g.writeType(s, t.X, depth, false)
-		s.WriteByte(' ')
-		s.WriteString(t.Op.String())
-		s.WriteByte(' ')
+		s.WriteString(fmt.Sprintf(" %s ", t.Op.String()))
 		g.writeType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
 		// fmt.Println("writeType - *ast.InterfaceType", t)
@@ -570,10 +558,8 @@ func (g *PackageGenerator) writeTypeParamsFields(s *strings.Builder, fields []*a
 	s.WriteByte('<')
 	for i, f := range fields {
 		for j, ident := range f.Names {
-			s.WriteString(ident.Name)
-			s.WriteString(" extends ")
+			s.WriteString(fmt.Sprintf("%s extends ", ident.Name))
 			g.writeType(s, f.Type, 0, true)
-
 			if i != len(fields)-1 || j != len(f.Names)-1 {
 				s.WriteString(", ")
 			}
@@ -595,7 +581,6 @@ func (g *PackageGenerator) writeInterfaceFields(s *strings.Builder, fields []*as
 		g.writeCommentGroupIfNotNil(s, f.Doc, depth+1)
 		g.writeIndent(s, depth+1)
 		g.writeType(s, f.Type, depth, false)
-
 		if f.Comment != nil {
 			s.WriteString(" // ")
 			s.WriteString(f.Comment.Text())
@@ -722,7 +707,6 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
 			cgoType := tempSB.String()
-
 			longType := fmt.Sprintf("%s", f.Type)
 			// fmt.Println(longType)
 			if val, ok := g.ffi.TypeHelpers[longType]; ok {
@@ -746,12 +730,10 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 
 		if f.Comment != nil {
 			// Line comment is present, that means a comment after the field.
-			s.WriteString(" // ")
-			s.WriteString(f.Comment.Text())
+			s.WriteString(fmt.Sprintf(" // %s", f.Comment.Text()))
 		} else {
 			s.WriteByte('\n')
 		}
-
 		struct_fields = append(struct_fields, field_func)
 	}
 	return struct_fields
