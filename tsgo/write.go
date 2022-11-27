@@ -291,13 +291,13 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 	case *ast.ParenExpr:
 		// fmt.Println("writeCGoResType - *ast.ParenExpr", t)
 		s.WriteByte('(')
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, false, pkgName)
 		s.WriteByte(')')
 	case *ast.BinaryExpr:
 		// fmt.Println("writeCGoResType - *ast.BinaryExpr", t)
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, false, pkgName)
 		s.WriteString(fmt.Sprintf(" %s ", t.Op.String()))
-		g.writeType(s, t.Y, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.Y, depth, false, pkgName)
 	case *ast.InterfaceType:
 		// fmt.Println("writeCGoResType - *ast.InterfaceType", t)
 		g.writeInterfaceFields(s, t.Methods.List, depth+1)
@@ -309,7 +309,7 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		if t.Op == token.TILDE {
 			// We just ignore the tilde token, in Typescript extended types are
 			// put into the generic typing itself, which we can't support yet.
-			g.writeType(s, t.X, depth, false)
+			g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, false, pkgName)
 		} else {
 			err := fmt.Errorf("unhandled unary expr: %v\n %T", t, t)
 			fmt.Println(err)
@@ -317,10 +317,10 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		}
 	case *ast.IndexListExpr:
 		// fmt.Println("writeCGoResType - *ast.IndexListExpr", t)
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, false, pkgName)
 		s.WriteByte('<')
 		for i, index := range t.Indices {
-			g.writeType(s, index, depth, false)
+			g.writeCGoResType(s, cg, gh, ec, ci, fmtr, index, depth, false, pkgName)
 			if i != len(t.Indices)-1 {
 				s.WriteString(", ")
 			}
@@ -328,9 +328,9 @@ func (g *PackageGenerator) writeCGoResType(s *strings.Builder, cg *strings.Build
 		s.WriteByte('>')
 	case *ast.IndexExpr:
 		// fmt.Println("writeCGoResType - *ast.IndexExpr", t)
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.X, depth, false, pkgName)
 		s.WriteByte('<')
-		g.writeType(s, t.Index, depth, false)
+		g.writeCGoResType(s, cg, gh, ec, ci, fmtr, t.Index, depth, false, pkgName)
 		s.WriteByte('>')
 	default:
 		err := fmt.Errorf("unhandled: %s\n %T", t, t)
@@ -373,21 +373,17 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 			s.WriteString(fmt.Sprintf("%s /* %s */", g.conf.FFIFallbackType, longType))
 		}
 	case *ast.MapType:
-		s.WriteString("{ [key: ")
-		g.writeType(s, t.Key, depth, false)
-		s.WriteString("]: ")
-		g.writeType(s, t.Value, depth, false)
-		s.WriteByte('}')
+		s.WriteString("*C.char")
 	case *ast.BasicLit:
 		s.WriteString(t.Value)
 	case *ast.ParenExpr:
 		s.WriteByte('(')
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoType(s, t.X, depth, false)
 		s.WriteByte(')')
 	case *ast.BinaryExpr:
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoType(s, t.X, depth, false)
 		s.WriteString(fmt.Sprintf(" %s ", t.Op.String()))
-		g.writeType(s, t.Y, depth, false)
+		g.writeCGoType(s, t.Y, depth, false)
 	case *ast.InterfaceType:
 		g.writeInterfaceFields(s, t.Methods.List, depth+1)
 	case *ast.CallExpr, *ast.FuncType, *ast.ChanType:
@@ -396,26 +392,26 @@ func (g *PackageGenerator) writeCGoType(s *strings.Builder, t ast.Expr, depth in
 		if t.Op == token.TILDE {
 			// We just ignore the tilde token, in Typescript extended types are
 			// put into the generic typing itself, which we can't support yet.
-			g.writeType(s, t.X, depth, false)
+			g.writeCGoType(s, t.X, depth, false)
 		} else {
 			err := fmt.Errorf("unhandled unary expr: %v\n %T", t, t)
 			fmt.Println(err)
 			panic(err)
 		}
 	case *ast.IndexListExpr:
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoType(s, t.X, depth, false)
 		s.WriteByte('<')
 		for i, index := range t.Indices {
-			g.writeType(s, index, depth, false)
+			g.writeCGoType(s, index, depth, false)
 			if i != len(t.Indices)-1 {
 				s.WriteString(", ")
 			}
 		}
 		s.WriteByte('>')
 	case *ast.IndexExpr:
-		g.writeType(s, t.X, depth, false)
+		g.writeCGoType(s, t.X, depth, false)
 		s.WriteByte('<')
-		g.writeType(s, t.Index, depth, false)
+		g.writeCGoType(s, t.Index, depth, false)
 		s.WriteByte('>')
 	default:
 		err := fmt.Errorf("unhandled: %s\n %T", t, t)

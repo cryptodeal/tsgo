@@ -583,6 +583,7 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
+
 	fnSB.WriteString(fmt.Sprintf("//export _%s\n", name))
 	fnSB.WriteString(fmt.Sprintf("func _%s(", name))
 	// iterate through fn params, generating cgo function decl line
@@ -623,12 +624,12 @@ func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, 
 	}
 
 	var tempResType strings.Builder
+	g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
 	// write returned value (or intermediary, if necessary)
 	g.writeIndent(&fnSB, 1)
 	if f.isHandleFn {
 		fnSB.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle")
 	} else {
-		g.writeCGoResType(&tempResType, gi, gh, ec, ci, fmtr, *f.returns[0].ASTType, 0, true, pkgName)
 		if tempResType.String() == "encodeJSON" {
 			fnSB.WriteString("_temp_res_val := ")
 		} else {
