@@ -32,5 +32,5 @@ export interface UserEntry {
   complex: ComplexType;
 }
 export interface ListUsersResponse {
-  users: UserEntry[];
+  users: UserEntry[] | UserentryArray;
 }

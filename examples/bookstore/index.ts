@@ -6,7 +6,7 @@
 
 export interface AuthorBookListing {
   author_name: string;
-  written_books: Book[];
+  written_books: Book[] | BookArray;
 }
 
 //////////
@@ -31,6 +31,6 @@ export interface Book {
    */
   isbn: ISBN;
   genre: 'novel' | 'crime' | 'fantasy';
-  chapters: Chapter[];
+  chapters: Chapter[] | ChapterArray;
   published_at?: string /* RFC 3339 formatted */;
 }

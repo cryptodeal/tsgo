@@ -402,10 +402,4 @@ func _TestMap() *C.char {
   return _returned_value
 }
 
-//export _INIT_DemoStruct3
-func _INIT_DemoStruct3(a unsafe.Pointer, a_len uint64) unsafe.Pointer{
-	 _foo := unsafe.Slice((*float32)(a), a_len)
-	  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.DemoStruct3{AnotherArray: &_foo})))
-}
-
 func main() {} // Required but ignored

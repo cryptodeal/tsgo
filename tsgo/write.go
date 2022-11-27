@@ -241,7 +241,19 @@ func getCGoTypeHandler(s string) string {
 		return "C.CString"
 	}
 	return "unsafe.Pointer"
+}
 
+func isTypedArray(s string) bool {
+	switch s {
+	case "float32", "float64":
+		return true
+	case "int8", "int16", "int32", "int64":
+		return true
+	case "uint8", "uint16", "uint32", "uint64":
+		return true
+	default:
+		return false
+	}
 }
 
 func (g *PackageGenerator) writeIndent(s *strings.Builder, depth int) {
@@ -465,7 +477,12 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			break
 		}
 		g.writeType(s, t.Elt, depth, true)
-		s.WriteString(fmt.Sprintf("[] | %sArray", caser.String(g.getArrayType(t))))
+		arr_type := g.getArrayType(t)
+		if isTypedArray(arr_type) {
+			s.WriteString(fmt.Sprintf("[] | %sArray", caser.String(g.getArrayType(t))))
+		} else {
+			s.WriteString("[]")
+		}
 	case *ast.StructType:
 		// fmt.Println("writeType - *ast.StructType", t)
 		s.WriteString("{\n")
