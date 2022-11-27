@@ -15,9 +15,6 @@ packages:
     ffi_fallback_type: 'unsafe.Pointer'
     frontmatter: | # We can define some additional text to put at the start of the file.
       export type Something = string | number;
-    enum_structs:
-      MyIotaType: 'MyEnum'
-      FooInt64: 'FooEnum'
   - path: 'github.com/cryptodeal/tsgo/examples/simple'
     enum_structs:
       UserRole: 'UserRoles'

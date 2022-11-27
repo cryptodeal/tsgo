@@ -371,6 +371,17 @@ func _GET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.BacktoAnotherStruct)))
 }
 
+//export _GET_DemoStruct3_AnotherArray
+func _GET_DemoStruct3_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
+  h := cgo.Handle(handle)
+  s := h.Value().(abstract.DemoStruct3)
+  if s.AnotherArray == nil {
+    return nil
+  }
+  _returned_value := unsafe.Pointer(CFloat32(*s.AnotherArray))
+  return _returned_value
+}
+
 //export _DISPOSE_Struct
 func _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)
@@ -389,6 +400,12 @@ func _TestMap() *C.char {
   _returned_value := C.CString(string(_temp_res_val))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
+}
+
+//export _INIT_DemoStruct3
+func _INIT_DemoStruct3(a unsafe.Pointer, a_len uint64) unsafe.Pointer{
+	 _foo := unsafe.Slice((*float32)(a), a_len)
+	  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(abstract.DemoStruct3{AnotherArray: &_foo})))
 }
 
 func main() {} // Required but ignored

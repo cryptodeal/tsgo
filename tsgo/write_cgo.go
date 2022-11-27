@@ -251,7 +251,7 @@ func (g *PackageGenerator) addArraySize(s *strings.Builder, gi *strings.Builder)
 		var res_helper = &ResHelpers{
 			FFIType:     "FFIType.u64_fast",
 			CGoWrapType: "C.size_t",
-			OGGoType:    "uint64",
+			OGGoType:    "C.uint64_t",
 		}
 		var ffi_func = &FFIFunc{
 			args:       []*ArgHelpers{arg_helper},

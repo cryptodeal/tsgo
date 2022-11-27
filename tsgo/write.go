@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/structtag"
 	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var validJSNameRegexp = regexp.MustCompile(`(?m)^[\pL_][\pL\pN_]*$`)
@@ -446,9 +447,9 @@ func (g *PackageGenerator) getStructName(t ast.Expr) string {
 }
 
 func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, optionalParens bool) {
+	caser := cases.Title(language.AmericanEnglish)
 	switch t := t.(type) {
 	case *ast.StarExpr:
-		// fmt.Println("writeType - *ast.StarExpr", t)
 		if optionalParens {
 			s.WriteByte('(')
 		}
@@ -464,7 +465,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			break
 		}
 		g.writeType(s, t.Elt, depth, true)
-		s.WriteString("[]")
+		s.WriteString(fmt.Sprintf("[] | %sArray", caser.String(g.getArrayType(t))))
 	case *ast.StructType:
 		// fmt.Println("writeType - *ast.StructType", t)
 		s.WriteString("{\n")

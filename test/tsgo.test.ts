@@ -20,7 +20,8 @@ import {
 	arraySize,
 	genDisposePtr,
   _DemoStruct,
-  _DemoStruct2
+  _DemoStruct2,
+  _DemoStruct3
 } from '@tsgo/abstract';
 import { ptr, toArrayBuffer } from 'bun:ffi';
 import { describe, expect, it } from 'bun:test';
@@ -239,6 +240,11 @@ describe('tsgo', () => {
     expect(StructBar.StructField.ArrayField instanceof Float32Array).toBe(true);
     expect(StructBar.StructField.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
     expect(StructBar.StructField.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
-    expect(StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct instanceof _StructBar).toBe(true);
+    expect(StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct instanceof _DemoStruct3).toBe(true);
+	});
+
+  it('iniitializes a new Go struct', () => {
+		const DemoStruct3 = _DemoStruct3.init([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+		expect(DemoStruct3 instanceof _DemoStruct3).toBe(true);
 	});
 });
