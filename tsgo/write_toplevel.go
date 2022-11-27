@@ -100,7 +100,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	id, isIdent := ts.Type.(*ast.Ident)
-	if isIdent && g.IsEnumStruct(ts.Name.Name) {
+	if isIdent {
 		// fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
@@ -114,10 +114,6 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 			s.WriteString(fmt.Sprintf("export type %s = %s;\n", ts.Name.Name, getIdent(id.Name)))
 		}
 		s.WriteString(fmt.Sprintf("export enum %s {", enumName))
-	} else if isIdent {
-		// fmt.Println("isIdent")
-		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
-		s.WriteString(fmt.Sprintf("export type %s = %s;", ts.Name.Name, getIdent(id.Name)))
 	}
 
 	if !isStruct && !isIdent {
