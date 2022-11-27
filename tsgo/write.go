@@ -487,7 +487,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 			s.WriteString(mappedTsType)
 		} else {
 			// For unknown types we use the fallback type
-			s.WriteString(fmt.Sprintf("%s /* %s */", g.conf.FFIFallbackType, longType))
+			s.WriteString(fmt.Sprintf("%s /* %s */", g.conf.FallbackType, longType))
 		}
 	case *ast.MapType:
 		// fmt.Println("writeType - *ast.MapType", t)

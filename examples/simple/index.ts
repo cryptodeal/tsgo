@@ -25,7 +25,7 @@ export interface UserEntry {
      * An unknown type without a `tstype` tag or mapping in the config file
      * uses the `fallback_type`, which defaults to `any`.
      */
-    bar: any /* uuid.UUID */;
+    bar:  /* uuid.UUID */;
   }};
   address?: string;
   nickname?: string;
