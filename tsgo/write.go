@@ -578,8 +578,7 @@ func (g *PackageGenerator) writeInterfaceFields(s *strings.Builder, fields []*as
 		g.writeIndent(s, depth+1)
 		g.writeType(s, f.Type, depth, false)
 		if f.Comment != nil {
-			s.WriteString(" // ")
-			s.WriteString(f.Comment.Text())
+			s.WriteString(fmt.Sprintf(" // %s", f.Comment.Text()))
 		}
 	}
 }

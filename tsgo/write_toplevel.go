@@ -75,7 +75,6 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
 	// fmt.Println("name:", ts.Name.Name, "ts:", ts)
-
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)
 	} else if group.isGroupedDeclaration {
@@ -103,7 +102,6 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent && g.IsEnumStruct(ts.Name.Name) {
 		// fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
-
 		enumName := g.conf.EnumStructs[ts.Name.Name]
 		// if names match, dev expects we overwrite the type as enum
 		if enumName == "" {
@@ -126,7 +124,6 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 		// fmt.Println("!isStruct && !isIdent")
 		var tempSB = &strings.Builder{}
 		g.writeCGoType(tempSB, ts.Type, 0, false)
-		// TODO: might not be correct?
 		g.ffi.TypeHelpers[ts.Name.Name] = tempSB.String()
 		s.WriteString(fmt.Sprintf("export type %s = ", ts.Name.Name))
 		g.writeType(s, ts.Type, 0, true)
