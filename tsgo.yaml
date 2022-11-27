@@ -26,7 +26,7 @@ packages:
   - path: 'net/http'
     output_path: './examples/http/index.ts'
     type_mappings:
-    time.Duration: 'number /* time in nanoseconds (time.Duration) */'
+      time.Duration: 'number /* time in nanoseconds (time.Duration) */'
   # Generate the "time" output example, note the output is in gitignore as it's pretty big
   # - path: "time"
   # output_path: "./examples/time/index.ts"

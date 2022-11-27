@@ -262,12 +262,17 @@ func _TestStruct() unsafe.Pointer {
 }
 
 //export _GET_StructBar_Field
-func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
+func _GET_StructBar_Field(handle C.uintptr_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  _returned_value := C.CString(string(s.Field))
-  defer C.free(unsafe.Pointer(_returned_value))
-  return _returned_value
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s.Field)))
+}
+
+//export _DISPOSE_Struct
+func _DISPOSE_Struct(handle C.uintptr_t) {
+  h := cgo.Handle(handle)
+  fmt.Println("deleted handle @ uintptr:", handle)
+  h.Delete()
 }
 
 //export _GET_StructBar_FieldWithWeirdJSONTag
@@ -369,13 +374,6 @@ func _GET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t) unsafe.Pointer {
     return nil
   }
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(*s.BacktoAnotherStruct)))
-}
-
-//export _DISPOSE_Struct
-func _DISPOSE_Struct(handle C.uintptr_t) {
-  h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)
-  h.Delete()
 }
 
 //export _TestStruct2

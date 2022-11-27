@@ -96,6 +96,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	id, isIdent := ts.Type.(*ast.Ident)
 	if isIdent {
+		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
 		g.TSHelpers.EnumStructs[ts.Name.Name] = []*EnumField{}
 		s.WriteString(fmt.Sprintf("export type %s = %s;\n", ts.Name.Name, getIdent(id.Name)))
 	}
