@@ -74,7 +74,6 @@ func (g *PackageGenerator) writeSpec(s *strings.Builder, spec ast.Spec, group *g
 // or
 // `type Bar = string`
 func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, group *groupContext) {
-	// fmt.Println("name:", ts.Name.Name, "ts:", ts)
 	if ts.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
 		g.writeCommentGroup(s, ts.Doc, 0)
 	} else if group.isGroupedDeclaration {
@@ -83,15 +82,11 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
-		// fmt.Println("isStruct")
 		s.WriteString(fmt.Sprintf("export interface %s", ts.Name.Name))
-
 		if ts.TypeParams != nil {
 			g.writeTypeParamsFields(s, ts.TypeParams.List)
 		}
-
 		s.WriteString(" {\n")
-
 		g.ffi.StructHelpers[ts.Name.Name] = g.writeStructFields(s, st.Fields.List, 0)
 		for _, helper := range g.ffi.StructHelpers[ts.Name.Name] {
 			helper.args[0].OGGoType = ts.Name.Name
@@ -100,28 +95,12 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 	}
 
 	id, isIdent := ts.Type.(*ast.Ident)
-	if isIdent && g.IsEnumStruct(ts.Name.Name) {
-		// fmt.Println("isIdent && g.IsEnumStruct(ts.Name.Name)")
-		enumName := g.conf.EnumStructs[ts.Name.Name]
-		// if names match, dev expects we overwrite the type as enum
-		if enumName == "" {
-			enumName = fmt.Sprintf("%sEnum", ts.Name.Name)
-		}
-		if !strings.EqualFold(enumName, ts.Name.Name) {
-			g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
-			// add to TypeHelpers
-			// keeps the original type
-			s.WriteString(fmt.Sprintf("export type %s = %s;\n", ts.Name.Name, getIdent(id.Name)))
-		}
-		s.WriteString(fmt.Sprintf("export enum %s {", enumName))
-	} else if isIdent {
-		// fmt.Println("isIdent")
-		g.ffi.TypeHelpers[ts.Name.Name] = getCGoIdent(id.Name)
-		s.WriteString(fmt.Sprintf("export type %s = %s;", ts.Name.Name, getIdent(id.Name)))
+	if isIdent {
+		g.TSHelpers.EnumStructs[ts.Name.Name] = []*EnumField{}
+		s.WriteString(fmt.Sprintf("export type %s = %s;\n", ts.Name.Name, getIdent(id.Name)))
 	}
 
 	if !isStruct && !isIdent {
-		// fmt.Println("!isStruct && !isIdent")
 		var tempSB = &strings.Builder{}
 		g.writeCGoType(tempSB, ts.Type, 0, false)
 		g.ffi.TypeHelpers[ts.Name.Name] = tempSB.String()
@@ -150,13 +129,9 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 		}
 
 		if vs.Doc != nil { // The spec has its own comment, which overrules the grouped comment.
-			if group.isGroupedDeclaration {
-				g.writeCommentGroup(s, vs.Doc, 1)
-			} else {
-				g.writeCommentGroup(s, vs.Doc, 0)
-			}
+			g.writeCommentGroup(s, vs.Doc, 0)
 		} else if group.isGroupedDeclaration {
-			g.writeCommentGroupIfNotNil(s, group.doc, 1)
+			g.writeCommentGroupIfNotNil(s, group.doc, 0)
 		}
 
 		hasExplicitValue := len(vs.Values) > i
@@ -164,42 +139,17 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			group.groupType = ""
 		}
 
-		// TODO: really need to clean up this logic LOL
-		if vs.Type != nil && group.isGroupedDeclaration {
-			g.writeIndent(s, 1)
-			s.WriteString(name.Name)
+		s.WriteString(fmt.Sprintf("export const %s", name.Name))
+		if vs.Type != nil {
+			s.WriteString(": ")
 			tempSB := &strings.Builder{}
 			g.writeType(tempSB, vs.Type, 0, true)
 			typeString := tempSB.String()
-
+			s.WriteString(typeString)
 			group.groupType = typeString
-		} else if vs.Type != nil {
-			g.writeIndent(s, 1)
-			s.WriteString(name.Name)
-
-			tempSB := &strings.Builder{}
-			g.writeType(tempSB, vs.Type, 0, true)
-			typeString := tempSB.String()
-
-			group.groupType = typeString
-		} else if group.isGroupedDeclaration {
-			g.writeIndent(s, 1)
-			s.WriteString(name.Name)
 		} else if group.groupType != "" && !hasExplicitValue {
-			if g.IsEnumStruct(group.groupType) {
-				s.WriteString(name.Name)
-			} else {
-				s.WriteString(fmt.Sprintf("export const %s: %s", name.Name, group.groupType))
-			}
-		} else {
-			if !group.isGroupedDeclaration {
-				s.WriteString("export const ")
-			} else {
-				g.writeIndent(s, 1)
-			}
-			s.WriteString(name.Name)
+			s.WriteString(fmt.Sprintf(": %s", group.groupType))
 		}
-		// fmt.Println("name:", name.Name, "vs:", vs, "group:", group, "group.groupType:", group.groupType)
 
 		s.WriteString(" = ")
 
@@ -225,20 +175,12 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 			}
 			s.WriteString(valueString)
 		}
-		if !isLast && group.isGroupedDeclaration {
-			s.WriteByte(',')
-		} else if group.groupType != "" && !hasExplicitValue {
-			s.WriteByte(';')
-		}
 
+		s.WriteByte(';')
 		if vs.Comment != nil {
 			s.WriteString(fmt.Sprintf(" // %s", vs.Comment.Text()))
 		} else {
 			s.WriteByte('\n')
-		}
-
-		if isLast && group.isGroupedDeclaration {
-			s.WriteString("}\n")
 		}
 	}
 }

@@ -91,10 +91,20 @@ type FFIState struct {
 
 // Responsible for generating the code for an input package
 type PackageGenerator struct {
-	conf    *PackageConfig
-	pkg     *packages.Package
-	ffi     *FFIState
-	GoFiles []string
+	conf      *PackageConfig
+	pkg       *packages.Package
+	TSHelpers *TSHelpers
+	ffi       *FFIState
+	GoFiles   []string
+}
+
+type EnumField struct {
+	Name string
+	Val  string
+}
+
+type TSHelpers struct {
+	EnumStructs map[string][]*EnumField
 }
 
 func New(config *Config) *TSGo {
@@ -141,11 +151,16 @@ func (g *TSGo) Generate() error {
 			GoWrappedStructs: make(map[string]bool),
 		}
 
+		TSHelpers := &TSHelpers{
+			EnumStructs: make(map[string][]*EnumField),
+		}
+
 		pkgGen := &PackageGenerator{
-			conf:    pkgConfig,
-			GoFiles: pkg.GoFiles,
-			ffi:     ffi,
-			pkg:     pkg,
+			conf:      pkgConfig,
+			GoFiles:   pkg.GoFiles,
+			TSHelpers: TSHelpers,
+			ffi:       ffi,
+			pkg:       pkg,
 		}
 		g.packageGenerators[pkg.PkgPath] = pkgGen
 		code, err := pkgGen.Generate()
