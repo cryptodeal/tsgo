@@ -20,6 +20,7 @@ export type Any =
     string | any;
 export type Empty = any;
 export type Something = any;
+export enum SomethingEnum {
 export interface EmptyStruct {
 }
 export interface ValAndPtr<V extends any, PT extends (V | undefined), Unused extends number /* uint64 */> {
