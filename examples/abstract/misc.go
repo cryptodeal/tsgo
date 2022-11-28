@@ -29,12 +29,12 @@ Some more text
 */
 type StructBar struct {
 	// Comment for field Field of type Foo
-	Field                 Foo   `json:"field"` // Line Comment for field Field of type Foo
-	FieldWithWeirdJSONTag int64 `json:"weird"`
+	Field                 Foo
+	FieldWithWeirdJSONTag int64
 
-	FieldThatShouldBeOptional    *string `json:"field_that_should_be_optional"`
-	FieldThatShouldNotBeOptional *string `json:"field_that_should_not_be_optional" tstype:",required"`
-	FieldThatShouldBeReadonly    string  `json:"field_that_should_be_readonly" tstype:",readonly"`
+	FieldThatShouldBeOptional    *string
+	FieldThatShouldNotBeOptional *string
+	FieldThatShouldBeReadonly    string
 	ArrayField                   []float32
 	StructField                  *DemoStruct
 }

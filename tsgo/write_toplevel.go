@@ -216,6 +216,12 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				// write static method to init new Go Struct
 				g.writeIndent(s, 1)
 				s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *c.name, *c.name))
+				g.writeIndent(s, 2)
+				s.WriteString("const { ")
+				for _, f := range c.fieldAccessors {
+					s.WriteString(*f.name)
+				}
+				s.WriteString(" } = struct;\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 

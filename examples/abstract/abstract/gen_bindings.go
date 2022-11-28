@@ -294,6 +294,9 @@ func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
 func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
+  if s.FieldThatShouldNotBeOptional == nil {
+    return nil
+  }
   _returned_value := C.CString(string(*s.FieldThatShouldNotBeOptional))
   defer C.free(unsafe.Pointer(_returned_value))
   return _returned_value
