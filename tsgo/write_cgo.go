@@ -728,9 +728,9 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			fn_str.WriteString(fmt.Sprintf("func _INIT_%s(", *func_data.name))
 			argLen := len(func_data.fieldAccessors)
 			for i, arg := range func_data.fieldAccessors {
-				fn_str.WriteString(fmt.Sprintf("%b %s", alphaArgs[i], arg.returns[0].CGoWrapType))
+				fn_str.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
 				if arg.arrayType != nil {
-					fn_str.WriteString(fmt.Sprintf(", %b_len C.uint64_t", alphaArgs[i]))
+					fn_str.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
 				}
 				if i < argLen-1 {
 					fn_str.WriteString(", ")

@@ -215,42 +215,42 @@ func _StringTest() *C.char {
 }
 
 //export _Float32ArgTest
-func _Float32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Float32ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*float32)(foo), foo_len)
   _returned_value := CFloat32(abstract.Float32ArgTest(_foo))
   return _returned_value
 }
 
 //export _Float64ArgTest
-func _Float64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Float64ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*float64)(foo), foo_len)
   _returned_value := CFloat64(abstract.Float64ArgTest(_foo))
   return _returned_value
 }
 
 //export _Int32ArgTest
-func _Int32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Int32ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*int32)(foo), foo_len)
   _returned_value := CInt32(abstract.Int32ArgTest(_foo))
   return _returned_value
 }
 
 //export _Int64ArgTest
-func _Int64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Int64ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*int64)(foo), foo_len)
   _returned_value := CInt64(abstract.Int64ArgTest(_foo))
   return _returned_value
 }
 
 //export _Uint32ArgTest
-func _Uint32ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Uint32ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*uint32)(foo), foo_len)
   _returned_value := CUint32(abstract.Uint32ArgTest(_foo))
   return _returned_value
 }
 
 //export _Uint64ArgTest
-func _Uint64ArgTest(foo unsafe.Pointer, foo_len uint64) unsafe.Pointer {
+func _Uint64ArgTest(foo unsafe.Pointer, foo_len C.uint64_t) unsafe.Pointer {
   _foo := unsafe.Slice((*uint64)(foo), foo_len)
   _returned_value := CUint64(abstract.Uint64ArgTest(_foo))
   return _returned_value
@@ -390,6 +390,10 @@ func _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)
   fmt.Println("deleted handle @ uintptr:", handle)
   h.Delete()
+}
+
+//export _INIT_StructBar
+func _INIT_StructBar(1100001 *C.char, 1100001_len C.uint64_t, 1100010 C.int64_t, 1100010_len C.uint64_t, 1100011 *C.char, 1100011_len C.uint64_t, 1100100 *C.char, 1100100_len C.uint64_t, 1100101 *C.char, 1100101_len C.uint64_t, 1100110 unsafe.Pointer, 1100110_len C.uint64_t, 1100111 unsafe.Pointer, 1100111_len C.uint64_t) unsafe.Pointer {
 }
 
 //export _TestStruct2
