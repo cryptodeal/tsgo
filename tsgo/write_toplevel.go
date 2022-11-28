@@ -261,13 +261,16 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		g.writeIndent(s, 2)
 		if l.arrayType != nil && *l.arrayType != "" {
 			param.IsPtr = true
+			usedArgs = append(usedArgs, param)
+			var len_helper = &InitStructParam{Name: fmt.Sprintf("%s.length", *l.name), IsPtr: false}
+			usedArgs = append(usedArgs, len_helper)
 			s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
 		} else if l.isHandleFn != nil {
 			param.IsStruct = true
 			param.IsPtr = true
+			usedArgs = append(usedArgs, param)
 			s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
 		}
-		usedArgs = append(usedArgs, param)
 	}
 
 	// write return fn
@@ -327,8 +330,6 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString("}\n\n")
 
 				// write struct field `getters`
-				fieldCount := len(c.fieldAccessors)
-				fieldsVisited := 0
 				for _, f := range c.fieldAccessors {
 					g.writeIndent(s, 1)
 					s.WriteString(fmt.Sprintf("get %s(): ", *f.name))
@@ -379,12 +380,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", *f.fnName))
 					}
 					g.writeIndent(s, 1)
-					if fieldsVisited == fieldCount-1 {
-						s.WriteString("}\n")
-					} else {
-						s.WriteString("}\n\n")
-					}
-					fieldsVisited++
+					s.WriteString("}\n\n")
 				}
 
 				// write static method to init new Go Struct
@@ -398,7 +394,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
-				s.WriteString("}\n\n")
+				s.WriteString("}\n")
 				struct_wrappers[*c.name] = true
 			}
 		}
