@@ -226,10 +226,12 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		s.WriteString(" } = struct;\n")
 		for _, l := range letDestFields {
 			g.writeIndent(s, 2)
-			if l.arrayType != nil {
+			if l.arrayType != nil && *l.arrayType != "" {
 				s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
-			} else if l.returns[0].FFIType == "string" {
+			} else if l.returns[0].FFIType == "FFIType.cstring" {
 				s.WriteString(fmt.Sprintf("%s = Buffer.from(%s + '/%d', %q);\n", *l.name, *l.name, 0, "utf8"))
+			} else {
+				// TODO handle `structs` in init method
 			}
 		}
 	}
