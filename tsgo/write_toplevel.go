@@ -238,6 +238,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 
 	// parse fields that require `const` declaration (e.g. strings)
 	for _, c := range constDestFields {
+		g.writeIndent(s, 2)
 		if c.returns[0].FFIType == "FFIType.cstring" {
 			arg_name := fmt.Sprintf("_%s", *c.name)
 			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
