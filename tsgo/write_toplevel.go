@@ -412,7 +412,8 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 			returns:        v.returns,
 		}
 		*class_wrappers = append(*class_wrappers, classWrapper)
-		// declare export for struct dispose fn
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("_INIT_%s,\n", *v.isHandleFn))
 		fieldCount := len(classWrapper.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
@@ -448,6 +449,8 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 			s.WriteString("_DISPOSE_Struct,\n")
 			*isDisposeWritten = true
 		}
+		g.writeIndent(s, 2)
+		s.WriteString(fmt.Sprintf("_INIT_%s,\n", *v.name))
 		fieldCount := len(classWrapper.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
