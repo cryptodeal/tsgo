@@ -83,6 +83,8 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
+    _Int32ArrayTest,
+    _Int32ArgTest,
     _Uint64ArgTest,
     _TestStruct2,
     _DISPOSE_Struct,
@@ -98,30 +100,40 @@ export const {
     _GET_DemoStruct2_AnotherArray,
     _GET_DemoStruct2_BacktoAnotherStruct,
     _GET_DemoStruct3_AnotherArray,
-    _StringTest,
-    _Float32ArgTest,
-    _Int32ArgTest,
-    _Int64ArgTest,
-    _IntTest,
-    arraySize,
-    _Float64ArrayTest,
-    _Int64ArrayTest,
-    _Int32ArrayTest,
-    _Uint32ArgTest,
-    _TestStruct,
-    _TestMap,
-    _Float64ArgTest,
     _Float32ArrayTest,
+    _Int64ArrayTest,
+    _Float64ArgTest,
+    _IntTest,
     genDisposePtr,
     _Uint32ArrayTest,
-    _Uint64ArrayTest
+    _StringTest,
+    _Int64ArgTest,
+    _TestStruct,
+    _TestMap,
+    arraySize,
+    _Float64ArrayTest,
+    _Uint64ArrayTest,
+    _Float32ArgTest,
+    _Uint32ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Uint64ArgTest: {
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct2: {
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -175,24 +187,26 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _StringTest: {
+  _TestMap: {
     returns: FFIType.cstring
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
   },
   _IntTest: {
     args: [FFIType.cstring],
     returns: FFIType.int
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
   },
   arraySize: {
     args: [FFIType.ptr],
@@ -202,43 +216,29 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int64ArrayTest: {
+  _Uint64ArrayTest: {
     args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Int32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint32ArgTest: {
+  _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct: {
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  _Float64ArgTest: {
+  _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
+  _TestStruct2: {
     returns: FFIType.ptr
   },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -254,19 +254,8 @@ export class _StructBar {
     registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
-  static init(struct: StructBar): _StructBar {
-    const { FieldWithWeirdJSONTag } = struct;
-    let { Field, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, ArrayField, StructField } = struct;
-    Field = Buffer.from(Field + '/0', "utf8");
-    FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
-    FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + '/0', "utf8");
-    FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
-    if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    if (!(StructField instanceof _DemoStruct)) StructField = _DemoStruct.init(StructField);
-  }
-
-  public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+  get ptr(): number {
+    return this._ptr;
   }
 
   get Field(): string {
@@ -302,6 +291,22 @@ export class _StructBar {
     if (!ptr) return undefined;
     return new _DemoStruct(ptr);
   }
+  static init(struct: StructBar): _StructBar {
+    const { Field, FieldWithWeirdJSONTag, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly } = struct;
+    let { ArrayField, StructField } = struct;
+const _Field = Buffer.from(Field + '/0', "utf8");
+const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
+const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + '/0', "utf8");
+const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
+    if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
+    if (!(StructField instanceof _DemoStruct)) StructField = _DemoStruct.init(StructField);
+    return new _StructBar(DUMMY_INIT_FN_NAME(ptr(_Field), Field, FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), FieldThatShouldBeOptional, ptr(_FieldThatShouldNotBeOptional), FieldThatShouldNotBeOptional, ptr(_FieldThatShouldBeReadonly), FieldThatShouldBeReadonly, ptr(ArrayField), ptr(StructField)));
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 
 export class _DemoStruct {
@@ -312,14 +317,8 @@ export class _DemoStruct {
     registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
-  static init(struct: DemoStruct): _DemoStruct {
-    let { ArrayField, FieldToAnotherStruct } = struct;
-    if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    if (!(FieldToAnotherStruct instanceof _DemoStruct2)) FieldToAnotherStruct = _DemoStruct2.init(FieldToAnotherStruct);
-  }
-
-  public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+  get ptr(): number {
+    return this._ptr;
   }
 
   get ArrayField(): Float32Array | undefined {
@@ -335,6 +334,17 @@ export class _DemoStruct {
     if (!ptr) return undefined;
     return new _DemoStruct2(ptr);
   }
+  static init(struct: DemoStruct): _DemoStruct {
+    let { ArrayField, FieldToAnotherStruct } = struct;
+    if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
+    if (!(FieldToAnotherStruct instanceof _DemoStruct2)) FieldToAnotherStruct = _DemoStruct2.init(FieldToAnotherStruct);
+    return new _DemoStruct(DUMMY_INIT_FN_NAME(ptr(ArrayField), ptr(FieldToAnotherStruct)));
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 
 export class _DemoStruct2 {
@@ -345,14 +355,8 @@ export class _DemoStruct2 {
     registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
-  static init(struct: DemoStruct2): _DemoStruct2 {
-    let { AnotherArray, BacktoAnotherStruct } = struct;
-    if (!(AnotherArray instanceof Float64Array)) AnotherArray = new Float64Array(AnotherArray);
-    if (!(BacktoAnotherStruct instanceof _DemoStruct3)) BacktoAnotherStruct = _DemoStruct3.init(BacktoAnotherStruct);
-  }
-
-  public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+  get ptr(): number {
+    return this._ptr;
   }
 
   get AnotherArray(): Float64Array | undefined {
@@ -368,6 +372,17 @@ export class _DemoStruct2 {
     if (!ptr) return undefined;
     return new _DemoStruct3(ptr);
   }
+  static init(struct: DemoStruct2): _DemoStruct2 {
+    let { AnotherArray, BacktoAnotherStruct } = struct;
+    if (!(AnotherArray instanceof Float64Array)) AnotherArray = new Float64Array(AnotherArray);
+    if (!(BacktoAnotherStruct instanceof _DemoStruct3)) BacktoAnotherStruct = _DemoStruct3.init(BacktoAnotherStruct);
+    return new _DemoStruct2(DUMMY_INIT_FN_NAME(ptr(AnotherArray), ptr(BacktoAnotherStruct)));
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 
 export class _DemoStruct3 {
@@ -378,13 +393,8 @@ export class _DemoStruct3 {
     registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
-  static init(struct: DemoStruct3): _DemoStruct3 {
-    let { AnotherArray } = struct;
-    if (!(AnotherArray instanceof Float32Array)) AnotherArray = new Float32Array(AnotherArray);
-  }
-
-  public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+  get ptr(): number {
+    return this._ptr;
   }
 
   get AnotherArray(): Float32Array | undefined {
@@ -394,5 +404,15 @@ export class _DemoStruct3 {
     // @ts-ignore - overload toArrayBuffer params
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize(ptr) * 4, genDisposePtr.native()));
   }
+  static init(struct: DemoStruct3): _DemoStruct3 {
+    let { AnotherArray } = struct;
+    if (!(AnotherArray instanceof Float32Array)) AnotherArray = new Float32Array(AnotherArray);
+    return new _DemoStruct3(DUMMY_INIT_FN_NAME(ptr(AnotherArray)));
+  }
+
+  public _gc_dispose(ptr: number): void {
+    return _DISPOSE_Struct(ptr);
+  }
+
 }
 

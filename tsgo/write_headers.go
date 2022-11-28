@@ -32,5 +32,5 @@ func (g *PackageGenerator) writeFileSourceHeader(w *strings.Builder, path string
 }
 
 func (g *PackageGenerator) writeFFIHeaders(w *strings.Builder) {
-	w.WriteString("import { dlopen, FFIType, toArrayBuffer } from 'bun:ffi';\n")
+	w.WriteString("import { dlopen, FFIType, ptr, toArrayBuffer } from 'bun:ffi';\n")
 }
