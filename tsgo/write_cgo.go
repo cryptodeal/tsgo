@@ -616,6 +616,80 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 	return fnSB.String()
 }
 
+func (g *PackageGenerator) writeInitStructMethod(s *strings.Builder, name string, pkgName string, fieldAccessors []*StructAccessor) {
+	fnName := fmt.Sprintf("_INIT_%s", name)
+	if !g.ffi.FFIHelpers[fnName] {
+		// write wrapper to create new struct
+		const alphaArgs = "abcdefghijklmnopqrstuvwxyz"
+		s.WriteString(fmt.Sprintf("//export _INIT_%s\n", name))
+		s.WriteString(fmt.Sprintf("func _INIT_%s(", name))
+		argLen := len(fieldAccessors)
+		for i, arg := range fieldAccessors {
+			s.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
+			if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.arrayType != nil {
+				s.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
+			}
+			if i < argLen-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteString(") unsafe.Pointer {\n")
+		//TODO: parse args (casting types as need be) and return Handle for new struct
+		var usedArgs = []string{}
+		for i, arg := range fieldAccessors {
+			if arg.arrayType != nil && g.isTypedArrayHelper(*arg.arrayType) {
+				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+				usedArgs = append(usedArgs, usedName)
+				g.writeIndent(s, 1)
+				s.WriteString(fmt.Sprintf("%s := unsafe.Slice((*%s)(%s), %s_len)\n", usedName, *arg.arrayType, string(alphaArgs[i]), string(alphaArgs[i])))
+			} else if arg.isHandleFn != nil {
+				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+				usedArgs = append(usedArgs, usedName)
+				g.writeIndent(s, 1)
+				s.WriteString(fmt.Sprintf("%s_h := cgo.Handle(%s)\n", string(alphaArgs[i]), string(alphaArgs[i])))
+				g.writeIndent(s, 1)
+				s.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s.%s)\n", usedName, string(alphaArgs[i]), pkgName, *arg.isHandleFn))
+			} else if arg.returns[0].CGoWrapType == "*C.char" {
+				isStructType, structType := g.isResHandle(*arg.returns[0].ASTType)
+				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+				usedArgs = append(usedArgs, usedName)
+				g.writeIndent(s, 1)
+				if !isStructType {
+					s.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
+				} else {
+					s.WriteString(fmt.Sprintf("%s := %s.%s(C.GoString(%s))\n", usedName, pkgName, structType, string(alphaArgs[i])))
+
+				}
+			} else {
+				usedArgs = append(usedArgs, string(alphaArgs[i]))
+			}
+		}
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("res := &%s.%s{", pkgName, name))
+		for i, arg := range fieldAccessors {
+			s.WriteString(fmt.Sprintf("%s: ", *arg.name))
+			if arg.isStarExpr {
+				s.WriteString(fmt.Sprintf("&%s", usedArgs[i]))
+			} else {
+				num_type := g.getNumCast(arg.returns[0].CGoWrapType)
+				if num_type != "" {
+					s.WriteString(fmt.Sprintf("%s(%s)", num_type, usedArgs[i]))
+				} else {
+					s.WriteString(usedArgs[i])
+				}
+			}
+			if i < argLen-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteString("}\n")
+		g.writeIndent(s, 1)
+		s.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))\n")
+		s.WriteString("}\n\n")
+		g.ffi.FFIHelpers[fnName] = true
+	}
+}
+
 func (g *PackageGenerator) writeCGoFn(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *FFIFunc, name string, pkgName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
@@ -761,71 +835,7 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			const alphaArgs = "abcdefghijklmnopqrstuvwxyz"
 
 			// write wrapper to create new struct
-			fn_str.WriteString(fmt.Sprintf("//export _INIT_%s\n", *func_data.name))
-			fn_str.WriteString(fmt.Sprintf("func _INIT_%s(", *func_data.name))
-			argLen := len(func_data.fieldAccessors)
-			for i, arg := range func_data.fieldAccessors {
-				fn_str.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
-				if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.arrayType != nil {
-					fn_str.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
-				}
-				if i < argLen-1 {
-					fn_str.WriteString(", ")
-				}
-			}
-			fn_str.WriteString(") unsafe.Pointer {\n")
-			//TODO: parse args (casting types as need be) and return Handle for new struct
-			var usedArgs = []string{}
-			for i, arg := range func_data.fieldAccessors {
-				if arg.arrayType != nil && g.isTypedArrayHelper(*arg.arrayType) {
-					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
-					usedArgs = append(usedArgs, usedName)
-					g.writeIndent(&fn_str, 1)
-					fn_str.WriteString(fmt.Sprintf("%s := unsafe.Slice((*%s)(%s), %s_len)\n", usedName, *arg.arrayType, string(alphaArgs[i]), string(alphaArgs[i])))
-				} else if arg.isHandleFn != nil {
-					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
-					usedArgs = append(usedArgs, usedName)
-					g.writeIndent(&fn_str, 1)
-					fn_str.WriteString(fmt.Sprintf("%s_h := cgo.Handle(%s)\n", string(alphaArgs[i]), string(alphaArgs[i])))
-					g.writeIndent(&fn_str, 1)
-					fn_str.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s.%s)\n", usedName, string(alphaArgs[i]), pkgName, *arg.isHandleFn))
-				} else if arg.returns[0].CGoWrapType == "*C.char" {
-					isStructType, structType := g.isResHandle(*arg.returns[0].ASTType)
-					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
-					usedArgs = append(usedArgs, usedName)
-					g.writeIndent(&fn_str, 1)
-					if !isStructType {
-						fn_str.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
-					} else {
-						fn_str.WriteString(fmt.Sprintf("%s := %s.%s(C.GoString(%s))\n", usedName, pkgName, structType, string(alphaArgs[i])))
-
-					}
-				} else {
-					usedArgs = append(usedArgs, string(alphaArgs[i]))
-				}
-			}
-			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString(fmt.Sprintf("res := &%s.%s{", pkgName, *func_data.name))
-			for i, arg := range func_data.fieldAccessors {
-				fn_str.WriteString(fmt.Sprintf("%s: ", *arg.name))
-				if arg.isStarExpr {
-					fn_str.WriteString(fmt.Sprintf("&%s", usedArgs[i]))
-				} else {
-					num_type := g.getNumCast(arg.returns[0].CGoWrapType)
-					if num_type != "" {
-						fn_str.WriteString(fmt.Sprintf("%s(%s)", num_type, usedArgs[i]))
-					} else {
-						fn_str.WriteString(usedArgs[i])
-					}
-				}
-				if i < argLen-1 {
-					fn_str.WriteString(", ")
-				}
-			}
-			fn_str.WriteString("}\n")
-			g.writeIndent(&fn_str, 1)
-			fn_str.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))\n")
-			fn_str.WriteString("}\n\n")
+			g.writeInitStructMethod(&fn_str, *func_data.name, pkgName, func_data.fieldAccessors)
 		}
 	}
 
