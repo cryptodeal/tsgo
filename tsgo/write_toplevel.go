@@ -472,6 +472,25 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 
 func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int, isLast bool) {
 	if v.isHandleFn != nil && !struct_config[*v.name] {
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("_INIT_%s: {\n", *v.name))
+		g.writeIndent(s, 2)
+		s.WriteString("args: [")
+		argLen := len(v.fieldAccessors)
+		for i, fa := range v.fieldAccessors {
+			s.WriteString(fa.args[0].FFIType)
+			if fa.arrayType != nil {
+				s.WriteString(", FFIType.u64_fast")
+			}
+			if i < argLen-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteString("],\n")
+		g.writeIndent(s, 2)
+		s.WriteString("returns: FFIType.ptr\n")
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
 		// write config for struct field accessors
 		fieldCount := len(v.fieldAccessors)
 		fieldsVisited := 0
@@ -535,6 +554,26 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 			s.WriteString("},\n")
 			*isDisposeWritten = true
 		}
+		g.writeIndent(s, 1)
+		s.WriteString(fmt.Sprintf("_INIT_%s: {\n", *v.name))
+		g.writeIndent(s, 2)
+		s.WriteString("args: [")
+		argLen := len(v.fieldAccessors)
+		for i, fa := range v.fieldAccessors {
+			s.WriteString(fa.args[0].FFIType)
+			if fa.arrayType != nil {
+				s.WriteString(", FFIType.u64_fast")
+			}
+			if i < argLen-1 {
+				s.WriteString(", ")
+			}
+		}
+		s.WriteString("],\n")
+		g.writeIndent(s, 2)
+		s.WriteString("returns: FFIType.ptr\n")
+		g.writeIndent(s, 1)
+		s.WriteString("},\n")
+
 		// write config for struct field accessors
 		fieldCount := len(v.fieldAccessors)
 		fieldsVisited := 0
