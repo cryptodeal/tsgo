@@ -258,7 +258,7 @@ func getCGoTypeHandler(s string) string {
 	return "unsafe.Pointer"
 }
 
-func isTypedArray(s string) bool {
+func (g *PackageGenerator) isTypedArrayHelper(s string) bool {
 	switch s {
 	case "float32", "float64":
 		return true
@@ -493,7 +493,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		}
 		g.writeType(s, t.Elt, depth, true)
 		arr_type := g.getArrayType(t)
-		if isTypedArray(arr_type) {
+		if g.isTypedArrayHelper(arr_type) {
 			s.WriteString(fmt.Sprintf("[] | %sArray", caser.String(g.getArrayType(t))))
 		} else {
 			s.WriteString("[]")

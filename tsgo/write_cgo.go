@@ -724,12 +724,13 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			g.ffi.GoWrappedStructs[*func_data.name] = true
 			const alphaArgs = "abcdefghijklmnopqrstuvwxyz"
 
+			// write wrapper to create new struct
 			fn_str.WriteString(fmt.Sprintf("//export _INIT_%s\n", *func_data.name))
 			fn_str.WriteString(fmt.Sprintf("func _INIT_%s(", *func_data.name))
 			argLen := len(func_data.fieldAccessors)
 			for i, arg := range func_data.fieldAccessors {
 				fn_str.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
-				if arg.arrayType != nil {
+				if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.arrayType != nil {
 					fn_str.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
 				}
 				if i < argLen-1 {
@@ -738,7 +739,30 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 			fn_str.WriteString(") unsafe.Pointer {\n")
 			//TODO: parse args (casting types as need be) and return Handle for new struct
-
+			var usedArgs = []string{}
+			for i, arg := range func_data.fieldAccessors {
+				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+				usedArgs = append(usedArgs, usedName)
+				g.writeIndent(&fn_str, 1)
+				if arg.arrayType != nil && g.isTypedArrayHelper(*arg.arrayType) {
+					fn_str.WriteString(fmt.Sprintf("%s := unsafe.Slice((*%s)(%s), %s_len)\n", usedName, *arg.arrayType, string(alphaArgs[i]), string(alphaArgs[i])))
+				} else if arg.isHandleFn != nil {
+					fn_str.WriteString(fmt.Sprintf("%s_h := cgo.Handle(%s)\n", string(alphaArgs[i]), string(alphaArgs[i])))
+					fn_str.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s)\n", usedName, string(alphaArgs[i]), *arg.isHandleFn))
+				} else if arg.returns[0].CGoWrapType == "*C.char" {
+					fn_str.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
+				}
+			}
+			fn_str.WriteString(fmt.Sprintf("res := &%s{", *func_data.name))
+			for i, arg := range func_data.fieldAccessors {
+				fn_str.WriteString(fmt.Sprintf("%s: %s", *arg.name, usedArgs[i]))
+				if i < argLen-1 {
+					fn_str.WriteString(", ")
+				}
+			}
+			fn_str.WriteString("}\n")
+			g.writeIndent(&fn_str, 1)
+			fn_str.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))\n")
 			fn_str.WriteString("}\n\n")
 		}
 	}

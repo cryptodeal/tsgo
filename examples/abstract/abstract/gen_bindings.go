@@ -393,7 +393,7 @@ func _DISPOSE_Struct(handle C.uintptr_t) {
 }
 
 //export _INIT_StructBar
-func _INIT_StructBar(1100001 *C.char, 1100001_len C.uint64_t, 1100010 C.int64_t, 1100010_len C.uint64_t, 1100011 *C.char, 1100011_len C.uint64_t, 1100100 *C.char, 1100100_len C.uint64_t, 1100101 *C.char, 1100101_len C.uint64_t, 1100110 unsafe.Pointer, 1100110_len C.uint64_t, 1100111 unsafe.Pointer, 1100111_len C.uint64_t) unsafe.Pointer {
+func _INIT_StructBar(a *C.char, a_len C.uint64_t, b C.int64_t, b_len C.uint64_t, c *C.char, c_len C.uint64_t, d *C.char, d_len C.uint64_t, e *C.char, e_len C.uint64_t, f unsafe.Pointer, f_len C.uint64_t, g unsafe.Pointer, g_len C.uint64_t) unsafe.Pointer {
 }
 
 //export _TestStruct2
