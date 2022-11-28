@@ -178,8 +178,6 @@ func (g *PackageGenerator) getGoType(t string) string {
 		return "float32"
 	case "double":
 		return "float64"
-	case "string":
-		return "*C.char"
 	}
 	return "unsafe.Pointer"
 }

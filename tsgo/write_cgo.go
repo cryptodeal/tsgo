@@ -22,6 +22,42 @@ func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Buil
 	cg.WriteString(fmt.Sprintf("*/\nimport %q\n\nimport(\n%s)\n\n", "C", gi.String()))
 }
 
+// TODO:
+// * see if we can handle `complex64` and `complex128`?
+// * perhaps do a better job of mapping (no default value??)
+func (g *PackageGenerator) getNumCast(s string) string {
+	// fmt.Println(s)
+	switch s {
+	case "C.int":
+		return "int"
+	case "C.int8_t":
+		return "int8"
+	case "C.int16_t":
+		return "int16"
+	case "C.int32_t":
+		return "int32"
+	case "C.int64_t":
+		return "int64"
+	case "C.uint":
+		return "uint"
+	case "C.uint8_t":
+		return "uint8"
+	case "C.uint16_t":
+		return "uint16"
+	case "C.uint32_t":
+		return "uint32"
+	case "C.uint64_t":
+		return "uint64"
+	case "C.float":
+		return "float32"
+	case "C.double":
+		return "float64"
+	case "C.uintptr_t":
+		return "uintptr"
+	}
+	return ""
+}
+
 func (g *PackageGenerator) writeCArrayHandler(cg *strings.Builder, ec *strings.Builder, t string, fmtr cases.Caser) string {
 	sizeHandler := g.addCSizeHelper(ec, t)
 	arrType := fmt.Sprintf("C%s", fmtr.String(t))
@@ -775,7 +811,12 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 				if arg.isStarExpr {
 					fn_str.WriteString(fmt.Sprintf("&%s", usedArgs[i]))
 				} else {
-					fn_str.WriteString(usedArgs[i])
+					num_type := g.getNumCast(arg.returns[0].CGoWrapType)
+					if num_type != "" {
+						fn_str.WriteString(fmt.Sprintf("%s(%s)", num_type, usedArgs[i]))
+					} else {
+						fn_str.WriteString(usedArgs[i])
+					}
 				}
 				if i < argLen-1 {
 					fn_str.WriteString(", ")
