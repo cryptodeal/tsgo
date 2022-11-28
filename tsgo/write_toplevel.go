@@ -231,7 +231,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			} else if l.returns[0].FFIType == "FFIType.cstring" {
 				s.WriteString(fmt.Sprintf("%s = Buffer.from(%s + '/%d', %q);\n", *l.name, *l.name, 0, "utf8"))
 			} else if l.isHandleFn != nil {
-				s.WriteString(fmt.Sprintf("if (!(%s instanceof %s)) %s = new _%s(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
+				s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
 			}
 		}
 	}
