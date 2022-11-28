@@ -218,8 +218,14 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *c.name, *c.name))
 				g.writeIndent(s, 2)
 				s.WriteString("const { ")
-				for _, f := range c.fieldAccessors {
-					s.WriteString(*f.name)
+
+				fieldCount := len(c.fieldAccessors)
+				for i, f := range c.fieldAccessors {
+					if i < fieldCount-1 {
+						s.WriteString(fmt.Sprintf(" %s,", *f.name))
+					} else {
+						s.WriteString(fmt.Sprintf(" %s", *f.name))
+					}
 				}
 				s.WriteString(" } = struct;\n")
 				g.writeIndent(s, 1)
@@ -234,7 +240,6 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString("}\n\n")
 
 				// write struct field `getters`
-				fieldCount := len(c.fieldAccessors)
 				fieldsVisited := 0
 				for _, f := range c.fieldAccessors {
 					g.writeIndent(s, 1)
