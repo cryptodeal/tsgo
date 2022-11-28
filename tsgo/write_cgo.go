@@ -743,19 +743,36 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			for i, arg := range func_data.fieldAccessors {
 				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
 				usedArgs = append(usedArgs, usedName)
-				g.writeIndent(&fn_str, 1)
 				if arg.arrayType != nil && g.isTypedArrayHelper(*arg.arrayType) {
+					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+					usedArgs = append(usedArgs, usedName)
+					g.writeIndent(&fn_str, 1)
 					fn_str.WriteString(fmt.Sprintf("%s := unsafe.Slice((*%s)(%s), %s_len)\n", usedName, *arg.arrayType, string(alphaArgs[i]), string(alphaArgs[i])))
 				} else if arg.isHandleFn != nil {
+					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+					usedArgs = append(usedArgs, usedName)
+					g.writeIndent(&fn_str, 1)
 					fn_str.WriteString(fmt.Sprintf("%s_h := cgo.Handle(%s)\n", string(alphaArgs[i]), string(alphaArgs[i])))
-					fn_str.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s)\n", usedName, string(alphaArgs[i]), *arg.isHandleFn))
+					g.writeIndent(&fn_str, 1)
+					fn_str.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s.%s)\n", usedName, string(alphaArgs[i]), pkgName, *arg.isHandleFn))
 				} else if arg.returns[0].CGoWrapType == "*C.char" {
+					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
+					usedArgs = append(usedArgs, usedName)
+					g.writeIndent(&fn_str, 1)
 					fn_str.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
+				} else {
+					usedArgs = append(usedArgs, string(alphaArgs[i]))
 				}
 			}
-			fn_str.WriteString(fmt.Sprintf("res := &%s{", *func_data.name))
+			g.writeIndent(&fn_str, 1)
+			fn_str.WriteString(fmt.Sprintf("res := &%s.%s{", pkgName, *func_data.name))
 			for i, arg := range func_data.fieldAccessors {
-				fn_str.WriteString(fmt.Sprintf("%s: %s", *arg.name, usedArgs[i]))
+				fn_str.WriteString(fmt.Sprintf("%s: ", *arg.name))
+				if arg.isStarExpr {
+					fn_str.WriteString(fmt.Sprintf("&%s", usedArgs[i]))
+				} else {
+					fn_str.WriteString(usedArgs[i])
+				}
 				if i < argLen-1 {
 					fn_str.WriteString(", ")
 				}

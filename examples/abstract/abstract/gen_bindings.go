@@ -393,7 +393,16 @@ func _DISPOSE_Struct(handle C.uintptr_t) {
 }
 
 //export _INIT_StructBar
-func _INIT_StructBar(a *C.char, a_len C.uint64_t, b C.int64_t, b_len C.uint64_t, c *C.char, c_len C.uint64_t, d *C.char, d_len C.uint64_t, e *C.char, e_len C.uint64_t, f unsafe.Pointer, f_len C.uint64_t, g unsafe.Pointer, g_len C.uint64_t) unsafe.Pointer {
+func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f unsafe.Pointer, f_len C.uint64_t, g unsafe.Pointer, g_len C.uint64_t) unsafe.Pointer {
+  _a := C.GoString(a)
+    _c := C.GoString(c)
+  _d := C.GoString(d)
+  _e := C.GoString(e)
+  _f := unsafe.Slice((*float32)(f), f_len)
+  g_h := cgo.Handle(g)
+_g := g_h.Value().(abstract.DemoStruct)
+res := &abstract.StructBar{Field: _a, FieldWithWeirdJSONTag: _b, FieldThatShouldBeOptional: _c, FieldThatShouldNotBeOptional: *_d, FieldThatShouldBeReadonly: _e, ArrayField: _f, StructField: _g}
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 
 //export _TestStruct2
