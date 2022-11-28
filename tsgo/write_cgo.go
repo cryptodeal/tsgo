@@ -410,7 +410,7 @@ func (g *PackageGenerator) parseFn(f *ast.FuncDecl) *FFIFunc {
 			lenName.WriteString("_len")
 			var len_helper = &ArgHelpers{
 				FFIType:     "FFIType.u64_fast",
-				CGoWrapType: "uint64",
+				CGoWrapType: "C.uint64_t",
 				OGGoType:    "C.size_t",
 				Name:        lenName.String(),
 			}
@@ -722,6 +722,24 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 			fn_str.WriteString(g.writeDisposeStruct(func_data.disposeHandle))
 			g.ffi.GoWrappedStructs[*func_data.name] = true
+			const alphaArgs = "abcdefghijklmnopqrstuvwxyz"
+
+			fn_str.WriteString(fmt.Sprintf("//export _INIT_%s\n", *func_data.name))
+			fn_str.WriteString(fmt.Sprintf("func _INIT_%s(", *func_data.name))
+			argLen := len(func_data.fieldAccessors)
+			for i, arg := range func_data.fieldAccessors {
+				fn_str.WriteString(fmt.Sprintf("%b %s", alphaArgs[i], arg.returns[0].CGoWrapType))
+				if arg.arrayType != nil {
+					fn_str.WriteString(fmt.Sprintf(", %b_len C.uint64_t", alphaArgs[i]))
+				}
+				if i < argLen-1 {
+					fn_str.WriteString(", ")
+				}
+			}
+			fn_str.WriteString(") unsafe.Pointer {\n")
+			//TODO: parse args (casting types as need be) and return Handle for new struct
+
+			fn_str.WriteString("}\n\n")
 		}
 	}
 
