@@ -610,7 +610,8 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 		}
 		fnSB.WriteString(g.writeDisposeStruct(f.disposeHandle))
 		g.ffi.GoWrappedStructs[*f.isHandleFn] = true
-
+		// write wrapper to create new struct
+		g.writeInitStructMethod(&fnSB, *f.isHandleFn, pkgName, f.fieldAccessors)
 	}
 
 	return fnSB.String()
@@ -832,7 +833,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			}
 			fn_str.WriteString(g.writeDisposeStruct(func_data.disposeHandle))
 			g.ffi.GoWrappedStructs[*func_data.name] = true
-			const alphaArgs = "abcdefghijklmnopqrstuvwxyz"
 
 			// write wrapper to create new struct
 			g.writeInitStructMethod(&fn_str, *func_data.name, pkgName, func_data.fieldAccessors)
