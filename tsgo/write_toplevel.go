@@ -230,8 +230,8 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 				s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
 			} else if l.returns[0].FFIType == "FFIType.cstring" {
 				s.WriteString(fmt.Sprintf("%s = Buffer.from(%s + '/%d', %q);\n", *l.name, *l.name, 0, "utf8"))
-			} else {
-				// TODO handle `structs` in init method
+			} else if l.isHandleFn != nil {
+				s.WriteString(fmt.Sprintf("if (!(%s instanceof %s)) %s = new _%s(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
 			}
 		}
 	}

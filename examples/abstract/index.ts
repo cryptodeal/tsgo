@@ -83,10 +83,17 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
+    _Uint64ArrayTest,
+    _Float32ArgTest,
+    _Float64ArgTest,
+    _Int32ArgTest,
+    _Uint64ArgTest,
+    arraySize,
     _Float64ArrayTest,
     _Int32ArrayTest,
-    _Int32ArgTest,
-    _Int64ArgTest,
+    _Uint32ArrayTest,
+    _StringTest,
+    _Uint32ArgTest,
     _TestStruct2,
     _DISPOSE_Struct,
     _GET_StructBar_Field,
@@ -101,35 +108,40 @@ export const {
     _GET_DemoStruct2_AnotherArray,
     _GET_DemoStruct2_BacktoAnotherStruct,
     _GET_DemoStruct3_AnotherArray,
-    _TestMap,
     _Float32ArrayTest,
-    arraySize,
     _Int64ArrayTest,
     _TestStruct,
-    _IntTest,
-    _Uint32ArrayTest,
-    _Float32ArgTest,
-    _Uint32ArgTest,
     genDisposePtr,
-    _Uint64ArrayTest,
-    _StringTest,
-    _Float64ArgTest,
-    _Uint64ArgTest
+    _Int64ArgTest,
+    _TestMap,
+    _IntTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
-  _Int64ArrayTest: {
+  _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _TestStruct: {
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct2: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -183,42 +195,9 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Uint32ArrayTest: {
+  _Float32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
   },
   _Float64ArrayTest: {
     args: [FFIType.cstring],
@@ -228,17 +207,38 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int32ArgTest: {
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Uint32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _TestStruct: {
+    returns: FFIType.ptr
+  },
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
   },
   _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct2: {
-    returns: FFIType.ptr
-  },
+  _TestMap: {
+    returns: FFIType.cstring
+  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -257,13 +257,12 @@ export class _StructBar {
   static init(struct: StructBar): _StructBar {
     const { FieldWithWeirdJSONTag } = struct;
     let { Field, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, ArrayField, StructField } = struct;
-    if (!(Field instanceof Array)) Field = new Array(Field);
-    if (!(FieldThatShouldBeOptional instanceof Array)) FieldThatShouldBeOptional = new Array(FieldThatShouldBeOptional);
-    if (!(FieldThatShouldNotBeOptional instanceof Array)) FieldThatShouldNotBeOptional = new Array(FieldThatShouldNotBeOptional);
-    if (!(FieldThatShouldBeReadonly instanceof Array)) FieldThatShouldBeReadonly = new Array(FieldThatShouldBeReadonly);
+    Field = Buffer.from(Field + '/0', "utf8");
+    FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
+    FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + '/0', "utf8");
+    FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    if (!(StructField instanceof Array)) StructField = new Array(StructField);
-  }
+      }
 
   public _gc_dispose(ptr: number): void {
     return _DISPOSE_Struct(ptr);
@@ -315,8 +314,7 @@ export class _DemoStruct {
   static init(struct: DemoStruct): _DemoStruct {
     let { ArrayField, FieldToAnotherStruct } = struct;
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    if (!(FieldToAnotherStruct instanceof Array)) FieldToAnotherStruct = new Array(FieldToAnotherStruct);
-  }
+      }
 
   public _gc_dispose(ptr: number): void {
     return _DISPOSE_Struct(ptr);
@@ -348,8 +346,7 @@ export class _DemoStruct2 {
   static init(struct: DemoStruct2): _DemoStruct2 {
     let { AnotherArray, BacktoAnotherStruct } = struct;
     if (!(AnotherArray instanceof Float64Array)) AnotherArray = new Float64Array(AnotherArray);
-    if (!(BacktoAnotherStruct instanceof Array)) BacktoAnotherStruct = new Array(BacktoAnotherStruct);
-  }
+      }
 
   public _gc_dispose(ptr: number): void {
     return _DISPOSE_Struct(ptr);
