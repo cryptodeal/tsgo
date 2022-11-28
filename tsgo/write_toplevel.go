@@ -200,7 +200,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 	var usedArgs = []*InitStructParam{}
 
 	for _, f := range cw.fieldAccessors {
-		if f.returns[0].FFIType == "FFIType.cstring" {
+		if f.returns[0].FFIType == "FFIType.cstring" || f.isHandleFn != nil {
 			constDestFields = append(constDestFields, f)
 		} else if !isParsingRequired(f.returns[0].FFIType) {
 			constDestFields = append(constDestFields, f)
@@ -243,6 +243,11 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
 			var param = &InitStructParam{Name: arg_name, IsPtr: true}
 			usedArgs = append(usedArgs, param)
+		} else if c.isHandleFn != nil {
+			arg_name := fmt.Sprintf("_%s", *c.name)
+			s.WriteString(fmt.Sprintf("const %s = _%s.init(%s);\n", arg_name, *c.isHandleFn, *c.name))
+			var param = &InitStructParam{Name: arg_name, IsStruct: true, IsPtr: false}
+			usedArgs = append(usedArgs, param)
 		} else {
 			var param = &InitStructParam{Name: *c.name, IsPtr: false}
 			usedArgs = append(usedArgs, param)
@@ -266,7 +271,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 
 	// write return fn
 	g.writeIndent(s, 2)
-	s.WriteString(fmt.Sprintf("return new _%s(DUMMY_INIT_FN_NAME(", *cw.name))
+	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s(", *cw.name, *cw.name))
 	argCount := len(usedArgs)
 	for i, arg := range usedArgs {
 		Fmt := ""
