@@ -186,11 +186,12 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) writeObjDestructure(s *strings.Builder, fa *[]*StructAccessor) {
-	fieldCount := len(*fa)
+func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper) {
+	g.writeIndent(s, 1)
+	s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *cw.name, *cw.name))
 	var constDestFields = []*StructAccessor{}
 	var letDestFields = []*StructAccessor{}
-	for _, f := range *fa {
+	for _, f := range cw.fieldAccessors {
 		if isParsingRequired(f.returns[0].FFIType) {
 			constDestFields = append(constDestFields, f)
 		} else {
@@ -199,6 +200,7 @@ func (g *PackageGenerator) writeObjDestructure(s *strings.Builder, fa *[]*Struct
 	}
 	g.writeIndent(s, 2)
 	s.WriteString("const {")
+	fieldCount := len(constDestFields)
 	for i, c := range constDestFields {
 		if i < fieldCount-1 {
 			s.WriteString(fmt.Sprintf(" %s,", *c.name))
@@ -210,6 +212,7 @@ func (g *PackageGenerator) writeObjDestructure(s *strings.Builder, fa *[]*Struct
 
 	g.writeIndent(s, 2)
 	s.WriteString("let {")
+	fieldCount = len(letDestFields)
 	for i, l := range letDestFields {
 		if i < fieldCount-1 {
 			s.WriteString(fmt.Sprintf(" %s,", *l.name))
@@ -218,6 +221,8 @@ func (g *PackageGenerator) writeObjDestructure(s *strings.Builder, fa *[]*Struct
 		}
 	}
 	s.WriteString(" } = struct;\n")
+	g.writeIndent(s, 1)
+	s.WriteString("}\n\n")
 }
 
 func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
@@ -248,11 +253,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString("}\n\n")
 
 				// write static method to init new Go Struct
-				g.writeIndent(s, 1)
-				s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *c.name, *c.name))
-				g.writeObjDestructure(s, &c.fieldAccessors)
-				g.writeIndent(s, 1)
-				s.WriteString("}\n\n")
+				g.writeInitMethod(s, c)
 
 				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)

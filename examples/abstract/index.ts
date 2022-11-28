@@ -83,13 +83,17 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    arraySize,
-    _Uint64ArrayTest,
+    _Uint32ArrayTest,
     _Float64ArgTest,
-    _Int64ArgTest,
-    _Float64ArrayTest,
-    _Float32ArgTest,
     _Uint64ArgTest,
+    _TestMap,
+    _Float32ArrayTest,
+    arraySize,
+    _Float64ArrayTest,
+    _Int64ArrayTest,
+    _IntTest,
+    genDisposePtr,
+    _Int32ArrayTest,
     _TestStruct,
     _DISPOSE_Struct,
     _GET_StructBar_Field,
@@ -105,42 +109,19 @@ export const {
     _GET_DemoStruct2_BacktoAnotherStruct,
     _GET_DemoStruct3_AnotherArray,
     _TestStruct2,
-    _IntTest,
-    _Float32ArrayTest,
-    genDisposePtr,
-    _StringTest,
+    _Uint64ArrayTest,
     _Int32ArgTest,
+    _Int64ArgTest,
     _Uint32ArgTest,
-    _Int32ArrayTest,
-    _Int64ArrayTest,
-    _Uint32ArrayTest,
-    _TestMap
+    _StringTest,
+    _Float32ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
   _StringTest: {
     returns: FFIType.cstring
   },
-  _Int32ArgTest: {
+  _Float32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int32ArrayTest: {
-    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _Int64ArrayTest: {
@@ -151,34 +132,41 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
   _TestMap: {
     returns: FFIType.cstring
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
   },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
   _Float64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
+  genDisposePtr: {
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -239,6 +227,18 @@ export const {
   _TestStruct2: {
     returns: FFIType.ptr
   },
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -255,7 +255,8 @@ export class _StructBar {
   }
 
   static init(struct: StructBar): _StructBar {
-    const {  Field, FieldWithWeirdJSONTag, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, ArrayField, StructField } = struct;
+    const { Field, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, ArrayField, StructField, } = struct;
+    let { FieldWithWeirdJSONTag, } = struct;
   }
 
   public _gc_dispose(ptr: number): void {
@@ -307,6 +308,7 @@ export class _DemoStruct {
 
   static init(struct: DemoStruct): _DemoStruct {
     const { ArrayField, FieldToAnotherStruct } = struct;
+    let { } = struct;
   }
 
   public _gc_dispose(ptr: number): void {
@@ -337,7 +339,8 @@ export class _DemoStruct2 {
   }
 
   static init(struct: DemoStruct2): _DemoStruct2 {
-    const {  AnotherArray, BacktoAnotherStruct } = struct;
+    const { AnotherArray, BacktoAnotherStruct } = struct;
+    let { } = struct;
   }
 
   public _gc_dispose(ptr: number): void {
@@ -368,7 +371,8 @@ export class _DemoStruct3 {
   }
 
   static init(struct: DemoStruct3): _DemoStruct3 {
-    const {  AnotherArray } = struct;
+    const { AnotherArray } = struct;
+    let { } = struct;
   }
 
   public _gc_dispose(ptr: number): void {
