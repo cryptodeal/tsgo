@@ -243,9 +243,10 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
 			var param = &InitStructParam{Name: arg_name, IsPtr: true}
 			usedArgs = append(usedArgs, param)
+		} else {
+			var param = &InitStructParam{Name: *c.name, IsPtr: false}
+			usedArgs = append(usedArgs, param)
 		}
-		var param = &InitStructParam{Name: *c.name, IsPtr: false}
-		usedArgs = append(usedArgs, param)
 	}
 
 	// parse fields that don't require `const` declaration
