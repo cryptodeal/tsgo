@@ -401,7 +401,7 @@ func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f 
   _f := unsafe.Slice((*float32)(f), f_len)
   g_h := cgo.Handle(g)
   _g := g_h.Value().(abstract.DemoStruct)
-  res := &abstract.StructBar{Field: _a, FieldWithWeirdJSONTag: _a, FieldThatShouldBeOptional: &_b, FieldThatShouldNotBeOptional: &b, FieldThatShouldBeReadonly: _c, ArrayField: _c, StructField: &_d}
+  res := &abstract.StructBar{Field: abstract.Foo(_a), FieldWithWeirdJSONTag: b, FieldThatShouldBeOptional: &_c, FieldThatShouldNotBeOptional: &_d, FieldThatShouldBeReadonly: _e, ArrayField: _f, StructField: &_g}
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 

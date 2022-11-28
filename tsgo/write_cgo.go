@@ -754,10 +754,16 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 					g.writeIndent(&fn_str, 1)
 					fn_str.WriteString(fmt.Sprintf("%s := %s_h.Value().(%s.%s)\n", usedName, string(alphaArgs[i]), pkgName, *arg.isHandleFn))
 				} else if arg.returns[0].CGoWrapType == "*C.char" {
+					isStructType, structType := g.isResHandle(*arg.returns[0].ASTType)
 					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
 					usedArgs = append(usedArgs, usedName)
 					g.writeIndent(&fn_str, 1)
-					fn_str.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
+					if !isStructType {
+						fn_str.WriteString(fmt.Sprintf("%s := C.GoString(%s)\n", usedName, string(alphaArgs[i])))
+					} else {
+						fn_str.WriteString(fmt.Sprintf("%s := %s.%s(C.GoString(%s))\n", usedName, pkgName, structType, string(alphaArgs[i])))
+
+					}
 				} else {
 					usedArgs = append(usedArgs, string(alphaArgs[i]))
 				}
