@@ -186,13 +186,23 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
+type InitStructParam struct {
+	Name     string
+	IsPtr    bool
+	IsStruct bool
+}
+
 func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper, fmtr cases.Caser) {
 	g.writeIndent(s, 1)
 	s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *cw.name, *cw.name))
 	var constDestFields = []*StructAccessor{}
 	var letDestFields = []*StructAccessor{}
+	var usedArgs = []*InitStructParam{}
+
 	for _, f := range cw.fieldAccessors {
-		if !isParsingRequired(f.returns[0].FFIType) {
+		if f.returns[0].FFIType == "FFIType.cstring" {
+			constDestFields = append(constDestFields, f)
+		} else if !isParsingRequired(f.returns[0].FFIType) {
 			constDestFields = append(constDestFields, f)
 		} else {
 			letDestFields = append(letDestFields, f)
@@ -224,17 +234,53 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			}
 		}
 		s.WriteString(" } = struct;\n")
-		for _, l := range letDestFields {
-			g.writeIndent(s, 2)
-			if l.arrayType != nil && *l.arrayType != "" {
-				s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
-			} else if l.returns[0].FFIType == "FFIType.cstring" {
-				s.WriteString(fmt.Sprintf("%s = Buffer.from(%s + '/%d', %q);\n", *l.name, *l.name, 0, "utf8"))
-			} else if l.isHandleFn != nil {
-				s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
-			}
+	}
+
+	// parse fields that require `const` declaration (e.g. strings)
+	for _, c := range constDestFields {
+		if c.returns[0].FFIType == "FFIType.cstring" {
+			arg_name := fmt.Sprintf("_%s", *c.name)
+			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
+			var param = &InitStructParam{Name: arg_name, IsPtr: true}
+			usedArgs = append(usedArgs, param)
+		}
+		var param = &InitStructParam{Name: *c.name, IsPtr: false}
+		usedArgs = append(usedArgs, param)
+	}
+
+	// parse fields that don't require `const` declaration
+	for _, l := range letDestFields {
+		var param = &InitStructParam{Name: *l.name, IsPtr: false}
+		g.writeIndent(s, 2)
+		if l.arrayType != nil && *l.arrayType != "" {
+			param.IsPtr = true
+			s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
+		} else if l.isHandleFn != nil {
+			param.IsStruct = true
+			param.IsPtr = true
+			s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
+		}
+		usedArgs = append(usedArgs, param)
+	}
+
+	// write return fn
+	g.writeIndent(s, 2)
+	s.WriteString(fmt.Sprintf("return new _%s(DUMMY_INIT_FN_NAME(", *cw.name))
+	argCount := len(usedArgs)
+	for i, arg := range usedArgs {
+		Fmt := ""
+		if i < argCount-1 {
+			Fmt = ", "
+		}
+		if arg.IsPtr {
+			s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
+		} else if arg.IsStruct {
+			s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
+		} else {
+			s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
 		}
 	}
+	s.WriteString("));\n")
 	g.writeIndent(s, 1)
 	s.WriteString("}\n\n")
 }
@@ -266,14 +312,10 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
-				// write static method to init new Go Struct
-				g.writeInitMethod(s, c, fmtr)
-
-				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)
-				s.WriteString("public _gc_dispose(ptr: number): void {\n")
+				s.WriteString("get ptr(): number {\n")
 				g.writeIndent(s, 2)
-				s.WriteString("return _DISPOSE_Struct(ptr);\n")
+				s.WriteString("return this._ptr;\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
@@ -337,6 +379,18 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					}
 					fieldsVisited++
 				}
+
+				// write static method to init new Go Struct
+				g.writeInitMethod(s, c, fmtr)
+
+				// write class method that frees `Handle` + CGo mem for struct @ GC
+				g.writeIndent(s, 1)
+				s.WriteString("public _gc_dispose(ptr: number): void {\n")
+				g.writeIndent(s, 2)
+				s.WriteString("return _DISPOSE_Struct(ptr);\n")
+				g.writeIndent(s, 1)
+				s.WriteString("}\n\n")
+
 				s.WriteString("}\n\n")
 				struct_wrappers[*c.name] = true
 			}
