@@ -186,13 +186,13 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
-func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper) {
+func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper, fmtr cases.Caser) {
 	g.writeIndent(s, 1)
 	s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *cw.name, *cw.name))
 	var constDestFields = []*StructAccessor{}
 	var letDestFields = []*StructAccessor{}
 	for _, f := range cw.fieldAccessors {
-		if isParsingRequired(f.returns[0].FFIType) {
+		if !isParsingRequired(f.returns[0].FFIType) {
 			constDestFields = append(constDestFields, f)
 		} else {
 			letDestFields = append(letDestFields, f)
@@ -224,6 +224,14 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper)
 			}
 		}
 		s.WriteString(" } = struct;\n")
+		for _, l := range letDestFields {
+			g.writeIndent(s, 2)
+			if l.arrayType != nil {
+				s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
+			} else if l.returns[0].FFIType == "string" {
+				s.WriteString(fmt.Sprintf("%s = Buffer.from(%s + '/%d', %q);\n", *l.name, *l.name, 0, "utf8"))
+			}
+		}
 	}
 	g.writeIndent(s, 1)
 	s.WriteString("}\n\n")
@@ -257,7 +265,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString("}\n\n")
 
 				// write static method to init new Go Struct
-				g.writeInitMethod(s, c)
+				g.writeInitMethod(s, c, fmtr)
 
 				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)
