@@ -186,6 +186,40 @@ func (g *PackageGenerator) writeValueSpec(s *strings.Builder, vs *ast.ValueSpec,
 	}
 }
 
+func (g *PackageGenerator) writeObjDestructure(s *strings.Builder, fa *[]*StructAccessor) {
+	fieldCount := len(*fa)
+	var constDestFields = []*StructAccessor{}
+	var letDestFields = []*StructAccessor{}
+	for _, f := range *fa {
+		if isParsingRequired(f.returns[0].FFIType) {
+			constDestFields = append(constDestFields, f)
+		} else {
+			letDestFields = append(letDestFields, f)
+		}
+	}
+	g.writeIndent(s, 2)
+	s.WriteString("const {")
+	for i, c := range constDestFields {
+		if i < fieldCount-1 {
+			s.WriteString(fmt.Sprintf(" %s,", *c.name))
+		} else {
+			s.WriteString(fmt.Sprintf(" %s", *c.name))
+		}
+	}
+	s.WriteString(" } = struct;\n")
+
+	g.writeIndent(s, 2)
+	s.WriteString("let {")
+	for i, l := range letDestFields {
+		if i < fieldCount-1 {
+			s.WriteString(fmt.Sprintf(" %s,", *l.name))
+		} else {
+			s.WriteString(fmt.Sprintf(" %s", *l.name))
+		}
+	}
+	s.WriteString(" } = struct;\n")
+}
+
 func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappers *[]*ClassWrapper, fmtr cases.Caser) {
 	if len(*class_wrappers) > 0 {
 		s.WriteString("const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {\n")
@@ -216,18 +250,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				// write static method to init new Go Struct
 				g.writeIndent(s, 1)
 				s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *c.name, *c.name))
-				g.writeIndent(s, 2)
-				s.WriteString("const { ")
-
-				fieldCount := len(c.fieldAccessors)
-				for i, f := range c.fieldAccessors {
-					if i < fieldCount-1 {
-						s.WriteString(fmt.Sprintf(" %s,", *f.name))
-					} else {
-						s.WriteString(fmt.Sprintf(" %s", *f.name))
-					}
-				}
-				s.WriteString(" } = struct;\n")
+				g.writeObjDestructure(s, &c.fieldAccessors)
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
@@ -240,6 +263,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				s.WriteString("}\n\n")
 
 				// write struct field `getters`
+				fieldCount := len(c.fieldAccessors)
 				fieldsVisited := 0
 				for _, f := range c.fieldAccessors {
 					g.writeIndent(s, 1)

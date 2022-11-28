@@ -19,6 +19,21 @@ func validJSName(n string) bool {
 	return validJSNameRegexp.MatchString(n)
 }
 
+func isParsingRequired(t string) bool {
+	switch t {
+	case "FFIType.char", "FFIType.int8_t", "FFIType.i8", "FFIType.int16_t", "FFIType.i16", "FFIType.int32_t", "FFIType.i32", "FFIType.int", "FFIType.int64_t", "FFIType.i64", "FFIType.i64_fast":
+		return false
+	case "FFIType.uint8_t", "FFIType.u8", "FFIType.uint16_t", "FFIType.u16", "FFIType.uint32_t", "FFIType.u32", "FFIType.uint64_t", "FFIType.u64", "FFIType.u64_fast":
+		return false
+	case "FFIType.double", "FFIType.f64", "FFIType.float", "FFIType.f32":
+		return false
+	case "FFIType.bool":
+		return false
+	default:
+		return true
+	}
+}
+
 func getIdent(s string) string {
 	switch s {
 	case "bool":
