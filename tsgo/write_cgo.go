@@ -741,8 +741,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			//TODO: parse args (casting types as need be) and return Handle for new struct
 			var usedArgs = []string{}
 			for i, arg := range func_data.fieldAccessors {
-				usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
-				usedArgs = append(usedArgs, usedName)
 				if arg.arrayType != nil && g.isTypedArrayHelper(*arg.arrayType) {
 					usedName := fmt.Sprintf("_%s", string(alphaArgs[i]))
 					usedArgs = append(usedArgs, usedName)
