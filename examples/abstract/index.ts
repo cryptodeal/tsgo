@@ -83,8 +83,8 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    _Uint64ArrayTest,
-    _Uint64ArgTest,
+    _Float32ArgTest,
+    _Int64ArgTest,
     _TestStruct2,
     _DISPOSE_Struct,
     _GET_StructBar_Field,
@@ -99,65 +99,40 @@ export const {
     _GET_DemoStruct2_AnotherArray,
     _GET_DemoStruct2_BacktoAnotherStruct,
     _GET_DemoStruct3_AnotherArray,
-    genDisposePtr,
-    arraySize,
-    _StringTest,
-    _Float32ArrayTest,
-    _Float64ArrayTest,
-    _Float64ArgTest,
-    _Uint32ArrayTest,
-    _Float32ArgTest,
-    _Int32ArgTest,
-    _Int64ArgTest,
-    _Uint32ArgTest,
     _IntTest,
+    arraySize,
+    _Float64ArrayTest,
+    _StringTest,
+    _TestMap,
+    genDisposePtr,
+    _Uint32ArrayTest,
+    _Uint64ArrayTest,
+    _Int32ArgTest,
+    _Uint64ArgTest,
+    _TestStruct,
+    _Float32ArrayTest,
     _Int32ArrayTest,
     _Int64ArrayTest,
-    _TestStruct,
-    _TestMap
+    _Float64ArgTest,
+    _Uint32ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Int32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
+  genDisposePtr: {
     returns: FFIType.ptr
   },
   _Uint32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Float32ArgTest: {
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -215,28 +190,53 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  _Uint64ArrayTest: {
+  _Float32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _TestStruct2: {
     returns: FFIType.ptr
   },
-  genDisposePtr: {
-    returns: FFIType.ptr
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
   },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
   _StringTest: {
+    returns: FFIType.cstring
+  },
+  _TestMap: {
     returns: FFIType.cstring
   }
 })
@@ -300,7 +300,7 @@ const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional +
 const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
     if (!(StructField instanceof _DemoStruct)) StructField = _DemoStruct.init(StructField);
-    return new _StructBar(DUMMY_INIT_FN_NAME(ptr(_Field), Field, FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), FieldThatShouldBeOptional, ptr(_FieldThatShouldNotBeOptional), FieldThatShouldNotBeOptional, ptr(_FieldThatShouldBeReadonly), FieldThatShouldBeReadonly, ptr(ArrayField), ptr(StructField)));
+    return new _StructBar(DUMMY_INIT_FN_NAME(ptr(_Field), FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), ptr(_FieldThatShouldNotBeOptional), ptr(_FieldThatShouldBeReadonly), ptr(ArrayField), ptr(StructField)));
   }
 
   public _gc_dispose(ptr: number): void {

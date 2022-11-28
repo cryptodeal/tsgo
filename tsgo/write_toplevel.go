@@ -273,10 +273,10 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		if i < argCount-1 {
 			Fmt = ", "
 		}
-		if arg.IsPtr {
-			s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
-		} else if arg.IsStruct {
+		if arg.IsStruct {
 			s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
+		} else if arg.IsPtr {
+			s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
 		} else {
 			s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
 		}
