@@ -392,6 +392,31 @@ func _DISPOSE_Struct(handle C.uintptr_t) {
   h.Delete()
 }
 
+//export _INIT_DemoStruct3
+func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
+  _a := unsafe.Slice((*float32)(a), a_len)
+  res := &abstract.DemoStruct3{AnotherArray: &_a}
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
+}
+
+//export _INIT_DemoStruct2
+func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_len C.uint64_t) unsafe.Pointer {
+  _a := unsafe.Slice((*float64)(a), a_len)
+  b_h := cgo.Handle(b)
+  _b := b_h.Value().(abstract.DemoStruct3)
+  res := &abstract.DemoStruct2{AnotherArray: &_a, BacktoAnotherStruct: &_b}
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
+}
+
+//export _INIT_DemoStruct
+func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_len C.uint64_t) unsafe.Pointer {
+  _a := unsafe.Slice((*float32)(a), a_len)
+  b_h := cgo.Handle(b)
+  _b := b_h.Value().(abstract.DemoStruct2)
+  res := &abstract.DemoStruct{ArrayField: &_a, FieldToAnotherStruct: &_b}
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
+}
+
 //export _INIT_StructBar
 func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f unsafe.Pointer, f_len C.uint64_t, g unsafe.Pointer, g_len C.uint64_t) unsafe.Pointer {
   _a := abstract.Foo(C.GoString(a))

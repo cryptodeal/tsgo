@@ -471,9 +471,9 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 }
 
 func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructAccessor, struct_config map[string]bool, k string, visited int, count int, resLen int, isLast bool) {
-	if v.isHandleFn != nil && !struct_config[*v.name] {
+	if v.isHandleFn != nil && !struct_config[*v.isHandleFn] {
 		g.writeIndent(s, 1)
-		s.WriteString(fmt.Sprintf("_INIT_%s: {\n", *v.name))
+		s.WriteString(fmt.Sprintf("_INIT_%s: {\n", *v.isHandleFn))
 		g.writeIndent(s, 2)
 		s.WriteString("args: [")
 		argLen := len(v.fieldAccessors)
