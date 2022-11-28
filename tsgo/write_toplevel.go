@@ -198,29 +198,33 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper)
 			letDestFields = append(letDestFields, f)
 		}
 	}
-	g.writeIndent(s, 2)
-	s.WriteString("const {")
 	fieldCount := len(constDestFields)
-	for i, c := range constDestFields {
-		if i < fieldCount-1 {
-			s.WriteString(fmt.Sprintf(" %s,", *c.name))
-		} else {
-			s.WriteString(fmt.Sprintf(" %s", *c.name))
+	if fieldCount > 0 {
+		g.writeIndent(s, 2)
+		s.WriteString("const {")
+		for i, c := range constDestFields {
+			if i < fieldCount-1 {
+				s.WriteString(fmt.Sprintf(" %s,", *c.name))
+			} else {
+				s.WriteString(fmt.Sprintf(" %s", *c.name))
+			}
 		}
+		s.WriteString(" } = struct;\n")
 	}
-	s.WriteString(" } = struct;\n")
 
-	g.writeIndent(s, 2)
-	s.WriteString("let {")
 	fieldCount = len(letDestFields)
-	for i, l := range letDestFields {
-		if i < fieldCount-1 {
-			s.WriteString(fmt.Sprintf(" %s,", *l.name))
-		} else {
-			s.WriteString(fmt.Sprintf(" %s", *l.name))
+	if fieldCount > 0 {
+		g.writeIndent(s, 2)
+		s.WriteString("let {")
+		for i, l := range letDestFields {
+			if i < fieldCount-1 {
+				s.WriteString(fmt.Sprintf(" %s,", *l.name))
+			} else {
+				s.WriteString(fmt.Sprintf(" %s", *l.name))
+			}
 		}
+		s.WriteString(" } = struct;\n")
 	}
-	s.WriteString(" } = struct;\n")
 	g.writeIndent(s, 1)
 	s.WriteString("}\n\n")
 }
