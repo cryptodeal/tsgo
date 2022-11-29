@@ -362,7 +362,8 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _SET_StructBar_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.ArrayField = unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  temp := unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  s.ArrayField = temp
 }
 
 //export _GET_StructBar_StructField
@@ -390,7 +391,8 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
-  s.ArrayField = &unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  temp := unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  s.ArrayField = &temp
 }
 
 //export _GET_DemoStruct_FieldToAnotherStruct
@@ -418,7 +420,8 @@ func _GET_DemoStruct2_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct2_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
-  s.AnotherArray = &unsafe.Slice((*float64)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+  temp := unsafe.Slice((*float64)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+  s.AnotherArray = &temp
 }
 
 //export _GET_DemoStruct2_BacktoAnotherStruct
@@ -447,7 +450,7 @@ func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray u
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct3)
   temp := unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
-	s.AnotherArray = &temp
+  s.AnotherArray = &temp
 }
 
 //export _DISPOSE_Struct
@@ -487,7 +490,7 @@ func _SET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t, _SET_VALUE_FieldTo
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
   value_h := cgo.Handle(_SET_VALUE_FieldToAnotherStruct)
-  value_s := value_h.Value().(abstract.DemoStruct)
+  value_s := value_h.Value().(abstract.DemoStruct2)
   s.FieldToAnotherStruct = &value_s
 }
 
@@ -505,7 +508,7 @@ func _SET_StructBar_StructField(handle C.uintptr_t, _SET_VALUE_StructField unsaf
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   value_h := cgo.Handle(_SET_VALUE_StructField)
-  value_s := value_h.Value().(abstract.StructBar)
+  value_s := value_h.Value().(abstract.DemoStruct)
   s.StructField = &value_s
 }
 

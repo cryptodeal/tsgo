@@ -650,12 +650,12 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 		starFmt = "&"
 	}
 	if f.returns[0].CGoWrapType == "*C.char" {
-		parsedName := fmt.Sprintf("_SET_VALUE_%s", *f.name)
+		parsedName := fmt.Sprintf("C.GoString(_SET_VALUE_%s)", *f.name)
 		if f.structType != nil {
-			parsedName = fmt.Sprintf("%s(_SET_VALUE_%s)", *f.structType, parsedName)
+			parsedName = fmt.Sprintf("%s(%s)", *f.structType, parsedName)
 		}
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString(fmt.Sprintf("temp := C.GoString(%s)\n", parsedName))
+		fnSB.WriteString(fmt.Sprintf("temp := %s\n", parsedName))
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %stemp\n", *f.name, starFmt))
 	} else if f.arrayType != nil && *f.arrayType != "" {
