@@ -260,14 +260,15 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 	// parse fields that don't require `const` declaration
 	for _, l := range letDestFields {
 		var param = &InitStructParam{Name: *l.name, IsPtr: false}
-		g.writeIndent(s, 2)
 		if l.arrayType != nil && *l.arrayType != "" {
+			g.writeIndent(s, 2)
 			param.IsPtr = true
 			usedArgs = append(usedArgs, param)
 			var len_helper = &InitStructParam{Name: fmt.Sprintf("%s.length", *l.name), IsPtr: false}
 			usedArgs = append(usedArgs, len_helper)
 			s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
 		} else if l.isHandleFn != nil {
+			g.writeIndent(s, 2)
 			param.IsStruct = true
 			param.IsPtr = true
 			usedArgs = append(usedArgs, param)
