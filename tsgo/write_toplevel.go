@@ -401,6 +401,33 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					// write setter for struct field
 					g.writeIndent(s, 1)
 					s.WriteString(fmt.Sprintf("set %s(val: %s[%q]) {\n", *f.name, *c.name, *f.name))
+					var tempArgs = []string{}
+					if f.arrayType != nil && *f.arrayType != "" {
+						g.writeIndent(s, 2)
+						s.WriteString(fmt.Sprintf("if (!(val instanceof %sArray)) val = new %sArray(val);\n", *f.arrayType, *f.arrayType))
+						tempArgs = append(tempArgs, "ptr(val)")
+						tempArgs = append(tempArgs, "val.length")
+					} else if f.isHandleFn != nil {
+						g.writeIndent(s, 2)
+						s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *f.name, *f.isHandleFn, *f.name, *f.isHandleFn, *f.name))
+						tempArgs = append(tempArgs, "val.ptr")
+					} else if f.returns[0].FFIType == "FFIType.cstring" {
+						g.writeIndent(s, 2)
+						s.WriteString(fmt.Sprintf("const parsed_val = Buffer.from(%s + '/%d', %q);\n", *c.name, 0, "utf8"))
+						tempArgs = append(tempArgs, "ptr(val)")
+					} else {
+						tempArgs = append(tempArgs, "val")
+					}
+					g.writeIndent(s, 2)
+					s.WriteString(fmt.Sprintf("_SET_%s_%s(this._ptr,", *c.name, *f.name))
+					tempArgLen := len(tempArgs)
+					for i, arg := range tempArgs {
+						s.WriteString(arg)
+						if i < tempArgLen-1 {
+							s.WriteString(", ")
+						}
+					}
+					s.WriteString(");\n")
 					g.writeIndent(s, 1)
 					s.WriteString("}\n\n")
 				}

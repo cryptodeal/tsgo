@@ -83,15 +83,11 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    _Uint64ArgTest,
-    genDisposePtr,
-    _Int32ArrayTest,
-    _Int64ArrayTest,
-    _Uint32ArrayTest,
-    _Uint64ArrayTest,
     _IntTest,
-    _Int32ArgTest,
-    _TestStruct2,
+    _Int64ArrayTest,
+    _Int64ArgTest,
+    _Uint64ArgTest,
+    _TestStruct,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _SET_StructBar_Field,
@@ -121,27 +117,50 @@ export const {
     _INIT_DemoStruct3,
     _SET_DemoStruct3_AnotherArray,
     _GET_DemoStruct3_AnotherArray,
-    _Float32ArrayTest,
-    _Int64ArgTest,
-    _Uint32ArgTest,
-    _TestStruct,
-    _TestMap,
-    arraySize,
-    _Float64ArrayTest,
-    _StringTest,
+    _TestStruct2,
+    _Int32ArrayTest,
+    _Uint32ArrayTest,
+    _Uint64ArrayTest,
     _Float32ArgTest,
-    _Float64ArgTest
+    _Int32ArgTest,
+    _Float32ArrayTest,
+    _StringTest,
+    _Float64ArgTest,
+    _Uint32ArgTest,
+    _TestMap,
+    genDisposePtr,
+    arraySize,
+    _Float64ArrayTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
   _IntTest: {
     args: [FFIType.cstring],
     returns: FFIType.int
   },
-  _Int32ArgTest: {
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct2: {
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -247,51 +266,10 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestStruct: {
-    returns: FFIType.ptr
-  },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  genDisposePtr: {
+  _TestStruct2: {
     returns: FFIType.ptr
   },
   _Int32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -303,9 +281,31 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
+  _Float32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
   }
 })
 
@@ -330,35 +330,35 @@ export class _StructBar {
     return <Foo>_GET_StructBar_Field(this._ptr).toString();
   }
 
-  set Field(val: StructBar.Field) {
+  set Field(val: StructBar["Field"]) {
   }
 
   get FieldWithWeirdJSONTag(): number {
     return _GET_StructBar_FieldWithWeirdJSONTag.native(this._ptr);
   }
 
-  set FieldWithWeirdJSONTag(val: StructBar.FieldWithWeirdJSONTag) {
+  set FieldWithWeirdJSONTag(val: StructBar["FieldWithWeirdJSONTag"]) {
   }
 
   get FieldThatShouldBeOptional(): string | undefined {
     return _GET_StructBar_FieldThatShouldBeOptional(this._ptr).toString();
   }
 
-  set FieldThatShouldBeOptional(val: StructBar.FieldThatShouldBeOptional) {
+  set FieldThatShouldBeOptional(val: StructBar["FieldThatShouldBeOptional"]) {
   }
 
   get FieldThatShouldNotBeOptional(): string {
     return _GET_StructBar_FieldThatShouldNotBeOptional(this._ptr).toString();
   }
 
-  set FieldThatShouldNotBeOptional(val: StructBar.FieldThatShouldNotBeOptional) {
+  set FieldThatShouldNotBeOptional(val: StructBar["FieldThatShouldNotBeOptional"]) {
   }
 
   get FieldThatShouldBeReadonly(): string {
     return _GET_StructBar_FieldThatShouldBeReadonly(this._ptr).toString();
   }
 
-  set FieldThatShouldBeReadonly(val: StructBar.FieldThatShouldBeReadonly) {
+  set FieldThatShouldBeReadonly(val: StructBar["FieldThatShouldBeReadonly"]) {
   }
 
   get ArrayField(): Float32Array | undefined {
@@ -369,7 +369,7 @@ export class _StructBar {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
   }
 
-  set ArrayField(val: StructBar.ArrayField) {
+  set ArrayField(val: StructBar["ArrayField"]) {
   }
 
   get StructField(): _DemoStruct | undefined {
@@ -378,7 +378,7 @@ export class _StructBar {
     return new _DemoStruct(ptr);
   }
 
-  set StructField(val: StructBar.StructField) {
+  set StructField(val: StructBar["StructField"]) {
   }
 
   static init(struct: StructBar): _StructBar {
@@ -418,7 +418,7 @@ export class _DemoStruct {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
   }
 
-  set ArrayField(val: DemoStruct.ArrayField) {
+  set ArrayField(val: DemoStruct["ArrayField"]) {
   }
 
   get FieldToAnotherStruct(): _DemoStruct2 | undefined {
@@ -427,7 +427,7 @@ export class _DemoStruct {
     return new _DemoStruct2(ptr);
   }
 
-  set FieldToAnotherStruct(val: DemoStruct.FieldToAnotherStruct) {
+  set FieldToAnotherStruct(val: DemoStruct["FieldToAnotherStruct"]) {
   }
 
   static init(struct: DemoStruct): _DemoStruct {
@@ -463,7 +463,7 @@ export class _DemoStruct2 {
     return new Float64Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 8, genDisposePtr.native()));
   }
 
-  set AnotherArray(val: DemoStruct2.AnotherArray) {
+  set AnotherArray(val: DemoStruct2["AnotherArray"]) {
   }
 
   get BacktoAnotherStruct(): _DemoStruct3 | undefined {
@@ -472,7 +472,7 @@ export class _DemoStruct2 {
     return new _DemoStruct3(ptr);
   }
 
-  set BacktoAnotherStruct(val: DemoStruct2.BacktoAnotherStruct) {
+  set BacktoAnotherStruct(val: DemoStruct2["BacktoAnotherStruct"]) {
   }
 
   static init(struct: DemoStruct2): _DemoStruct2 {
@@ -508,7 +508,7 @@ export class _DemoStruct3 {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
   }
 
-  set AnotherArray(val: DemoStruct3.AnotherArray) {
+  set AnotherArray(val: DemoStruct3["AnotherArray"]) {
   }
 
   static init(struct: DemoStruct3): _DemoStruct3 {
