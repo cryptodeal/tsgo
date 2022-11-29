@@ -344,8 +344,9 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
-				// write struct field `getters`
+				// write struct field getters/setters
 				for _, f := range c.fieldAccessors {
+					// write getter for struct field
 					g.writeIndent(s, 1)
 					s.WriteString(fmt.Sprintf("get %s(): ", *f.name))
 					tempType := g.getJSFromFFIType(f.returns[0].FFIType)
@@ -394,6 +395,12 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					} else {
 						s.WriteString(fmt.Sprintf("return %s.native(this._ptr);\n", *f.fnName))
 					}
+					g.writeIndent(s, 1)
+					s.WriteString("}\n\n")
+
+					// write setter for struct field
+					g.writeIndent(s, 1)
+					s.WriteString(fmt.Sprintf("set %s(val: %s.%s) {\n", *f.name, *c.name, *f.name))
 					g.writeIndent(s, 1)
 					s.WriteString("}\n\n")
 				}
