@@ -289,7 +289,7 @@ func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 func _SET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t, _SET_VALUE_FieldWithWeirdJSONTag C.int64_t, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.FieldWithWeirdJSONTag := unsafe.Slice((*)(_SET_VALUE_FieldWithWeirdJSONTag), _SET_VALUE_LEN)
+  s.FieldWithWeirdJSONTag = unsafe.Slice((*)(_SET_VALUE_FieldWithWeirdJSONTag), _SET_VALUE_LEN)
 }
 
 //export _GET_StructBar_FieldThatShouldBeOptional
@@ -358,7 +358,7 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _SET_StructBar_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.ArrayField := unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  s.ArrayField = unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
 }
 
 //export _GET_StructBar_StructField
@@ -386,7 +386,7 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
-  s.ArrayField := &unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
+  s.ArrayField = &unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
 }
 
 //export _GET_DemoStruct_FieldToAnotherStruct
@@ -414,7 +414,7 @@ func _GET_DemoStruct2_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct2_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
-  s.AnotherArray := &unsafe.Slice((*float64)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+  s.AnotherArray = &unsafe.Slice((*float64)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
 }
 
 //export _GET_DemoStruct2_BacktoAnotherStruct
@@ -442,7 +442,7 @@ func _GET_DemoStruct3_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct3)
-  s.AnotherArray := &unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+  s.AnotherArray = &unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
 }
 
 //export _DISPOSE_Struct
@@ -463,7 +463,7 @@ func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
 func _SET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t, _SET_VALUE_BacktoAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
-  s.BacktoAnotherStruct := &unsafe.Slice((*)(_SET_VALUE_BacktoAnotherStruct), _SET_VALUE_LEN)
+  s.BacktoAnotherStruct = &unsafe.Slice((*)(_SET_VALUE_BacktoAnotherStruct), _SET_VALUE_LEN)
 }
 
 //export _INIT_DemoStruct2
@@ -479,7 +479,7 @@ func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe
 func _SET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t, _SET_VALUE_FieldToAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
-  s.FieldToAnotherStruct := &unsafe.Slice((*)(_SET_VALUE_FieldToAnotherStruct), _SET_VALUE_LEN)
+  s.FieldToAnotherStruct = &unsafe.Slice((*)(_SET_VALUE_FieldToAnotherStruct), _SET_VALUE_LEN)
 }
 
 //export _INIT_DemoStruct
@@ -495,7 +495,7 @@ func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe.
 func _SET_StructBar_StructField(handle C.uintptr_t, _SET_VALUE_StructField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.StructField := &unsafe.Slice((*)(_SET_VALUE_StructField), _SET_VALUE_LEN)
+  s.StructField = &unsafe.Slice((*)(_SET_VALUE_StructField), _SET_VALUE_LEN)
 }
 
 //export _INIT_StructBar

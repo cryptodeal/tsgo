@@ -652,7 +652,7 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 	if f.returns[0].CGoWrapType == "*C.char" {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %sC.GoString(_SET_VALUE_%s)\n", *f.name, starFmt, *f.name))
-	} else if f.arrayType != nil {
+	} else if f.arrayType != nil && *f.arrayType != "" {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %sunsafe.Slice((*%s)(_SET_VALUE_%s), _SET_VALUE_LEN)\n", *f.name, starFmt, *f.arrayType, *f.name))
 	} else if f.isHandleFn != nil {
