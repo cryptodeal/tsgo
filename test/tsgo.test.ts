@@ -1,4 +1,7 @@
 import {
+	_DemoStruct,
+	_DemoStruct2,
+	_DemoStruct3,
 	_Float32ArgTest,
 	_Float32ArrayTest,
 	_Float64ArgTest,
@@ -18,10 +21,7 @@ import {
 	_Uint64ArgTest,
 	_Uint64ArrayTest,
 	arraySize,
-	genDisposePtr,
-  _DemoStruct,
-  _DemoStruct2,
-  _DemoStruct3
+	genDisposePtr
 } from '@tsgo/abstract';
 import { ptr, toArrayBuffer } from 'bun:ffi';
 import { describe, expect, it } from 'bun:test';
@@ -217,7 +217,7 @@ describe('tsgo', () => {
 		}
 	});
 
-  it('returns Go *struct (wrapped class)', () => {
+	it('returns Go *struct (wrapped class)', () => {
 		const StructBar = new _StructBar(_TestStruct2());
 		expect(typeof StructBar).toBe('object');
 		expect(typeof StructBar.Field).toBe('string');
@@ -236,37 +236,55 @@ describe('tsgo', () => {
 		expect(typeof StructBar.FieldThatShouldBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldNotBeOptional).toBe('string');
 		expect(typeof StructBar.FieldThatShouldBeReadonly).toBe('string');
-    expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
-    expect(StructBar.StructField.ArrayField instanceof Float32Array).toBe(true);
-    expect(StructBar.StructField.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
-    expect(StructBar.StructField.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
-    expect(StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct instanceof _DemoStruct3).toBe(true);
+		expect(StructBar.StructField instanceof _DemoStruct).toBe(true);
+		expect(StructBar.StructField.ArrayField instanceof Float32Array).toBe(true);
+		expect(StructBar.StructField.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
+		expect(StructBar.StructField.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(
+			true
+		);
+		expect(
+			StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct instanceof _DemoStruct3
+		).toBe(true);
 	});
 
-  it('works to initialize Go structs', () => {
-    const AnotherArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+	it('works to initialize Go structs', () => {
+		const AnotherArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 		const DemoStruct3 = _DemoStruct3.init({ AnotherArray });
 		expect(DemoStruct3 instanceof _DemoStruct3).toBe(true);
-    for (let i = 0; i < AnotherArray.length; i++) {
-      expect(DemoStruct3.AnotherArray[i]).toBe(AnotherArray[i]);
-    }
-    const ArrayField = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const DemoStruct = _DemoStruct.init({ ArrayField, FieldToAnotherStruct: { AnotherArray, BacktoAnotherStruct: { AnotherArray } } });
-    expect(DemoStruct instanceof _DemoStruct).toBe(true);
-    for (let i = 0; i < ArrayField.length; i++) {
-      expect(DemoStruct.ArrayField[i]).toBe(ArrayField[i]);
-    }
-    expect(DemoStruct.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
-    expect(DemoStruct.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
-     for (let i = 0; i < AnotherArray.length; i++) {
-      expect(DemoStruct.FieldToAnotherStruct.AnotherArray[i]).toBe(AnotherArray[i]);
-    }
-    expect(DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray instanceof Float32Array).toBe(true);
-    for (let i = 0; i < AnotherArray.length; i++) {
-      expect(DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray[i]).toBe(AnotherArray[i]);
-    }
-    const TestStruct = _StructBar.init({ Field: 'hello', FieldWithWeirdJSONTag: 123, ArrayField, FieldThatShouldBeOptional: 'optional', FieldThatShouldNotBeOptional: 'not optional', FieldThatShouldBeReadonly: 'readonly', StructField: DemoStruct });
-    expect(TestStruct instanceof _StructBar).toBe(true);
+		for (let i = 0; i < AnotherArray.length; i++) {
+			expect(DemoStruct3.AnotherArray[i]).toBe(AnotherArray[i]);
+		}
+		const ArrayField = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		const DemoStruct = _DemoStruct.init({
+			ArrayField,
+			FieldToAnotherStruct: { AnotherArray, BacktoAnotherStruct: { AnotherArray } }
+		});
+		expect(DemoStruct instanceof _DemoStruct).toBe(true);
+		for (let i = 0; i < ArrayField.length; i++) {
+			expect(DemoStruct.ArrayField[i]).toBe(ArrayField[i]);
+		}
+		expect(DemoStruct.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
+		expect(DemoStruct.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
+		for (let i = 0; i < AnotherArray.length; i++) {
+			expect(DemoStruct.FieldToAnotherStruct.AnotherArray[i]).toBe(AnotherArray[i]);
+		}
+		expect(
+			DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray instanceof Float32Array
+		).toBe(true);
+		for (let i = 0; i < AnotherArray.length; i++) {
+			expect(DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray[i]).toBe(
+				AnotherArray[i]
+			);
+		}
+		const TestStruct = _StructBar.init({
+			Field: 'hello',
+			FieldWithWeirdJSONTag: 123,
+			ArrayField,
+			FieldThatShouldBeOptional: 'optional',
+			FieldThatShouldNotBeOptional: 'not optional',
+			FieldThatShouldBeReadonly: 'readonly',
+			StructField: DemoStruct
+		});
+		expect(TestStruct instanceof _StructBar).toBe(true);
 	});
-  
 });
