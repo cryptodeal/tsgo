@@ -652,7 +652,7 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 	if f.returns[0].CGoWrapType == "*C.char" {
 		parsedName := fmt.Sprintf("C.GoString(_SET_VALUE_%s)", *f.name)
 		if f.structType != nil {
-			parsedName = fmt.Sprintf("%s(%s)", *f.structType, parsedName)
+			parsedName = fmt.Sprintf("%s.%s(%s)", pkgName, *f.structType, parsedName)
 		}
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("temp := %s\n", parsedName))
@@ -676,7 +676,7 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 	} else {
 		parsedName := fmt.Sprintf("%s(_SET_VALUE_%s)", g.getGoCast(f.returns[0].CGoWrapType), *f.name)
 		if f.structType != nil {
-			parsedName = fmt.Sprintf("%s(_SET_VALUE_%s)", *f.structType, parsedName)
+			parsedName = fmt.Sprintf("%s.%s(%s)", pkgName, *f.structType, parsedName)
 		}
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %s%s\n", *f.name, starFmt, parsedName))
