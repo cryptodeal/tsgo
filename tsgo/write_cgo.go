@@ -626,9 +626,13 @@ func (g *PackageGenerator) writeInitStructMethod(s *strings.Builder, name string
 		s.WriteString(fmt.Sprintf("func _INIT_%s(", name))
 		argLen := len(fieldAccessors)
 		for i, arg := range fieldAccessors {
-			s.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
-			if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.arrayType != nil {
-				s.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
+			if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.isHandleFn != nil {
+				s.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), "C.uintptr_t"))
+			} else {
+				s.WriteString(fmt.Sprintf("%s %s", string(alphaArgs[i]), arg.returns[0].CGoWrapType))
+				if arg.returns[0].CGoWrapType == "unsafe.Pointer" && arg.arrayType != nil {
+					s.WriteString(fmt.Sprintf(", %s_len C.uint64_t", string(alphaArgs[i])))
+				}
 			}
 			if i < argLen-1 {
 				s.WriteString(", ")
