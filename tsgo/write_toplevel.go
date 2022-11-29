@@ -277,7 +277,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 
 	// write return fn
 	g.writeIndent(s, 2)
-	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s(", *cw.name, *cw.name))
+	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s.native(", *cw.name, *cw.name))
 	argCount := len(usedArgs)
 	i := 0
 	for _, v := range cw.fieldAccessors {
@@ -333,7 +333,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 2)
 				s.WriteString("this._ptr = ptr;\n")
 				g.writeIndent(s, 2)
-				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
+				s.WriteString("registry.register(this, { cb: this._gc_dispose.native, ptr });\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
@@ -370,13 +370,13 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						}
 						s.WriteString(";\n")
 					} else if f.isHandleFn != nil {
-						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+						s.WriteString(fmt.Sprintf("const ptr = %s.native(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
 						s.WriteString("if (!ptr) return undefined;\n")
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
 					} else if *f.arrayType != "" {
-						s.WriteString(fmt.Sprintf("const ptr = %s(this._ptr);\n", *f.fnName))
+						s.WriteString(fmt.Sprintf("const ptr = %s.native(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
 						s.WriteString("if (!ptr) return undefined;\n")
 						g.writeIndent(s, 2)
@@ -384,7 +384,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						g.writeIndent(s, 2)
 						s.WriteString("// @ts-ignore - overload toArrayBuffer params\n")
 						g.writeIndent(s, 2)
-						s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
+						s.WriteString(fmt.Sprintf("return new %sArray(toArrayBuffer(ptr, 0, arraySize.native(ptr) * %d, genDisposePtr.native()));\n", fmtr.String(*f.arrayType), getByteSize(*f.arrayType)))
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						s.WriteString(fmt.Sprintf("return %s(this._ptr)", *f.fnName))
 						if tempType == "string" {
@@ -392,7 +392,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						}
 						s.WriteString(";\n")
 					} else {
-						s.WriteString(fmt.Sprintf("return %s(this._ptr);\n", *f.fnName))
+						s.WriteString(fmt.Sprintf("return %s.native(this._ptr);\n", *f.fnName))
 					}
 					g.writeIndent(s, 1)
 					s.WriteString("}\n\n")
