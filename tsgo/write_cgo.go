@@ -666,7 +666,7 @@ func (g *PackageGenerator) writeInitStructMethod(s *strings.Builder, name string
 			}
 		}
 		g.writeIndent(s, 1)
-		s.WriteString(fmt.Sprintf("res := &%s.%s{", pkgName, name))
+		s.WriteString(fmt.Sprintf("res := %s.%s{", pkgName, name))
 		for i, arg := range fieldAccessors {
 			s.WriteString(fmt.Sprintf("%s: ", *arg.name))
 			if arg.isStarExpr {

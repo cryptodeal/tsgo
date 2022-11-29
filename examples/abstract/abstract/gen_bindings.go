@@ -395,7 +395,7 @@ func _DISPOSE_Struct(handle C.uintptr_t) {
 //export _INIT_DemoStruct3
 func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
   _a := unsafe.Slice((*float32)(a), a_len)
-  res := &abstract.DemoStruct3{AnotherArray: &_a}
+  res := abstract.DemoStruct3{AnotherArray: &_a}
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 
