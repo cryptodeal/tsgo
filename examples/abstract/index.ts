@@ -144,7 +144,8 @@ export const {
     returns: FFIType.ptr
   },
   _SET_StructBar_Field: {
-    args: [FFIType.ptr, FFIType.cstring]
+    args: [FFIType.ptr, FFIType.cstring],
+    returns: FFIType.ptr
   },
   _GET_StructBar_Field: {
     args: [FFIType.ptr],
@@ -332,7 +333,7 @@ export class _StructBar {
 
   set Field(val: StructBar["Field"]) {
     const parsed_val = Buffer.from(val + '/0', "utf8");
-    _SET_StructBar_Field(this._ptr, ptr(parsed_val));
+     this._ptr =  _SET_StructBar_Field(this._ptr, ptr(parsed_val));
   }
 
   get FieldWithWeirdJSONTag(): number {

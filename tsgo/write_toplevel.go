@@ -241,7 +241,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		if c.returns[0].FFIType == "FFIType.cstring" {
 			g.writeIndent(s, 2)
 			arg_name := fmt.Sprintf("_%s", *c.name)
-			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
+			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + %q, %q);\n", arg_name, *c.name, string(rune(0)), "utf8"))
 			var param = &InitStructParam{Name: arg_name, IsPtr: true}
 			usedArgs = append(usedArgs, param)
 		} else if c.isHandleFn != nil {
@@ -408,7 +408,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						tempArgs = append(tempArgs, "parsed_value.ptr")
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						g.writeIndent(s, 2)
-						s.WriteString(fmt.Sprintf("const parsed_val = Buffer.from(val + '/%d', %q);\n", 0, "utf8"))
+						s.WriteString(fmt.Sprintf("const parsed_val = Buffer.from(val + %q, %q);\n", string(rune(0)), "utf8"))
 						tempArgs = append(tempArgs, "ptr(parsed_val)")
 					} else {
 						tempArgs = append(tempArgs, "val")
@@ -548,7 +548,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		for _, fa := range v.fieldAccessors {
 			// write Bun FFI config for setters
 			g.writeIndent(s, 1)
-			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.isHandleFn, *fa.name))
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.name))
 			g.writeIndent(s, 2)
 			s.WriteString("args: [FFIType.ptr, ")
 			s.WriteString(fa.returns[0].FFIType)
