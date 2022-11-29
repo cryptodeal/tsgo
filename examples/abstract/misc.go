@@ -33,7 +33,7 @@ type StructBar struct {
 	FieldWithWeirdJSONTag int64
 
 	FieldThatShouldBeOptional    *string
-	FieldThatShouldNotBeOptional *string
+	FieldThatShouldNotBeOptional *string `tstype:",required"`
 	FieldThatShouldBeReadonly    string
 	ArrayField                   []float32
 	StructField                  *DemoStruct

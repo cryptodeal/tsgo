@@ -57,7 +57,7 @@ export interface StructBar {
   Field: Foo;
   FieldWithWeirdJSONTag: number /* int64 */;
   FieldThatShouldBeOptional?: string;
-  FieldThatShouldNotBeOptional?: string;
+  FieldThatShouldNotBeOptional: string;
   FieldThatShouldBeReadonly: string;
   ArrayField: number /* float32 */[] | Float32Array;
   StructField?: DemoStruct | _DemoStruct;
@@ -83,12 +83,14 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    genDisposePtr,
+    arraySize,
+    _Float64ArrayTest,
     _Int32ArrayTest,
     _Int64ArrayTest,
-    _Float64ArgTest,
-    _Uint32ArgTest,
-    _TestStruct,
+    _Uint64ArrayTest,
+    _Int32ArgTest,
+    _Uint64ArgTest,
+    _TestStruct2,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _GET_StructBar_Field,
@@ -106,22 +108,24 @@ export const {
     _GET_DemoStruct2_BacktoAnotherStruct,
     _INIT_DemoStruct3,
     _GET_DemoStruct3_AnotherArray,
-    arraySize,
-    _Uint64ArrayTest,
-    _Float32ArgTest,
-    _TestStruct2,
-    _TestMap,
-    _Float64ArrayTest,
-    _StringTest,
-    _IntTest,
     _Float32ArrayTest,
-    _Uint32ArrayTest,
-    _Int32ArgTest,
+    _Float32ArgTest,
+    _Float64ArgTest,
     _Int64ArgTest,
-    _Uint64ArgTest
+    _Uint32ArgTest,
+    _IntTest,
+    genDisposePtr,
+    _StringTest,
+    _TestMap,
+    _Uint32ArrayTest,
+    _TestStruct,
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _TestStruct2: {
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _TestStruct: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -191,33 +195,7 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
   _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -225,30 +203,15 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _IntTest: {
+  _TestStruct2: {
+    returns: FFIType.ptr
+  },
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
+  },
+  _Float64ArrayTest: {
     args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestStruct: {
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
     returns: FFIType.ptr
   },
   _Int32ArrayTest: {
@@ -258,6 +221,43 @@ export const {
   _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
+  },
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _TestMap: {
+    returns: FFIType.cstring
   }
 })
 
@@ -271,7 +271,7 @@ export class _StructBar {
 
   constructor(ptr: number) {
     this._ptr = ptr;
-    registry.register(this, { cb: this._gc_dispose.native, ptr });
+    registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
   get ptr(): number {
@@ -290,7 +290,7 @@ export class _StructBar {
     return _GET_StructBar_FieldThatShouldBeOptional(this._ptr).toString();
   }
 
-  get FieldThatShouldNotBeOptional(): string | undefined {
+  get FieldThatShouldNotBeOptional(): string {
     return _GET_StructBar_FieldThatShouldNotBeOptional(this._ptr).toString();
   }
 
@@ -325,7 +325,7 @@ export class _StructBar {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+    return _DISPOSE_Struct.native(ptr);
   }
 }
 
@@ -334,7 +334,7 @@ export class _DemoStruct {
 
   constructor(ptr: number) {
     this._ptr = ptr;
-    registry.register(this, { cb: this._gc_dispose.native, ptr });
+    registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
   get ptr(): number {
@@ -364,7 +364,7 @@ export class _DemoStruct {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+    return _DISPOSE_Struct.native(ptr);
   }
 }
 
@@ -373,7 +373,7 @@ export class _DemoStruct2 {
 
   constructor(ptr: number) {
     this._ptr = ptr;
-    registry.register(this, { cb: this._gc_dispose.native, ptr });
+    registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
   get ptr(): number {
@@ -403,7 +403,7 @@ export class _DemoStruct2 {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+    return _DISPOSE_Struct.native(ptr);
   }
 }
 
@@ -412,7 +412,7 @@ export class _DemoStruct3 {
 
   constructor(ptr: number) {
     this._ptr = ptr;
-    registry.register(this, { cb: this._gc_dispose.native, ptr });
+    registry.register(this, { cb: this._gc_dispose, ptr });
   }
 
   get ptr(): number {
@@ -434,7 +434,7 @@ export class _DemoStruct3 {
   }
 
   public _gc_dispose(ptr: number): void {
-    return _DISPOSE_Struct(ptr);
+    return _DISPOSE_Struct.native(ptr);
   }
 }
 

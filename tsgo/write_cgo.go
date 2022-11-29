@@ -25,7 +25,7 @@ func (g *PackageGenerator) writeCGoHeaders(cg *strings.Builder, gi *strings.Buil
 // TODO:
 // * see if we can handle `complex64` and `complex128`?
 // * perhaps do a better job of mapping (no default value??)
-func (g *PackageGenerator) getNumCast(s string) string {
+func (g *PackageGenerator) getGoCast(s string) string {
 	// fmt.Println(s)
 	switch s {
 	case "C.int":
@@ -511,7 +511,7 @@ func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 	return disposeSB.String()
 }
 
-func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
+func (g *PackageGenerator) writeCGoFieldGetter(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
 	used_args := UsedParams{}
 	var fnSB strings.Builder
 	fnSB.WriteString(fmt.Sprintf("//export %s\n", *f.fnName))
@@ -606,7 +606,8 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 		for _, fa := range f.fieldAccessors {
 			name := fmt.Sprintf("_GET_%s_%s", *f.isHandleFn, *fa.name)
 			fa.fnName = &name
-			fnSB.WriteString(g.writeCGoFieldAccessor(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
+			fnSB.WriteString(g.writeCGoFieldGetter(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
+			fnSB.WriteString(g.writeCGoFieldSetter(gi, gh, ec, ci, fmtr, fa, pkgName, *f.isHandleFn))
 		}
 		fnSB.WriteString(g.writeDisposeStruct(f.disposeHandle))
 		g.ffi.GoWrappedStructs[*f.isHandleFn] = true
@@ -614,6 +615,62 @@ func (g *PackageGenerator) writeCGoFieldAccessor(gi *strings.Builder, gh *string
 		g.writeInitStructMethod(&fnSB, *f.isHandleFn, pkgName, f.fieldAccessors)
 	}
 
+	return fnSB.String()
+}
+
+func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.Builder, ec *strings.Builder, ci *strings.Builder, fmtr cases.Caser, f *StructAccessor, pkgName string, structName string) string {
+	fnName := fmt.Sprintf("_SET_%s_%s", structName, *f.name)
+	var fnSB strings.Builder
+	fnSB.WriteString(fmt.Sprintf("//export %s\n", fnName))
+	fnSB.WriteString(fmt.Sprintf("func %s(", fnName))
+	// iterate through fn params, generating cgo function decl line
+	argLen := len(f.args)
+	if argLen > 0 {
+		for i, arg := range f.args {
+			fnSB.WriteString(fmt.Sprintf("%s %s", arg.Name, arg.CGoWrapType))
+			if i < argLen-1 {
+				fnSB.WriteString(", ")
+			}
+		}
+	}
+	// write arg of value to set
+	fnSB.WriteString(fmt.Sprintf(", _SET_VALUE_%s %s", *f.name, f.returns[0].CGoWrapType))
+	if f.arrayType != nil && f.returns[0].CGoWrapType != "*C.char" {
+		fnSB.WriteString(", _SET_VALUE_LEN C.size_t")
+	}
+	fnSB.WriteString(") {\n")
+
+	// gen necessary type coercions (CGo C types -> Go types)
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString("h := cgo.Handle(handle)\n")
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString(fmt.Sprintf("s := h.Value().(%s.%s)\n", pkgName, structName))
+	starFmt := ""
+	if f.isStarExpr {
+		starFmt = "&"
+	}
+	if f.returns[0].CGoWrapType == "*C.char" {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s = %sC.GoString(_SET_VALUE_%s)\n", *f.name, starFmt, *f.name))
+	} else if f.arrayType != nil {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s := %sunsafe.Slice((*%s)(_SET_VALUE_%s), _SET_VALUE_LEN)\n", *f.name, starFmt, *f.arrayType, *f.name))
+	} else if f.isHandleFn != nil {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("value_h := cgo.Handle(_SET_VALUE_%s)\n", *f.name))
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("value_s := value_h.Value().(%s.%s)\n", pkgName, structName))
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s = %svalue_s\n", *f.name, starFmt))
+	} else if f.structType != nil {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s = %s%s(%s)\n", *f.name, starFmt, *f.structType, *f.name))
+	} else {
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s = %s%s(_SET_VALUE_%s)\n", *f.name, starFmt, g.getGoCast(f.returns[0].CGoWrapType), *f.name))
+	}
+
+	fnSB.WriteString("}\n\n")
 	return fnSB.String()
 }
 
@@ -676,7 +733,7 @@ func (g *PackageGenerator) writeInitStructMethod(s *strings.Builder, name string
 			if arg.isStarExpr {
 				s.WriteString(fmt.Sprintf("&%s", usedArgs[i]))
 			} else {
-				num_type := g.getNumCast(arg.returns[0].CGoWrapType)
+				num_type := g.getGoCast(arg.returns[0].CGoWrapType)
 				if num_type != "" {
 					s.WriteString(fmt.Sprintf("%s(%s)", num_type, usedArgs[i]))
 				} else {
@@ -807,25 +864,6 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 	// iterate through all function declarations, parsing into `*FFIFunc` helper struct & writing CGo/C helpers
 	for _, f := range fd {
 		func_data := g.parseFn(f)
-		/*
-			fmt.Println("test_func_parser:", func_data)
-			if func_data.name != nil {
-				fmt.Println("name: ", *func_data.name)
-			}
-			if func_data.fieldAccessors != nil {
-				for _, field := range func_data.fieldAccessors {
-					fmt.Println("field: ", *field.name)
-
-					for _, a := range field.args {
-						fmt.Println("arg: ", a)
-					}
-
-					for _, r := range field.returns {
-						fmt.Println("returns: ", r)
-					}
-				}
-			}
-		*/
 		g.ffi.FFIFuncs[f.Name.Name] = func_data
 
 		fn_str.WriteString(g.writeCGoFn(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, func_data, f.Name.Name, pkgName))
@@ -833,7 +871,8 @@ func (g *PackageGenerator) writeCGo(cg *strings.Builder, fd []*ast.FuncDecl, pkg
 			for _, field := range func_data.fieldAccessors {
 				name := fmt.Sprintf("_GET_%s_%s", *func_data.name, *field.name)
 				field.fnName = &name
-				fn_str.WriteString(g.writeCGoFieldAccessor(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
+				fn_str.WriteString(g.writeCGoFieldGetter(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
+				fn_str.WriteString(g.writeCGoFieldSetter(&goImportsSB, &goHelpersSB, &embeddedCSB, &cImportsSB, caser, field, pkgName, *func_data.name))
 			}
 			fn_str.WriteString(g.writeDisposeStruct(func_data.disposeHandle))
 			g.ffi.GoWrappedStructs[*func_data.name] = true
