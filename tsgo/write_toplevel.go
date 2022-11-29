@@ -500,6 +500,8 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
 			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("_SET_%s_%s,\n", *v.name, *fa.name))
+			g.writeIndent(s, 2)
 			s.WriteString(*fa.fnName)
 			if visited == count-1 && fieldsVisited == fieldCount-1 {
 				s.WriteByte('\n')
@@ -546,7 +548,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		for _, fa := range v.fieldAccessors {
 			// write Bun FFI config for setters
 			g.writeIndent(s, 1)
-			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.name))
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.isHandleFn, *fa.name))
 			g.writeIndent(s, 2)
 			s.WriteString("args: [FFIType.ptr, ")
 			s.WriteString(fa.returns[0].FFIType)
