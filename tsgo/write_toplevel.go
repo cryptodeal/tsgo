@@ -432,6 +432,8 @@ func (g *PackageGenerator) writeNestedFieldExports(s *strings.Builder, v *Struct
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
 			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("_SET_%s_%s,\n", *v.isHandleFn, *fa.name))
+			g.writeIndent(s, 2)
 			s.WriteString(*fa.fnName)
 			if isLast && visited == count-1 && fieldsVisited == fieldCount-1 {
 				s.WriteByte('\n')
@@ -468,6 +470,8 @@ func (g *PackageGenerator) writeAccessorFieldExports(s *strings.Builder, v *FFIF
 		fieldCount := len(classWrapper.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range classWrapper.fieldAccessors {
+			g.writeIndent(s, 2)
+			s.WriteString(fmt.Sprintf("_SET_%s_%s,\n", *v.name, *fa.name))
 			g.writeIndent(s, 2)
 			s.WriteString(*fa.fnName)
 			if visited == count-1 && fieldsVisited == fieldCount-1 {
