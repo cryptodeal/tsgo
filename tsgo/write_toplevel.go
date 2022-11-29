@@ -405,7 +405,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					} else if f.isHandleFn != nil {
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("const parsed_value = val instanceof _%s ? val : _%s.init(val);\n", *f.isHandleFn, *f.isHandleFn))
-						tempArgs = append(tempArgs, "val.ptr")
+						tempArgs = append(tempArgs, "parsed_value.ptr")
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						g.writeIndent(s, 2)
 						s.WriteString(fmt.Sprintf("const parsed_val = Buffer.from(val + '/%d', %q);\n", 0, "utf8"))
