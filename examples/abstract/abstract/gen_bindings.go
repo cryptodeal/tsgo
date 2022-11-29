@@ -289,7 +289,7 @@ func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 func _SET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t, _SET_VALUE_FieldWithWeirdJSONTag C.int64_t, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.FieldWithWeirdJSONTag = unsafe.Slice((*)(_SET_VALUE_FieldWithWeirdJSONTag), _SET_VALUE_LEN)
+  s.FieldWithWeirdJSONTag = int64(_SET_VALUE_FieldWithWeirdJSONTag)
 }
 
 //export _GET_StructBar_FieldThatShouldBeOptional
@@ -308,7 +308,8 @@ func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
 func _SET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeOptional *C.char) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.FieldThatShouldBeOptional = &C.GoString(_SET_VALUE_FieldThatShouldBeOptional)
+  temp := C.GoString(_SET_VALUE_FieldThatShouldBeOptional)
+	 s.FieldThatShouldBeOptional = &temp
 }
 
 //export _GET_StructBar_FieldThatShouldNotBeOptional
@@ -463,7 +464,9 @@ func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
 func _SET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t, _SET_VALUE_BacktoAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
-  s.BacktoAnotherStruct = &unsafe.Slice((*)(_SET_VALUE_BacktoAnotherStruct), _SET_VALUE_LEN)
+  value_h := cgo.Handle(_SET_VALUE_BacktoAnotherStruct)
+  value_s := value_h.Value().(abstract.DemoStruct2)
+  s.BacktoAnotherStruct = &value_s
 }
 
 //export _INIT_DemoStruct2
@@ -479,7 +482,9 @@ func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe
 func _SET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t, _SET_VALUE_FieldToAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
-  s.FieldToAnotherStruct = &unsafe.Slice((*)(_SET_VALUE_FieldToAnotherStruct), _SET_VALUE_LEN)
+  value_h := cgo.Handle(_SET_VALUE_FieldToAnotherStruct)
+  value_s := value_h.Value().(abstract.DemoStruct)
+  s.FieldToAnotherStruct = &value_s
 }
 
 //export _INIT_DemoStruct
@@ -495,7 +500,9 @@ func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe.
 func _SET_StructBar_StructField(handle C.uintptr_t, _SET_VALUE_StructField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.StructField = &unsafe.Slice((*)(_SET_VALUE_StructField), _SET_VALUE_LEN)
+  value_h := cgo.Handle(_SET_VALUE_StructField)
+  value_s := value_h.Value().(abstract.StructBar)
+  s.StructField = &value_s
 }
 
 //export _INIT_StructBar
