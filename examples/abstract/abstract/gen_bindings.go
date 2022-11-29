@@ -400,7 +400,7 @@ func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
 }
 
 //export _INIT_DemoStruct2
-func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_len C.uint64_t) unsafe.Pointer {
+func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe.Pointer {
   _a := unsafe.Slice((*float64)(a), a_len)
   b_h := cgo.Handle(b)
   _b := b_h.Value().(abstract.DemoStruct3)
@@ -409,7 +409,7 @@ func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_l
 }
 
 //export _INIT_DemoStruct
-func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_len C.uint64_t) unsafe.Pointer {
+func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe.Pointer {
   _a := unsafe.Slice((*float32)(a), a_len)
   b_h := cgo.Handle(b)
   _b := b_h.Value().(abstract.DemoStruct2)
@@ -418,7 +418,7 @@ func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_le
 }
 
 //export _INIT_StructBar
-func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f unsafe.Pointer, f_len C.uint64_t, g unsafe.Pointer, g_len C.uint64_t) unsafe.Pointer {
+func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f unsafe.Pointer, f_len C.uint64_t, g C.uintptr_t) unsafe.Pointer {
   _a := abstract.Foo(C.GoString(a))
   _c := C.GoString(c)
   _d := C.GoString(d)

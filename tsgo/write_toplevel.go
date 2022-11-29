@@ -478,9 +478,13 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		s.WriteString("args: [")
 		argLen := len(v.fieldAccessors)
 		for i, fa := range v.fieldAccessors {
-			s.WriteString(fa.args[0].FFIType)
-			if fa.arrayType != nil {
-				s.WriteString(", FFIType.u64_fast")
+			if fa.isHandleFn != nil {
+				s.WriteString("FFIType.u64_fast")
+			} else {
+				s.WriteString(fa.args[0].FFIType)
+				if fa.arrayType != nil {
+					s.WriteString(", FFIType.u64_fast")
+				}
 			}
 			if i < argLen-1 {
 				s.WriteString(", ")
