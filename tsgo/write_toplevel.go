@@ -293,7 +293,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 				} else if arg.IsPtr {
 					// increment twice, account for array length helper in `args`
 					i++
-					s.WriteString(fmt.Sprintf("ptr(%s)%s, %s.length", arg.Name, Fmt, arg.Name))
+					s.WriteString(fmt.Sprintf("ptr(%s), %s.length%s", arg.Name, arg.Name, Fmt))
 				} else {
 					s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
 				}
