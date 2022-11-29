@@ -513,10 +513,24 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		s.WriteString("returns: FFIType.ptr\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
-		// write config for struct field accessors
+		// write config for struct field getters/setters
 		fieldCount := len(v.fieldAccessors)
 		fieldsVisited := 0
 		for _, fa := range v.fieldAccessors {
+			// write Bun FFI config for setters
+			g.writeIndent(s, 1)
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.fnName))
+			g.writeIndent(s, 2)
+			s.WriteString("args: [FFIType.ptr, ")
+			s.WriteString(fa.returns[0].FFIType)
+			if fa.arrayType != nil && *fa.arrayType != "" {
+				s.WriteString(", FFIType.u64_fast")
+			}
+			s.WriteString("]\n")
+			g.writeIndent(s, 1)
+			s.WriteString("},\n")
+
+			// write Bun FFI config for getters
 			g.writeIndent(s, 1)
 			s.WriteString(fmt.Sprintf("%s: {\n", *fa.fnName))
 			fieldArgLen := len(fa.args)
@@ -597,8 +611,11 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
 
-		// write config for struct setter fields
+		// write config for struct field getters/setters
+		fieldCount := len(v.fieldAccessors)
+		fieldsVisited := 0
 		for _, fa := range v.fieldAccessors {
+			// write Bun FFI config for setters
 			g.writeIndent(s, 1)
 			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.fnName))
 			g.writeIndent(s, 2)
@@ -610,12 +627,8 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 			s.WriteString("]\n")
 			g.writeIndent(s, 1)
 			s.WriteString("},\n")
-		}
 
-		// write config for struct field accessors
-		fieldCount := len(v.fieldAccessors)
-		fieldsVisited := 0
-		for _, fa := range v.fieldAccessors {
+			// write Bun FFI config for getters
 			g.writeIndent(s, 1)
 			s.WriteString(fmt.Sprintf("%s: {\n", *fa.fnName))
 			fieldArgLen := len(fa.args)
