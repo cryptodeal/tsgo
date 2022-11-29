@@ -251,7 +251,6 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			var param = &InitStructParam{Name: arg_name, IsStruct: true, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		} else {
-			g.writeIndent(s, 2)
 			var param = &InitStructParam{Name: *c.name, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		}
