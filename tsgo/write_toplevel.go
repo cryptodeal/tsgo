@@ -238,18 +238,20 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 
 	// parse fields that require `const` declaration (e.g. strings)
 	for _, c := range constDestFields {
-		g.writeIndent(s, 2)
 		if c.returns[0].FFIType == "FFIType.cstring" {
+			g.writeIndent(s, 2)
 			arg_name := fmt.Sprintf("_%s", *c.name)
 			s.WriteString(fmt.Sprintf("const %s = Buffer.from(%s + '/%d', %q);\n", arg_name, *c.name, 0, "utf8"))
 			var param = &InitStructParam{Name: arg_name, IsPtr: true}
 			usedArgs = append(usedArgs, param)
 		} else if c.isHandleFn != nil {
+			g.writeIndent(s, 2)
 			arg_name := fmt.Sprintf("_%s", *c.name)
 			s.WriteString(fmt.Sprintf("const %s = _%s.init(%s);\n", arg_name, *c.isHandleFn, *c.name))
 			var param = &InitStructParam{Name: arg_name, IsStruct: true, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		} else {
+			g.writeIndent(s, 2)
 			var param = &InitStructParam{Name: *c.name, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		}
