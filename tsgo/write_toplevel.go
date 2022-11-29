@@ -277,11 +277,13 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 	g.writeIndent(s, 2)
 	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s(", *cw.name, *cw.name))
 	argCount := len(usedArgs)
+	i := 0
 	for _, v := range cw.fieldAccessors {
-		for i, arg := range usedArgs {
+		for _, arg := range usedArgs {
 			if !strings.Contains(arg.Name, *v.name) {
 				continue
 			} else {
+				i++
 				Fmt := ""
 				if i < argCount-1 {
 					Fmt = ", "
@@ -289,7 +291,9 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 				if arg.IsStruct {
 					s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
 				} else if arg.IsPtr {
-					s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
+					// increment twice, account for array length helper in `args`
+					i++
+					s.WriteString(fmt.Sprintf("ptr(%s)%s, %s.length", arg.Name, Fmt, arg.Name))
 				} else {
 					s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
 				}
@@ -399,9 +403,8 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 2)
 				s.WriteString("return _DISPOSE_Struct(ptr);\n")
 				g.writeIndent(s, 1)
-				s.WriteString("}\n\n")
-
 				s.WriteString("}\n")
+				s.WriteString("}\n\n")
 				struct_wrappers[*c.name] = true
 			}
 		}
