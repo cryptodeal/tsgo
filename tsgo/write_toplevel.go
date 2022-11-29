@@ -519,7 +519,7 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 		for _, fa := range v.fieldAccessors {
 			// write Bun FFI config for setters
 			g.writeIndent(s, 1)
-			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.fnName))
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.name))
 			g.writeIndent(s, 2)
 			s.WriteString("args: [FFIType.ptr, ")
 			s.WriteString(fa.returns[0].FFIType)
@@ -617,7 +617,7 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 		for _, fa := range v.fieldAccessors {
 			// write Bun FFI config for setters
 			g.writeIndent(s, 1)
-			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.fnName))
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.name))
 			g.writeIndent(s, 2)
 			s.WriteString("args: [FFIType.ptr, ")
 			s.WriteString(fa.returns[0].FFIType)
