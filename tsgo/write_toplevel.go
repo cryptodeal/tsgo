@@ -576,6 +576,7 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 			s.WriteString("},\n")
 			*isDisposeWritten = true
 		}
+		// write config for init struct fn
 		g.writeIndent(s, 1)
 		s.WriteString(fmt.Sprintf("_INIT_%s: {\n", *v.name))
 		g.writeIndent(s, 2)
@@ -595,6 +596,21 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 		s.WriteString("returns: FFIType.ptr\n")
 		g.writeIndent(s, 1)
 		s.WriteString("},\n")
+
+		// write config for struct setter fields
+		for _, fa := range v.fieldAccessors {
+			g.writeIndent(s, 1)
+			s.WriteString(fmt.Sprintf("_SET_%s_%s: {\n", *v.name, *fa.fnName))
+			g.writeIndent(s, 2)
+			s.WriteString("args: [FFIType.ptr, ")
+			s.WriteString(fa.returns[0].FFIType)
+			if fa.arrayType != nil && *fa.arrayType != "" {
+				s.WriteString(", FFIType.u64_fast")
+			}
+			s.WriteString("]\n")
+			g.writeIndent(s, 1)
+			s.WriteString("},\n")
+		}
 
 		// write config for struct field accessors
 		fieldCount := len(v.fieldAccessors)
