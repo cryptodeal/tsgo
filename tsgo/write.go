@@ -744,7 +744,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				OGGoType:    cgoType,
 				ASTType:     &f.Type,
 			}
-			if res_helper.FFIType != "FFIType.ptr" {
+			if res_helper.FFIType != "FFIType.ptr" && field_func.isHandleFn != nil {
 				field_func.structType = field_func.isHandleFn
 				field_func.isHandleFn = nil
 				if g.conf.FFIBindings {
