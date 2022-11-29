@@ -404,7 +404,7 @@ func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_l
   _a := unsafe.Slice((*float64)(a), a_len)
   b_h := cgo.Handle(b)
   _b := b_h.Value().(abstract.DemoStruct3)
-  res := &abstract.DemoStruct2{AnotherArray: &_a, BacktoAnotherStruct: &_b}
+  res := abstract.DemoStruct2{AnotherArray: &_a, BacktoAnotherStruct: &_b}
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 
@@ -413,7 +413,7 @@ func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b unsafe.Pointer, b_le
   _a := unsafe.Slice((*float32)(a), a_len)
   b_h := cgo.Handle(b)
   _b := b_h.Value().(abstract.DemoStruct2)
-  res := &abstract.DemoStruct{ArrayField: &_a, FieldToAnotherStruct: &_b}
+  res := abstract.DemoStruct{ArrayField: &_a, FieldToAnotherStruct: &_b}
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 
@@ -426,7 +426,7 @@ func _INIT_StructBar(a *C.char, b C.int64_t, c *C.char, d *C.char, e *C.char, f 
   _f := unsafe.Slice((*float32)(f), f_len)
   g_h := cgo.Handle(g)
   _g := g_h.Value().(abstract.DemoStruct)
-  res := &abstract.StructBar{Field: _a, FieldWithWeirdJSONTag: int64(b), FieldThatShouldBeOptional: &_c, FieldThatShouldNotBeOptional: &_d, FieldThatShouldBeReadonly: _e, ArrayField: _f, StructField: &_g}
+  res := abstract.StructBar{Field: _a, FieldWithWeirdJSONTag: int64(b), FieldThatShouldBeOptional: &_c, FieldThatShouldNotBeOptional: &_d, FieldThatShouldBeReadonly: _e, ArrayField: _f, StructField: &_g}
   return C.hackyHandle(C.uintptr_t(cgo.NewHandle(res)))
 }
 
