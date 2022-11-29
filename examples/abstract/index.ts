@@ -83,10 +83,12 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
+    _Int32ArrayTest,
     genDisposePtr,
-    arraySize,
-    _Uint64ArgTest,
-    _TestStruct2,
+    _Uint64ArrayTest,
+    _StringTest,
+    _Int64ArgTest,
+    _TestStruct,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _GET_StructBar_Field,
@@ -104,41 +106,28 @@ export const {
     _GET_DemoStruct2_BacktoAnotherStruct,
     _INIT_DemoStruct3,
     _GET_DemoStruct3_AnotherArray,
+    _Uint64ArgTest,
+    _TestStruct2,
+    _IntTest,
+    _Float32ArrayTest,
+    _Int64ArrayTest,
+    _Uint32ArrayTest,
+    _Uint32ArgTest,
     _TestMap,
+    arraySize,
     _Float64ArrayTest,
-    _Int32ArrayTest,
-    _Int64ArgTest,
-    _TestStruct,
     _Float32ArgTest,
     _Float64ArgTest,
-    _Int32ArgTest,
-    _IntTest,
-    _Int64ArrayTest,
-    _Uint64ArrayTest,
-    _StringTest,
-    _Float32ArrayTest,
-    _Uint32ArrayTest,
-    _Uint32ArgTest
+    _Int32ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
   },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Int64ArrayTest: {
+  _Float64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
   },
   _Float32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
@@ -148,30 +137,32 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
+  _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   genDisposePtr: {
     returns: FFIType.ptr
   },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct2: {
+  _TestStruct: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -241,24 +232,33 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _Float64ArrayTest: {
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
+  _Float32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int32ArrayTest: {
+  _Int64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int64ArgTest: {
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct: {
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  }
+  _TestStruct2: {
+    returns: FFIType.ptr
+  },
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -316,7 +316,7 @@ export class _StructBar {
     const { Field, FieldWithWeirdJSONTag, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, StructField } = struct;
     let { ArrayField } = struct;
     const _Field = Buffer.from(Field + '/0', "utf8");
-        const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
+    const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
     const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + '/0', "utf8");
     const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
     const _StructField = _DemoStruct.init(StructField);
