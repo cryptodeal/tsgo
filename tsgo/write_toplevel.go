@@ -333,7 +333,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 2)
 				s.WriteString("this._ptr = ptr;\n")
 				g.writeIndent(s, 2)
-				s.WriteString("registry.register(this, { cb: this._gc_dispose.native, ptr });\n")
+				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
@@ -405,7 +405,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 1)
 				s.WriteString("public _gc_dispose(ptr: number): void {\n")
 				g.writeIndent(s, 2)
-				s.WriteString("return _DISPOSE_Struct(ptr);\n")
+				s.WriteString("return _DISPOSE_Struct.native(ptr);\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n")
 				s.WriteString("}\n\n")
