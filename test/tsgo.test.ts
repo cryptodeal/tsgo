@@ -259,11 +259,11 @@ describe('tsgo', () => {
     expect(DemoStruct.FieldToAnotherStruct instanceof _DemoStruct2).toBe(true);
     expect(DemoStruct.FieldToAnotherStruct.AnotherArray instanceof Float64Array).toBe(true);
      for (let i = 0; i < AnotherArray.length; i++) {
-      expect(DemoStruct3.AnotherArray[i]).toBe(AnotherArray[i]);
+      expect(DemoStruct.FieldToAnotherStruct.AnotherArray[i]).toBe(AnotherArray[i]);
     }
-    expect(DemoStruct.FieldToAnotherStruct.AnotherArray instanceof Float32Array).toBe(true);
+    expect(DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray instanceof Float32Array).toBe(true);
     for (let i = 0; i < AnotherArray.length; i++) {
-      expect(DemoStruct3.AnotherArray[i]).toBe(AnotherArray[i]);
+      expect(DemoStruct.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray[i]).toBe(AnotherArray[i]);
     }
     const TestStruct = _StructBar.init({ Field: 'hello', FieldWithWeirdJSONTag: 123, ArrayField, FieldThatShouldBeOptional: 'optional', FieldThatShouldNotBeOptional: 'not optional', FieldThatShouldBeReadonly: 'readonly', StructField: DemoStruct });
     expect(TestStruct instanceof _StructBar).toBe(true);

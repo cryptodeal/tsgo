@@ -290,10 +290,12 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 				}
 				if arg.IsStruct {
 					s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
-				} else if arg.IsPtr {
+				} else if arg.IsPtr && v.returns[0].FFIType != "FFIType.cstring" {
 					// increment twice, account for array length helper in `args`
 					i++
 					s.WriteString(fmt.Sprintf("ptr(%s), %s.length%s", arg.Name, arg.Name, Fmt))
+				} else if arg.IsPtr {
+					s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
 				} else {
 					s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
 				}
