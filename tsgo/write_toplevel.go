@@ -277,17 +277,24 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 	g.writeIndent(s, 2)
 	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s(", *cw.name, *cw.name))
 	argCount := len(usedArgs)
-	for i, arg := range usedArgs {
-		Fmt := ""
-		if i < argCount-1 {
-			Fmt = ", "
-		}
-		if arg.IsStruct {
-			s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
-		} else if arg.IsPtr {
-			s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
-		} else {
-			s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
+	for _, v := range cw.fieldAccessors {
+		for i, arg := range usedArgs {
+			if !strings.Contains(arg.Name, *v.name) {
+				continue
+			} else {
+				Fmt := ""
+				if i < argCount-1 {
+					Fmt = ", "
+				}
+				if arg.IsStruct {
+					s.WriteString(fmt.Sprintf("%s.ptr%s", arg.Name, Fmt))
+				} else if arg.IsPtr {
+					s.WriteString(fmt.Sprintf("ptr(%s)%s", arg.Name, Fmt))
+				} else {
+					s.WriteString(fmt.Sprintf("%s%s", arg.Name, Fmt))
+				}
+				break
+			}
 		}
 	}
 	s.WriteString("));\n")
