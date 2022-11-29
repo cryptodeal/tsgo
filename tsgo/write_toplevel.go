@@ -247,7 +247,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		} else if c.isHandleFn != nil {
 			g.writeIndent(s, 2)
 			arg_name := fmt.Sprintf("_%s", *c.name)
-			s.WriteString(fmt.Sprintf("const %s = _%s.init(%s);\n", arg_name, *c.isHandleFn, *c.name))
+			s.WriteString(fmt.Sprintf("const %s = %s instanceof _%s ? %s : _%s.init(%s);\n", arg_name, *c.name, *c.isHandleFn, *c.name, *c.isHandleFn, *c.name))
 			var param = &InitStructParam{Name: arg_name, IsStruct: true, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		} else {
@@ -266,12 +266,6 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 			var len_helper = &InitStructParam{Name: fmt.Sprintf("%s.length", *l.name), IsPtr: false}
 			usedArgs = append(usedArgs, len_helper)
 			s.WriteString(fmt.Sprintf("if (!(%s instanceof %sArray)) %s = new %sArray(%s);\n", *l.name, fmtr.String(*l.arrayType), *l.name, fmtr.String(*l.arrayType), *l.name))
-		} else if l.isHandleFn != nil {
-			g.writeIndent(s, 2)
-			param.IsStruct = true
-			param.IsPtr = true
-			usedArgs = append(usedArgs, param)
-			s.WriteString(fmt.Sprintf("if (!(%s instanceof _%s)) %s = _%s.init(%s);\n", *l.name, *l.isHandleFn, *l.name, *l.isHandleFn, *l.name))
 		}
 	}
 
@@ -410,7 +404,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						tempArgs = append(tempArgs, "val.length")
 					} else if f.isHandleFn != nil {
 						g.writeIndent(s, 2)
-						s.WriteString(fmt.Sprintf("if (!(val instanceof _%s)) val = _%s.init(%s);\n", *f.isHandleFn, *f.isHandleFn, *f.name))
+						s.WriteString(fmt.Sprintf("const parsed_value = val instanceof _%s ? val : _%s.init(val);\n", *f.isHandleFn, *f.isHandleFn))
 						tempArgs = append(tempArgs, "val.ptr")
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						g.writeIndent(s, 2)
