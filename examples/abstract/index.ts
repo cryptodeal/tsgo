@@ -83,20 +83,15 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    arraySize,
-    _Int32ArrayTest,
-    _Uint32ArrayTest,
-    _Float64ArgTest,
-    _TestMap,
-    _Float64ArrayTest,
-    _Int64ArrayTest,
-    _Uint64ArrayTest,
-    _Int64ArgTest,
-    _IntTest,
-    genDisposePtr,
-    _Float32ArgTest,
     _Uint64ArgTest,
-    _TestStruct,
+    genDisposePtr,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Uint32ArrayTest,
+    _Uint64ArrayTest,
+    _IntTest,
+    _Int32ArgTest,
+    _TestStruct2,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _SET_StructBar_Field,
@@ -127,24 +122,22 @@ export const {
     _SET_DemoStruct3_AnotherArray,
     _GET_DemoStruct3_AnotherArray,
     _Float32ArrayTest,
-    _StringTest,
-    _Int32ArgTest,
+    _Int64ArgTest,
     _Uint32ArgTest,
-    _TestStruct2,
+    _TestStruct,
+    _TestMap,
+    arraySize,
+    _Float64ArrayTest,
+    _StringTest,
+    _Float32ArgTest,
+    _Float64ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Float32ArrayTest: {
+  _IntTest: {
     args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
+    returns: FFIType.int
   },
   _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -254,16 +247,34 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct: {
+    returns: FFIType.ptr
+  },
   arraySize: {
     args: [FFIType.ptr],
     returns: FFIType.u64_fast
   },
-  _Int32ArrayTest: {
+  _Float64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Float64ArgTest: {
@@ -273,7 +284,10 @@ export const {
   _TestMap: {
     returns: FFIType.cstring
   },
-  _Float64ArrayTest: {
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _Int32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -281,32 +295,18 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
   _Uint64ArrayTest: {
     args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  genDisposePtr: {
-    returns: FFIType.ptr
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
   _Uint64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
-  },
-  _TestStruct: {
-    returns: FFIType.ptr
-  },
+  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -330,20 +330,35 @@ export class _StructBar {
     return <Foo>_GET_StructBar_Field(this._ptr).toString();
   }
 
+  set Field(val: StructBar.Field) {
+  }
+
   get FieldWithWeirdJSONTag(): number {
     return _GET_StructBar_FieldWithWeirdJSONTag.native(this._ptr);
+  }
+
+  set FieldWithWeirdJSONTag(val: StructBar.FieldWithWeirdJSONTag) {
   }
 
   get FieldThatShouldBeOptional(): string | undefined {
     return _GET_StructBar_FieldThatShouldBeOptional(this._ptr).toString();
   }
 
+  set FieldThatShouldBeOptional(val: StructBar.FieldThatShouldBeOptional) {
+  }
+
   get FieldThatShouldNotBeOptional(): string {
     return _GET_StructBar_FieldThatShouldNotBeOptional(this._ptr).toString();
   }
 
+  set FieldThatShouldNotBeOptional(val: StructBar.FieldThatShouldNotBeOptional) {
+  }
+
   get FieldThatShouldBeReadonly(): string {
     return _GET_StructBar_FieldThatShouldBeReadonly(this._ptr).toString();
+  }
+
+  set FieldThatShouldBeReadonly(val: StructBar.FieldThatShouldBeReadonly) {
   }
 
   get ArrayField(): Float32Array | undefined {
@@ -354,10 +369,16 @@ export class _StructBar {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
   }
 
+  set ArrayField(val: StructBar.ArrayField) {
+  }
+
   get StructField(): _DemoStruct | undefined {
     const ptr = _GET_StructBar_StructField.native(this._ptr);
     if (!ptr) return undefined;
     return new _DemoStruct(ptr);
+  }
+
+  set StructField(val: StructBar.StructField) {
   }
 
   static init(struct: StructBar): _StructBar {
@@ -397,10 +418,16 @@ export class _DemoStruct {
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
   }
 
+  set ArrayField(val: DemoStruct.ArrayField) {
+  }
+
   get FieldToAnotherStruct(): _DemoStruct2 | undefined {
     const ptr = _GET_DemoStruct_FieldToAnotherStruct.native(this._ptr);
     if (!ptr) return undefined;
     return new _DemoStruct2(ptr);
+  }
+
+  set FieldToAnotherStruct(val: DemoStruct.FieldToAnotherStruct) {
   }
 
   static init(struct: DemoStruct): _DemoStruct {
@@ -436,10 +463,16 @@ export class _DemoStruct2 {
     return new Float64Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 8, genDisposePtr.native()));
   }
 
+  set AnotherArray(val: DemoStruct2.AnotherArray) {
+  }
+
   get BacktoAnotherStruct(): _DemoStruct3 | undefined {
     const ptr = _GET_DemoStruct2_BacktoAnotherStruct.native(this._ptr);
     if (!ptr) return undefined;
     return new _DemoStruct3(ptr);
+  }
+
+  set BacktoAnotherStruct(val: DemoStruct2.BacktoAnotherStruct) {
   }
 
   static init(struct: DemoStruct2): _DemoStruct2 {
@@ -473,6 +506,9 @@ export class _DemoStruct3 {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - overload toArrayBuffer params
     return new Float32Array(toArrayBuffer(ptr, 0, arraySize.native(ptr) * 4, genDisposePtr.native()));
+  }
+
+  set AnotherArray(val: DemoStruct3.AnotherArray) {
   }
 
   static init(struct: DemoStruct3): _DemoStruct3 {

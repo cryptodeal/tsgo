@@ -400,7 +400,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 
 					// write setter for struct field
 					g.writeIndent(s, 1)
-					s.WriteString(fmt.Sprintf("set %s(val: %s.%s) {\n", *f.name, *c.name, *f.name))
+					s.WriteString(fmt.Sprintf("set %s(val: %s[%q]) {\n", *f.name, *c.name, *f.name))
 					g.writeIndent(s, 1)
 					s.WriteString("}\n\n")
 				}
