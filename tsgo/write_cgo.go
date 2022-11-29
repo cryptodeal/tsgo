@@ -660,12 +660,14 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 		fnSB.WriteString(fmt.Sprintf("s.%s = %stemp\n", *f.name, starFmt))
 	} else if f.arrayType != nil && *f.arrayType != "" {
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString(fmt.Sprintf("s.%s = %sunsafe.Slice((*%s)(_SET_VALUE_%s), _SET_VALUE_LEN)\n", *f.name, starFmt, *f.arrayType, *f.name))
+		fnSB.WriteString(fmt.Sprintf("temp := unsafe.Slice((*%s)(_SET_VALUE_%s), _SET_VALUE_LEN)\n", *f.arrayType, *f.name))
+		g.writeIndent(&fnSB, 1)
+		fnSB.WriteString(fmt.Sprintf("s.%s = %stemp\n", *f.name, starFmt))
 	} else if f.isHandleFn != nil {
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("value_h := cgo.Handle(_SET_VALUE_%s)\n", *f.name))
 		g.writeIndent(&fnSB, 1)
-		fnSB.WriteString(fmt.Sprintf("value_s := value_h.Value().(%s.%s)\n", pkgName, structName))
+		fnSB.WriteString(fmt.Sprintf("value_s := value_h.Value().(%s.%s)\n", pkgName, *f.isHandleFn))
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %svalue_s\n", *f.name, starFmt))
 	} else if f.structType != nil {

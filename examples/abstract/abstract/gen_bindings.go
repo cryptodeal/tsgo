@@ -274,7 +274,8 @@ func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
 func _SET_StructBar_Field(handle C.uintptr_t, _SET_VALUE_Field *C.char) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.Field = C.GoString(_SET_VALUE_Field)
+  temp := C.GoString(Foo(_SET_VALUE__SET_VALUE_Field))
+  s.Field = temp
 }
 
 //export _GET_StructBar_FieldWithWeirdJSONTag
@@ -309,7 +310,7 @@ func _SET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t, _SET_VALUE_Fie
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := C.GoString(_SET_VALUE_FieldThatShouldBeOptional)
-	 s.FieldThatShouldBeOptional = &temp
+  s.FieldThatShouldBeOptional = &temp
 }
 
 //export _GET_StructBar_FieldThatShouldNotBeOptional
@@ -325,7 +326,8 @@ func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
 func _SET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldNotBeOptional *C.char) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.FieldThatShouldNotBeOptional = &C.GoString(_SET_VALUE_FieldThatShouldNotBeOptional)
+  temp := C.GoString(_SET_VALUE_FieldThatShouldNotBeOptional)
+  s.FieldThatShouldNotBeOptional = &temp
 }
 
 //export _GET_StructBar_FieldThatShouldBeReadonly
@@ -341,7 +343,8 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
 func _SET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeReadonly *C.char) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
-  s.FieldThatShouldBeReadonly = C.GoString(_SET_VALUE_FieldThatShouldBeReadonly)
+  temp := C.GoString(_SET_VALUE_FieldThatShouldBeReadonly)
+  s.FieldThatShouldBeReadonly = temp
 }
 
 //export _GET_StructBar_ArrayField
@@ -443,7 +446,8 @@ func _GET_DemoStruct3_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct3)
-  s.AnotherArray = &unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+  temp := unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
+	s.AnotherArray = &temp
 }
 
 //export _DISPOSE_Struct
@@ -465,7 +469,7 @@ func _SET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t, _SET_VALUE_BacktoA
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
   value_h := cgo.Handle(_SET_VALUE_BacktoAnotherStruct)
-  value_s := value_h.Value().(abstract.DemoStruct2)
+  value_s := value_h.Value().(abstract.DemoStruct3)
   s.BacktoAnotherStruct = &value_s
 }
 
