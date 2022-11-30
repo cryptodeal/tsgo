@@ -7,30 +7,30 @@
 /**
  * Comments are kept :)
  */
-export type ComplexType = { [key: string]: { [key: number /* uint16 */]: number /* uint32 */ | undefined}};
-export type UserRole = string;
+export type ComplexType = { [key: Istring]: { [key: number /* uint16 */]: number /* uint32 */ | undefined}};
+export type UserRole = Istring;
 
-export const UserRoleDefault: UserRole = "viewer";
-export const UserRoleEditor: UserRole = "editor"; // Line comments are also kept
+export const UserRoleDefault: IUserRole = "viewer";
+export const UserRoleEditor: IUserRole = "editor"; // Line comments are also kept
 export interface IUserEntry {
   /**
    * Instead of specifying `tstype` we could also declare the typing
    * for uuid.NullUUID in the config file.
    */
   id: string | null;
-  prefs: { [key: string]: {
-    foo: number /* uint32 */;
+  prefs: I{ [key: Istring]: {
+    foo: Inumber /* uint32 */;
     /**
      * An unknown type without a `tstype` tag or mapping in the config file
      * uses the `fallback_type`, which defaults to `any`.
      */
-    bar: any /* uuid.UUID */;
+    bar: Iany /* uuid.UUID */;
   }};
-  address?: string;
-  nickname?: string;
-  role: UserRole;
-  complex: ComplexType;
+  address?: IIstring;
+  nickname?: IIstring;
+  role: IIUserRole;
+  complex: IIComplexType;
 }
 export interface IListUsersResponse {
-  users: UserEntry[];
+  users: IIUserEntry[];
 }

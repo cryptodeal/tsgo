@@ -731,7 +731,6 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		if tstype == "" {
 			var tempType strings.Builder
 			g.writeType(&tempType, f.Type, depth, false)
-			s.WriteString(fmt.Sprintf("I%s", tempType.String()))
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
 			cgoType := tempSB.String()
@@ -751,7 +750,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				field_func.isHandleFn = nil
 			}
 			if g.conf.FFIBindings && field_func.isHandleFn != nil {
-				s.WriteString(fmt.Sprintf(" | %s", *field_func.isHandleFn))
+				s.WriteString(fmt.Sprintf("I%s | %s", tempType.String(), *field_func.isHandleFn))
+			} else {
+				s.WriteString(tempType.String())
 			}
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
