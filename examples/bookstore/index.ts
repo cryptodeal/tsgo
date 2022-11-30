@@ -4,7 +4,7 @@
 //////////
 // source: author.go
 
-export interface AuthorBookListing {
+export interface IAuthorBookListing {
   author_name: string;
   written_books: Book[];
 }
@@ -13,7 +13,7 @@ export interface AuthorBookListing {
 // source: book.go
 
 export type ISBN = string | null;
-export interface Chapter {
+export interface IChapter {
   /**
    * Chapter title
    */
@@ -23,7 +23,7 @@ export interface Chapter {
    */
   number_of_words: number /* uint */;
 }
-export interface Book {
+export interface IBook {
   book_id: string; // A line comment about BookID that should be kept.
   title: string;
   /**

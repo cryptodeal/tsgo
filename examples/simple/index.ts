@@ -12,7 +12,7 @@ export type UserRole = string;
 
 export const UserRoleDefault: UserRole = "viewer";
 export const UserRoleEditor: UserRole = "editor"; // Line comments are also kept
-export interface UserEntry {
+export interface IUserEntry {
   /**
    * Instead of specifying `tstype` we could also declare the typing
    * for uuid.NullUUID in the config file.
@@ -31,6 +31,6 @@ export interface UserEntry {
   role: UserRole;
   complex: ComplexType;
 }
-export interface ListUsersResponse {
+export interface IListUsersResponse {
   users: UserEntry[];
 }

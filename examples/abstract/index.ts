@@ -50,7 +50,7 @@ export const Alice = "Alice";
  * Multiline comment for StructBar
  * Some more text
  */
-export interface _StructBar {
+export interface IStructBar {
   /**
    * Comment for field Field of type Foo
    */
@@ -66,15 +66,15 @@ export interface _StructBar {
  * Another example multiline comment
  * for DemoStruct
  */
-export interface DemoStruct {
+export interface IDemoStruct {
   ArrayField?: number /* float32 */[] | Float32Array;
   FieldToAnotherStruct?: DemoStruct2 | _DemoStruct2;
 }
-export interface DemoStruct2 {
+export interface IDemoStruct2 {
   AnotherArray?: number /* float64 */[] | Float64Array;
   BacktoAnotherStruct?: DemoStruct3 | _DemoStruct3;
 }
-export interface DemoStruct3 {
+export interface IDemoStruct3 {
   AnotherArray?: number /* float32 */[] | Float32Array;
 }
 
@@ -83,11 +83,14 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    _IntTest,
-    _Int32ArrayTest,
+    arraySize,
+    _Int64ArgTest,
+    _TestMap,
+    genDisposePtr,
+    _Uint32ArrayTest,
     _StringTest,
+    _Float32ArgTest,
     _Float64ArgTest,
-    _Uint32ArgTest,
     _TestStruct,
     _DISPOSE_Struct,
     _INIT_StructBar,
@@ -118,48 +121,31 @@ export const {
     _INIT_DemoStruct3,
     _SET_DemoStruct3_AnotherArray,
     _GET_DemoStruct3_AnotherArray,
-    _Float64ArrayTest,
-    _Float32ArgTest,
-    _Int64ArgTest,
-    _TestMap,
-    genDisposePtr,
-    arraySize,
-    _Uint64ArrayTest,
+    _IntTest,
+    _Int32ArrayTest,
+    _Int32ArgTest,
+    _Uint32ArgTest,
     _TestStruct2,
     _Float32ArrayTest,
+    _Float64ArrayTest,
     _Int64ArrayTest,
-    _Uint32ArrayTest,
-    _Int32ArgTest,
+    _Uint64ArrayTest,
     _Uint64ArgTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
   },
   _Int64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  genDisposePtr: {
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _Uint64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _TestStruct2: {
+  _TestStruct: {
     returns: FFIType.ptr
   },
   _DISPOSE_Struct: {
@@ -277,24 +263,24 @@ export const {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
+  _TestMap: {
+    returns: FFIType.cstring
   },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
+  genDisposePtr: {
     returns: FFIType.ptr
   },
   _Uint32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _Int32ArgTest: {
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Float32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
+  _TestStruct2: {
     returns: FFIType.ptr
   },
   _IntTest: {
@@ -305,10 +291,7 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _Float64ArgTest: {
+  _Int32ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
@@ -316,9 +299,26 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _TestStruct: {
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  }
 })
 
 const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; ptr: number}) => {
@@ -326,7 +326,7 @@ const registry = new FinalizationRegistry((disp: { cb: (ptr: number) => void; pt
   return cb(ptr);
 });
 
-export class StructBar implements _StructBar {
+export class StructBar implements IStructBar {
   private _ptr: number;
 
   constructor(ptr: number) {
@@ -406,16 +406,16 @@ export class StructBar implements _StructBar {
     this._updatePtr(_SET_StructBar_StructField(this._ptr, parsed_value.ptr));
   }
 
-  static init(struct: StructBar): _StructBar {
+  static init(struct: StructBar | IStructBar): StructBar {
     const { Field, FieldWithWeirdJSONTag, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, StructField } = struct;
     let { ArrayField } = struct;
     const _Field = Buffer.from(Field + "\x00", "utf8");
     const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + "\x00", "utf8");
     const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + "\x00", "utf8");
     const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + "\x00", "utf8");
-    const _StructField = StructField instanceof _DemoStruct ? StructField : _DemoStruct.init(StructField);
+    const _StructField = StructField instanceof DemoStruct ? StructField : DemoStruct.init(StructField);
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    return new _StructBar(_INIT_StructBar.native(ptr(_Field), FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), ptr(_FieldThatShouldNotBeOptional), ptr(_FieldThatShouldBeReadonly), ptr(ArrayField), ArrayField.length, _StructField.ptr));
+    return new StructBar(_INIT_StructBar.native(ptr(_Field), FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), ptr(_FieldThatShouldNotBeOptional), ptr(_FieldThatShouldBeReadonly), ptr(ArrayField), ArrayField.length, _StructField.ptr));
   }
 
   private _updatePtr(ptr: number): void {
@@ -429,7 +429,7 @@ export class StructBar implements _StructBar {
   }
 }
 
-export class _DemoStruct {
+export class DemoStruct implements IDemoStruct {
   private _ptr: number;
 
   constructor(ptr: number) {
@@ -465,12 +465,12 @@ export class _DemoStruct {
     this._updatePtr(_SET_DemoStruct_FieldToAnotherStruct(this._ptr, parsed_value.ptr));
   }
 
-  static init(struct: DemoStruct): _DemoStruct {
+  static init(struct: DemoStruct | IDemoStruct): DemoStruct {
     const { FieldToAnotherStruct } = struct;
     let { ArrayField } = struct;
-    const _FieldToAnotherStruct = FieldToAnotherStruct instanceof _DemoStruct2 ? FieldToAnotherStruct : _DemoStruct2.init(FieldToAnotherStruct);
+    const _FieldToAnotherStruct = FieldToAnotherStruct instanceof DemoStruct2 ? FieldToAnotherStruct : DemoStruct2.init(FieldToAnotherStruct);
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
-    return new _DemoStruct(_INIT_DemoStruct.native(ptr(ArrayField), ArrayField.length, _FieldToAnotherStruct.ptr));
+    return new DemoStruct(_INIT_DemoStruct.native(ptr(ArrayField), ArrayField.length, _FieldToAnotherStruct.ptr));
   }
 
   private _updatePtr(ptr: number): void {
@@ -484,7 +484,7 @@ export class _DemoStruct {
   }
 }
 
-export class _DemoStruct2 {
+export class DemoStruct2 implements IDemoStruct2 {
   private _ptr: number;
 
   constructor(ptr: number) {
@@ -520,12 +520,12 @@ export class _DemoStruct2 {
     this._updatePtr(_SET_DemoStruct2_BacktoAnotherStruct(this._ptr, parsed_value.ptr));
   }
 
-  static init(struct: DemoStruct2): _DemoStruct2 {
+  static init(struct: DemoStruct2 | IDemoStruct2): DemoStruct2 {
     const { BacktoAnotherStruct } = struct;
     let { AnotherArray } = struct;
-    const _BacktoAnotherStruct = BacktoAnotherStruct instanceof _DemoStruct3 ? BacktoAnotherStruct : _DemoStruct3.init(BacktoAnotherStruct);
+    const _BacktoAnotherStruct = BacktoAnotherStruct instanceof DemoStruct3 ? BacktoAnotherStruct : DemoStruct3.init(BacktoAnotherStruct);
     if (!(AnotherArray instanceof Float64Array)) AnotherArray = new Float64Array(AnotherArray);
-    return new _DemoStruct2(_INIT_DemoStruct2.native(ptr(AnotherArray), AnotherArray.length, _BacktoAnotherStruct.ptr));
+    return new DemoStruct2(_INIT_DemoStruct2.native(ptr(AnotherArray), AnotherArray.length, _BacktoAnotherStruct.ptr));
   }
 
   private _updatePtr(ptr: number): void {
@@ -539,7 +539,7 @@ export class _DemoStruct2 {
   }
 }
 
-export class _DemoStruct3 {
+export class DemoStruct3 implements IDemoStruct3 {
   private _ptr: number;
 
   constructor(ptr: number) {
@@ -564,10 +564,10 @@ export class _DemoStruct3 {
     this._updatePtr(_SET_DemoStruct3_AnotherArray(this._ptr, ptr(val), val.length));
   }
 
-  static init(struct: DemoStruct3): _DemoStruct3 {
+  static init(struct: DemoStruct3 | IDemoStruct3): DemoStruct3 {
     let { AnotherArray } = struct;
     if (!(AnotherArray instanceof Float32Array)) AnotherArray = new Float32Array(AnotherArray);
-    return new _DemoStruct3(_INIT_DemoStruct3.native(ptr(AnotherArray), AnotherArray.length));
+    return new DemoStruct3(_INIT_DemoStruct3.native(ptr(AnotherArray), AnotherArray.length));
   }
 
   private _updatePtr(ptr: number): void {

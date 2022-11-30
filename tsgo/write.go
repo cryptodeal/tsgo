@@ -44,7 +44,7 @@ func getIdent(s string) string {
 		"complex64", "complex128":
 		return "number /* " + s + " */"
 	}
-	return s
+	return fmt.Sprintf("I%s", s)
 }
 
 func getByteSize(s string) int {
@@ -729,7 +729,9 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		s.WriteString(": ")
 
 		if tstype == "" {
-			g.writeType(s, f.Type, depth, false)
+			var tempType strings.Builder
+			g.writeType(&tempType, f.Type, depth, false)
+			s.WriteString(fmt.Sprintf("I%s", tempType.String()))
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
 			cgoType := tempSB.String()
@@ -749,7 +751,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				field_func.isHandleFn = nil
 			}
 			if g.conf.FFIBindings && field_func.isHandleFn != nil {
-				s.WriteString(fmt.Sprintf(" | _%s", *field_func.isHandleFn))
+				s.WriteString(fmt.Sprintf(" | %s", *field_func.isHandleFn))
 			}
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
