@@ -638,7 +638,7 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 	if f.arrayType != nil && f.returns[0].CGoWrapType != "*C.char" {
 		fnSB.WriteString(", _SET_VALUE_LEN C.size_t")
 	}
-	fnSB.WriteString(") {\n")
+	fnSB.WriteString(") unsafe.Pointer {\n")
 
 	// gen necessary type coercions (CGo C types -> Go types)
 	g.writeIndent(&fnSB, 1)
@@ -681,7 +681,10 @@ func (g *PackageGenerator) writeCGoFieldSetter(gi *strings.Builder, gh *strings.
 		g.writeIndent(&fnSB, 1)
 		fnSB.WriteString(fmt.Sprintf("s.%s = %s%s\n", *f.name, starFmt, parsedName))
 	}
-
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString("h.Delete()\n")
+	g.writeIndent(&fnSB, 1)
+	fnSB.WriteString("return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))\n")
 	fnSB.WriteString("}\n\n")
 	return fnSB.String()
 }
