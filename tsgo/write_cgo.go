@@ -502,8 +502,6 @@ func (g *PackageGenerator) writeDisposeStruct(t *DisposeStructFunc) string {
 		g.writeIndent(&disposeSB, 1)
 		disposeSB.WriteString(fmt.Sprintf("h := cgo.Handle(%s)\n", t.args[0].Name))
 		g.writeIndent(&disposeSB, 1)
-		disposeSB.WriteString(fmt.Sprintf("fmt.Println(\"deleted handle @ uintptr:\", %s)\n", t.args[0].Name))
-		g.writeIndent(&disposeSB, 1)
 		disposeSB.WriteString("h.Delete()\n")
 		disposeSB.WriteString("}\n\n")
 		g.ffi.FFIHelpers["_DISPOSE_Struct"] = true

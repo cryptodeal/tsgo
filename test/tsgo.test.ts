@@ -25,6 +25,7 @@ import {
 } from '@tsgo/abstract';
 import { ptr, toArrayBuffer } from 'bun:ffi';
 import { describe, expect, it } from 'bun:test';
+import { expectArraysClose } from './util';
 
 describe('tsgo', () => {
 	it('returns `int`', () => {
@@ -289,8 +290,50 @@ describe('tsgo', () => {
 	});
 
 	it('struct field setters work', () => {
-		const StructBar = new _StructBar(_TestStruct());
-		StructBar.Field = 'hello';
-		expect(StructBar.Field).toBe('hello');
+		const ArrayField = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		const AnotherArray = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+		const DemoStruct = _DemoStruct.init({
+			ArrayField,
+			FieldToAnotherStruct: { AnotherArray, BacktoAnotherStruct: { AnotherArray } }
+		});
+		const StructBar = _StructBar.init({
+			Field: 'foo',
+			FieldWithWeirdJSONTag: 123,
+			ArrayField,
+			FieldThatShouldBeOptional: 'optional',
+			FieldThatShouldNotBeOptional: 'not optional',
+			FieldThatShouldBeReadonly: 'readonly',
+			StructField: DemoStruct
+		});
+		// set string field
+		const test_str_a = 'hello from string init in Bun runtime';
+		StructBar.Field = test_str_a;
+		expect(StructBar.Field).toBe(test_str_a);
+		// set numeric field
+		StructBar.FieldWithWeirdJSONTag = 1234567890;
+		expect(StructBar.FieldWithWeirdJSONTag).toBe(1234567890);
+		// set string pointer field
+		const test_str_b = 'no longer optional ;)';
+		StructBar.FieldThatShouldBeOptional = test_str_b;
+		expect(StructBar.FieldThatShouldBeOptional).toBe(test_str_b);
+		// set array field
+		const testArray: number[] = new Array(100).fill(Math.random());
+		StructBar.ArrayField = testArray;
+		expectArraysClose(StructBar.ArrayField, testArray);
+		// set struct field
+		const test_demostruct = _DemoStruct.init({
+			ArrayField: testArray,
+			FieldToAnotherStruct: {
+				AnotherArray: testArray,
+				BacktoAnotherStruct: { AnotherArray: testArray }
+			}
+		});
+		StructBar.StructField = test_demostruct;
+		expectArraysClose(StructBar.StructField.ArrayField, testArray);
+		expectArraysClose(StructBar.StructField.FieldToAnotherStruct.AnotherArray, testArray);
+		expectArraysClose(
+			StructBar.StructField.FieldToAnotherStruct.BacktoAnotherStruct.AnotherArray,
+			testArray
+		);
 	});
 });

@@ -271,11 +271,13 @@ func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
 }
 
 //export _SET_StructBar_Field
-func _SET_StructBar_Field(handle C.uintptr_t, _SET_VALUE_Field *C.char) {
+func _SET_StructBar_Field(handle C.uintptr_t, _SET_VALUE_Field *C.char) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := abstract.Foo(C.GoString(_SET_VALUE_Field))
   s.Field = temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_FieldWithWeirdJSONTag
@@ -287,10 +289,12 @@ func _GET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t) C.int64_t {
 }
 
 //export _SET_StructBar_FieldWithWeirdJSONTag
-func _SET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t, _SET_VALUE_FieldWithWeirdJSONTag C.int64_t, _SET_VALUE_LEN C.size_t) {
+func _SET_StructBar_FieldWithWeirdJSONTag(handle C.uintptr_t, _SET_VALUE_FieldWithWeirdJSONTag C.int64_t, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   s.FieldWithWeirdJSONTag = int64(_SET_VALUE_FieldWithWeirdJSONTag)
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_FieldThatShouldBeOptional
@@ -306,11 +310,13 @@ func _GET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t) *C.char {
 }
 
 //export _SET_StructBar_FieldThatShouldBeOptional
-func _SET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeOptional *C.char) {
+func _SET_StructBar_FieldThatShouldBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeOptional *C.char) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := C.GoString(_SET_VALUE_FieldThatShouldBeOptional)
   s.FieldThatShouldBeOptional = &temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_FieldThatShouldNotBeOptional
@@ -323,11 +329,13 @@ func _GET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t) *C.char {
 }
 
 //export _SET_StructBar_FieldThatShouldNotBeOptional
-func _SET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldNotBeOptional *C.char) {
+func _SET_StructBar_FieldThatShouldNotBeOptional(handle C.uintptr_t, _SET_VALUE_FieldThatShouldNotBeOptional *C.char) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := C.GoString(_SET_VALUE_FieldThatShouldNotBeOptional)
   s.FieldThatShouldNotBeOptional = &temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_FieldThatShouldBeReadonly
@@ -340,11 +348,13 @@ func _GET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t) *C.char {
 }
 
 //export _SET_StructBar_FieldThatShouldBeReadonly
-func _SET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeReadonly *C.char) {
+func _SET_StructBar_FieldThatShouldBeReadonly(handle C.uintptr_t, _SET_VALUE_FieldThatShouldBeReadonly *C.char) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := C.GoString(_SET_VALUE_FieldThatShouldBeReadonly)
   s.FieldThatShouldBeReadonly = temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_ArrayField
@@ -359,11 +369,13 @@ func _GET_StructBar_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 }
 
 //export _SET_StructBar_ArrayField
-func _SET_StructBar_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_StructBar_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
   s.ArrayField = temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_StructBar_StructField
@@ -388,11 +400,13 @@ func _GET_DemoStruct_ArrayField(handle C.uintptr_t) unsafe.Pointer {
 }
 
 //export _SET_DemoStruct_ArrayField
-func _SET_DemoStruct_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_DemoStruct_ArrayField(handle C.uintptr_t, _SET_VALUE_ArrayField unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
   temp := unsafe.Slice((*float32)(_SET_VALUE_ArrayField), _SET_VALUE_LEN)
   s.ArrayField = &temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_DemoStruct_FieldToAnotherStruct
@@ -417,11 +431,13 @@ func _GET_DemoStruct2_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 }
 
 //export _SET_DemoStruct2_AnotherArray
-func _SET_DemoStruct2_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_DemoStruct2_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
   temp := unsafe.Slice((*float64)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
   s.AnotherArray = &temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _GET_DemoStruct2_BacktoAnotherStruct
@@ -446,11 +462,13 @@ func _GET_DemoStruct3_AnotherArray(handle C.uintptr_t) unsafe.Pointer {
 }
 
 //export _SET_DemoStruct3_AnotherArray
-func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct3)
   temp := unsafe.Slice((*float32)(_SET_VALUE_AnotherArray), _SET_VALUE_LEN)
   s.AnotherArray = &temp
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _DISPOSE_Struct
@@ -468,12 +486,14 @@ func _INIT_DemoStruct3(a unsafe.Pointer, a_len C.uint64_t) unsafe.Pointer {
 }
 
 //export _SET_DemoStruct2_BacktoAnotherStruct
-func _SET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t, _SET_VALUE_BacktoAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_DemoStruct2_BacktoAnotherStruct(handle C.uintptr_t, _SET_VALUE_BacktoAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct2)
   value_h := cgo.Handle(_SET_VALUE_BacktoAnotherStruct)
   value_s := value_h.Value().(abstract.DemoStruct3)
   s.BacktoAnotherStruct = &value_s
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _INIT_DemoStruct2
@@ -486,12 +506,14 @@ func _INIT_DemoStruct2(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe
 }
 
 //export _SET_DemoStruct_FieldToAnotherStruct
-func _SET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t, _SET_VALUE_FieldToAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_DemoStruct_FieldToAnotherStruct(handle C.uintptr_t, _SET_VALUE_FieldToAnotherStruct unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.DemoStruct)
   value_h := cgo.Handle(_SET_VALUE_FieldToAnotherStruct)
   value_s := value_h.Value().(abstract.DemoStruct2)
   s.FieldToAnotherStruct = &value_s
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _INIT_DemoStruct
@@ -504,12 +526,14 @@ func _INIT_DemoStruct(a unsafe.Pointer, a_len C.uint64_t, b C.uintptr_t) unsafe.
 }
 
 //export _SET_StructBar_StructField
-func _SET_StructBar_StructField(handle C.uintptr_t, _SET_VALUE_StructField unsafe.Pointer, _SET_VALUE_LEN C.size_t) {
+func _SET_StructBar_StructField(handle C.uintptr_t, _SET_VALUE_StructField unsafe.Pointer, _SET_VALUE_LEN C.size_t) unsafe.Pointer {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   value_h := cgo.Handle(_SET_VALUE_StructField)
   value_s := value_h.Value().(abstract.DemoStruct)
   s.StructField = &value_s
+  h.Delete()
+  return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
 }
 
 //export _INIT_StructBar
