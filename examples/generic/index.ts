@@ -21,29 +21,29 @@ export type Any =
 export type Empty = any;
 export type Something = any;
 
-export interface IEmptyStruct {
+export interface EmptyStruct {
 }
-export interface IValAndPtr<V extends any, PT extends (V | undefined), Unused extends number /* uint64 */> {
+export interface ValAndPtr<V extends any, PT extends (V | undefined), Unused extends number /* uint64 */> {
   Val: V;
   /**
    * Comment for ptr field
    */
   Ptr: PT; // ptr line comment
 }
-export interface IABCD<A extends string, B extends string, C extends UnionType, D extends number /* int64 */ | boolean> {
+export interface ABCD<A extends string, B extends string, C extends UnionType, D extends number /* int64 */ | boolean> {
   a: A;
   b: B;
   c: C;
   d: D;
 }
-export interface IFoo<A extends string | number /* uint64 */, B extends (A | undefined)> {
+export interface Foo<A extends string | number /* uint64 */, B extends (A | undefined)> {
   Bar: A;
   Boo: B;
 }
-export interface IWithFooGenericTypeArg<A extends Foo<string, string | undefined>> {
+export interface WithFooGenericTypeArg<A extends Foo<string, string | undefined>> {
   some_field: A;
 }
-export interface ISingle<S extends string | number /* uint */> {
+export interface Single<S extends string | number /* uint */> {
   Field: S;
 }
 export type SingleSpecific = Single<string>;

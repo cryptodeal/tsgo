@@ -507,12 +507,7 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		if t.String() == "any" {
 			s.WriteString(getIdent(g.conf.FallbackType))
 		} else {
-			tempType := getIdent(t.String())
-			if isStruct(tempType) && g.conf.FFIBindings {
-				s.WriteString(fmt.Sprintf("I%s | %s", tempType, tempType))
-			} else {
-				s.WriteString(tempType)
-			}
+			s.WriteString(getIdent(t.String()))
 		}
 	case *ast.SelectorExpr:
 		// fmt.Println("writeType - *ast.SelectorExpr", t)
@@ -734,8 +729,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 		s.WriteString(": ")
 
 		if tstype == "" {
-			var tempType strings.Builder
-			g.writeType(&tempType, f.Type, depth, false)
+			g.writeType(s, f.Type, depth, false)
 			var tempSB strings.Builder
 			g.writeCGoType(&tempSB, f.Type, depth, false)
 			cgoType := tempSB.String()
@@ -755,9 +749,7 @@ func (g *PackageGenerator) writeStructFields(s *strings.Builder, fields []*ast.F
 				field_func.isHandleFn = nil
 			}
 			if g.conf.FFIBindings && field_func.isHandleFn != nil {
-				s.WriteString(fmt.Sprintf("I%s | %s", tempType.String(), *field_func.isHandleFn))
-			} else {
-				s.WriteString(tempType.String())
+				s.WriteString(fmt.Sprintf(" | _%s", *field_func.isHandleFn))
 			}
 			field_func.returns = append(field_func.returns, res_helper)
 		} else {
