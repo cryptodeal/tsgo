@@ -345,7 +345,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 					s.WriteString(fmt.Sprintf("get %s(): ", *f.name))
 					tempType := g.getJSFromFFIType(f.returns[0].FFIType)
 					if f.isHandleFn != nil && f.returns[0].FFIType == "FFIType.ptr" {
-						s.WriteString(fmt.Sprintf("_%s | undefined", *f.isHandleFn))
+						s.WriteString(fmt.Sprintf("%s | undefined", *f.isHandleFn))
 					} else if f.isHandleFn != nil {
 						s.WriteString(fmt.Sprintf(*f.isHandleFn))
 					} else if *f.arrayType != "" {
@@ -369,7 +369,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						g.writeIndent(s, 2)
 						s.WriteString("if (!ptr) return undefined;\n")
 						g.writeIndent(s, 2)
-						s.WriteString(fmt.Sprintf("return new _%s(ptr);\n", *f.isHandleFn))
+						s.WriteString(fmt.Sprintf("return new %s(ptr);\n", *f.isHandleFn))
 					} else if *f.arrayType != "" {
 						s.WriteString(fmt.Sprintf("const ptr = %s.native(this._ptr);\n", *f.fnName))
 						g.writeIndent(s, 2)
@@ -404,7 +404,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						tempArgs = append(tempArgs, "val.length")
 					} else if f.isHandleFn != nil {
 						g.writeIndent(s, 2)
-						s.WriteString(fmt.Sprintf("const parsed_value = val instanceof _%s ? val : _%s.init(val);\n", *f.isHandleFn, *f.isHandleFn))
+						s.WriteString(fmt.Sprintf("const parsed_value = val instanceof %s ? val : %s.init(val);\n", *f.isHandleFn, *f.isHandleFn))
 						tempArgs = append(tempArgs, "parsed_value.ptr")
 					} else if f.returns[0].FFIType == "FFIType.cstring" {
 						g.writeIndent(s, 2)

@@ -11,39 +11,39 @@ export type UnionType =
     /**
      * Comment for fields are possible
      */
-    number /* uint64 */ | Istring | boolean | undefined // comment after
+    number /* uint64 */ | string | boolean | undefined // comment after
 ;
 export type Derived = 
-    number /* int */ | Istring // Line comment
+    number /* int */ | string // Line comment
 ;
 export type Any = 
-    Istring | Iany;
+    string | any;
 export type Empty = any;
-export type Something = Iany;
+export type Something = any;
 
 export interface IEmptyStruct {
 }
-export interface IValAndPtr<V extends Iany, PT extends (IV | undefined), Unused extends number /* uint64 */> {
-  Val: IV;
+export interface IValAndPtr<V extends any, PT extends (V | undefined), Unused extends number /* uint64 */> {
+  Val: V;
   /**
    * Comment for ptr field
    */
-  Ptr: IPT; // ptr line comment
+  Ptr: PT; // ptr line comment
 }
-export interface IABCD<A extends Istring, B extends Istring, C extends IUnionType, D extends number /* int64 */ | boolean> {
-  a: IA;
-  b: IB;
-  c: IC;
-  d: ID;
+export interface IABCD<A extends string, B extends string, C extends UnionType, D extends number /* int64 */ | boolean> {
+  a: A;
+  b: B;
+  c: C;
+  d: D;
 }
-export interface IFoo<A extends Istring | number /* uint64 */, B extends (IA | undefined)> {
-  Bar: IA;
-  Boo: IB;
+export interface IFoo<A extends string | number /* uint64 */, B extends (A | undefined)> {
+  Bar: A;
+  Boo: B;
 }
-export interface IWithFooGenericTypeArg<A extends IFoo<Istring, Istring | undefined>> {
-  some_field: IA;
+export interface IWithFooGenericTypeArg<A extends Foo<string, string | undefined>> {
+  some_field: A;
 }
-export interface ISingle<S extends Istring | number /* uint */> {
-  Field: IS;
+export interface ISingle<S extends string | number /* uint */> {
+  Field: S;
 }
-export type SingleSpecific = ISingle<Istring>;
+export type SingleSpecific = Single<string>;
