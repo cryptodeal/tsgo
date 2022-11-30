@@ -507,7 +507,12 @@ func (g *PackageGenerator) writeType(s *strings.Builder, t ast.Expr, depth int, 
 		if t.String() == "any" {
 			s.WriteString(getIdent(g.conf.FallbackType))
 		} else {
-			s.WriteString(getIdent(t.String()))
+			tempType := getIdent(t.String())
+			if isStruct(tempType) && g.conf.FFIBindings {
+				s.WriteString(fmt.Sprintf("I%s | %s", tempType, tempType))
+			} else {
+				s.WriteString(tempType)
+			}
 		}
 	case *ast.SelectorExpr:
 		// fmt.Println("writeType - *ast.SelectorExpr", t)

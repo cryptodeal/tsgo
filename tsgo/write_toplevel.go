@@ -82,7 +82,11 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
-		s.WriteString(fmt.Sprintf("export interface I%s", ts.Name.Name))
+		if g.conf.FFIBindings {
+			s.WriteString(fmt.Sprintf("export interface I%s", ts.Name.Name))
+		} else {
+			s.WriteString(fmt.Sprintf("export interface %s", ts.Name.Name))
+		}
 		if ts.TypeParams != nil {
 			g.writeTypeParamsFields(s, ts.TypeParams.List)
 		}

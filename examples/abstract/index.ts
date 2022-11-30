@@ -83,16 +83,18 @@ export interface IDemoStruct3 {
 
 export const {
   symbols: {
+    _Int32ArgTest,
     _TestMap,
-    _Int32ArrayTest,
-    _Uint32ArrayTest,
-    _Uint64ArrayTest,
-    _StringTest,
-    _Uint32ArgTest,
-    _Uint64ArgTest,
-    _Float32ArrayTest,
     genDisposePtr,
-    _TestStruct,
+    _Float32ArrayTest,
+    arraySize,
+    _Float64ArrayTest,
+    _Uint32ArrayTest,
+    _StringTest,
+    _Float64ArgTest,
+    _Int64ArgTest,
+    _IntTest,
+    _TestStruct2,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _SET_StructBar_Field,
@@ -122,22 +124,54 @@ export const {
     _INIT_DemoStruct3,
     _SET_DemoStruct3_AnotherArray,
     _GET_DemoStruct3_AnotherArray,
-    _TestStruct2,
-    arraySize,
-    _Int64ArrayTest,
-    _Int32ArgTest,
-    _IntTest,
-    _Float64ArrayTest,
+    _TestStruct,
+    _Uint64ArrayTest,
+    _Uint64ArgTest,
+    _Int32ArrayTest,
     _Float32ArgTest,
-    _Float64ArgTest,
-    _Int64ArgTest
+    _Uint32ArgTest,
+    _Int64ArrayTest
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Float64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
   _Float32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  genDisposePtr: {
+  arraySize: {
+    args: [FFIType.ptr],
+    returns: FFIType.u64_fast
+  },
+  _Float64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _TestStruct: {
@@ -261,54 +295,7 @@ export const {
   _TestStruct2: {
     returns: FFIType.ptr
   },
-  arraySize: {
-    args: [FFIType.ptr],
-    returns: FFIType.u64_fast
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Float64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Float32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
   _Int32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
@@ -316,8 +303,21 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _StringTest: {
-    returns: FFIType.cstring
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
   }
 })
 
@@ -395,14 +395,14 @@ export class StructBar implements IStructBar {
     this._updatePtr(_SET_StructBar_ArrayField(this._ptr, ptr(val), val.length));
   }
 
-  get StructField(): _DemoStruct | undefined {
+  get StructField(): DemoStruct | undefined {
     const ptr = _GET_StructBar_StructField.native(this._ptr);
     if (!ptr) return undefined;
-    return new _DemoStruct(ptr);
+    return new DemoStruct(ptr);
   }
 
   set StructField(val: StructBar["StructField"]) {
-    const parsed_value = val instanceof _DemoStruct ? val : _DemoStruct.init(val);
+    const parsed_value = val instanceof DemoStruct ? val : DemoStruct.init(val);
     this._updatePtr(_SET_StructBar_StructField(this._ptr, parsed_value.ptr));
   }
 
@@ -454,14 +454,14 @@ export class DemoStruct implements IDemoStruct {
     this._updatePtr(_SET_DemoStruct_ArrayField(this._ptr, ptr(val), val.length));
   }
 
-  get FieldToAnotherStruct(): _DemoStruct2 | undefined {
+  get FieldToAnotherStruct(): DemoStruct2 | undefined {
     const ptr = _GET_DemoStruct_FieldToAnotherStruct.native(this._ptr);
     if (!ptr) return undefined;
-    return new _DemoStruct2(ptr);
+    return new DemoStruct2(ptr);
   }
 
   set FieldToAnotherStruct(val: DemoStruct["FieldToAnotherStruct"]) {
-    const parsed_value = val instanceof _DemoStruct2 ? val : _DemoStruct2.init(val);
+    const parsed_value = val instanceof DemoStruct2 ? val : DemoStruct2.init(val);
     this._updatePtr(_SET_DemoStruct_FieldToAnotherStruct(this._ptr, parsed_value.ptr));
   }
 
@@ -509,14 +509,14 @@ export class DemoStruct2 implements IDemoStruct2 {
     this._updatePtr(_SET_DemoStruct2_AnotherArray(this._ptr, ptr(val), val.length));
   }
 
-  get BacktoAnotherStruct(): _DemoStruct3 | undefined {
+  get BacktoAnotherStruct(): DemoStruct3 | undefined {
     const ptr = _GET_DemoStruct2_BacktoAnotherStruct.native(this._ptr);
     if (!ptr) return undefined;
-    return new _DemoStruct3(ptr);
+    return new DemoStruct3(ptr);
   }
 
   set BacktoAnotherStruct(val: DemoStruct2["BacktoAnotherStruct"]) {
-    const parsed_value = val instanceof _DemoStruct3 ? val : _DemoStruct3.init(val);
+    const parsed_value = val instanceof DemoStruct3 ? val : DemoStruct3.init(val);
     this._updatePtr(_SET_DemoStruct2_BacktoAnotherStruct(this._ptr, parsed_value.ptr));
   }
 
