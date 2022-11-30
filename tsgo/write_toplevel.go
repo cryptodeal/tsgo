@@ -82,7 +82,7 @@ func (g *PackageGenerator) writeTypeSpec(s *strings.Builder, ts *ast.TypeSpec, g
 
 	st, isStruct := ts.Type.(*ast.StructType)
 	if isStruct {
-		s.WriteString(fmt.Sprintf("export interface %s", ts.Name.Name))
+		s.WriteString(fmt.Sprintf("export interface I%s", ts.Name.Name))
 		if ts.TypeParams != nil {
 			g.writeTypeParamsFields(s, ts.TypeParams.List)
 		}
@@ -194,7 +194,7 @@ type InitStructParam struct {
 
 func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper, fmtr cases.Caser) {
 	g.writeIndent(s, 1)
-	s.WriteString(fmt.Sprintf("static init(struct: %s): _%s {\n", *cw.name, *cw.name))
+	s.WriteString(fmt.Sprintf("static init(struct: %s | I%s): %s {\n", *cw.name, *cw.name, *cw.name))
 	var constDestFields = []*StructAccessor{}
 	var letDestFields = []*StructAccessor{}
 	var usedArgs = []*InitStructParam{}
@@ -247,7 +247,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 		} else if c.isHandleFn != nil {
 			g.writeIndent(s, 2)
 			arg_name := fmt.Sprintf("_%s", *c.name)
-			s.WriteString(fmt.Sprintf("const %s = %s instanceof _%s ? %s : _%s.init(%s);\n", arg_name, *c.name, *c.isHandleFn, *c.name, *c.isHandleFn, *c.name))
+			s.WriteString(fmt.Sprintf("const %s = %s instanceof %s ? %s : %s.init(%s);\n", arg_name, *c.name, *c.isHandleFn, *c.name, *c.isHandleFn, *c.name))
 			var param = &InitStructParam{Name: arg_name, IsStruct: true, IsPtr: false}
 			usedArgs = append(usedArgs, param)
 		} else {
@@ -271,7 +271,7 @@ func (g *PackageGenerator) writeInitMethod(s *strings.Builder, cw *ClassWrapper,
 
 	// write return fn
 	g.writeIndent(s, 2)
-	s.WriteString(fmt.Sprintf("return new _%s(_INIT_%s.native(", *cw.name, *cw.name))
+	s.WriteString(fmt.Sprintf("return new %s(_INIT_%s.native(", *cw.name, *cw.name))
 	argCount := len(usedArgs)
 	i := 0
 	for _, v := range cw.fieldAccessors {
@@ -319,7 +319,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 	for _, c := range *class_wrappers {
 		if v, ok := g.ffi.StructHelpers[*c.name]; ok && len(v) > 0 {
 			if !struct_wrappers[*c.name] {
-				s.WriteString(fmt.Sprintf("export class _%s {\n", *c.name))
+				s.WriteString(fmt.Sprintf("export class %s implements I%s {\n", *c.name, *c.name))
 				g.writeIndent(s, 1)
 				s.WriteString("private _ptr: number;\n\n")
 				g.writeIndent(s, 1)

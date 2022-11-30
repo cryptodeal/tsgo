@@ -474,7 +474,6 @@ func _SET_DemoStruct3_AnotherArray(handle C.uintptr_t, _SET_VALUE_AnotherArray u
 //export _DISPOSE_Struct
 func _DISPOSE_Struct(handle C.uintptr_t) {
   h := cgo.Handle(handle)
-  fmt.Println("deleted handle @ uintptr:", handle)
   h.Delete()
 }
 
