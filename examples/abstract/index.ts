@@ -83,23 +83,7 @@ export interface DemoStruct3 {
 
 export const {
   symbols: {
-    arraySize,
-    _Float64ArrayTest,
-    _TestMap,
-    genDisposePtr,
-    _Int64ArrayTest,
-    _Uint32ArrayTest,
-    _StringTest,
-    _Int32ArgTest,
-    _Float32ArrayTest,
-    _Int32ArrayTest,
-    _Uint64ArrayTest,
-    _Float32ArgTest,
-    _IntTest,
-    _Int64ArgTest,
-    _Uint32ArgTest,
-    _Uint64ArgTest,
-    _TestStruct,
+    _TestStruct2,
     _DISPOSE_Struct,
     _INIT_StructBar,
     _SET_StructBar_Field,
@@ -129,10 +113,41 @@ export const {
     _INIT_DemoStruct3,
     _SET_DemoStruct3_AnotherArray,
     _GET_DemoStruct3_AnotherArray,
-    _TestStruct2,
-    _Float64ArgTest
+    _IntTest,
+    arraySize,
+    _Float64ArrayTest,
+    _Uint64ArrayTest,
+    _Float32ArgTest,
+    _Int32ArgTest,
+    _Int64ArgTest,
+    _Float32ArrayTest,
+    genDisposePtr,
+    _Uint32ArgTest,
+    _TestMap,
+    _Float64ArgTest,
+    _Int32ArrayTest,
+    _Int64ArrayTest,
+    _Uint32ArrayTest,
+    _StringTest,
+    _Uint64ArgTest,
+    _TestStruct,
   }
 } = dlopen(import.meta.dir + '/abstract/gen_bindings.dylib', {
+  _Int64ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Uint32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _StringTest: {
+    returns: FFIType.cstring
+  },
+  _Uint64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
   _TestStruct: {
     returns: FFIType.ptr
   },
@@ -144,8 +159,7 @@ export const {
     returns: FFIType.ptr
   },
   _SET_StructBar_Field: {
-    args: [FFIType.ptr, FFIType.cstring],
-    returns: FFIType.ptr
+    args: [FFIType.ptr, FFIType.cstring]
   },
   _GET_StructBar_Field: {
     args: [FFIType.ptr],
@@ -197,14 +211,14 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _SET_DemoStruct_ArrayField: {
+  _SET_StructField_ArrayField: {
     args: [FFIType.ptr, FFIType.ptr, FFIType.u64_fast]
   },
   _GET_DemoStruct_ArrayField: {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _SET_DemoStruct_FieldToAnotherStruct: {
+  _SET_StructField_FieldToAnotherStruct: {
     args: [FFIType.ptr, FFIType.ptr]
   },
   _GET_DemoStruct_FieldToAnotherStruct: {
@@ -215,14 +229,14 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _SET_DemoStruct2_AnotherArray: {
+  _SET_FieldToAnotherStruct_AnotherArray: {
     args: [FFIType.ptr, FFIType.ptr, FFIType.u64_fast]
   },
   _GET_DemoStruct2_AnotherArray: {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _SET_DemoStruct2_BacktoAnotherStruct: {
+  _SET_FieldToAnotherStruct_BacktoAnotherStruct: {
     args: [FFIType.ptr, FFIType.ptr]
   },
   _GET_DemoStruct2_BacktoAnotherStruct: {
@@ -233,33 +247,15 @@ export const {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   },
-  _SET_DemoStruct3_AnotherArray: {
+  _SET_BacktoAnotherStruct_AnotherArray: {
     args: [FFIType.ptr, FFIType.ptr, FFIType.u64_fast]
   },
   _GET_DemoStruct3_AnotherArray: {
     args: [FFIType.ptr],
     returns: FFIType.ptr
   },
-  _TestStruct2: {
-    returns: FFIType.ptr
-  },
-  _Float64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Int64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Uint64ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  genDisposePtr: {
+  _Int32ArrayTest: {
+    args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   arraySize: {
@@ -270,41 +266,44 @@ export const {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
-  _TestMap: {
-    returns: FFIType.cstring
-  },
-  _Int32ArgTest: {
-    args: [FFIType.ptr, FFIType.u64_fast],
-    returns: FFIType.ptr
-  },
-  _Float32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Int64ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _Uint32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
-  _StringTest: {
-    returns: FFIType.cstring
-  },
-  _IntTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.int
-  },
-  _Int32ArrayTest: {
-    args: [FFIType.cstring],
-    returns: FFIType.ptr
-  },
   _Uint64ArrayTest: {
     args: [FFIType.cstring],
     returns: FFIType.ptr
   },
   _Float32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _Int64ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestStruct2: {
+    returns: FFIType.ptr
+  },
+  _IntTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.int
+  },
+  genDisposePtr: {
+    returns: FFIType.ptr
+  },
+  _Uint32ArgTest: {
+    args: [FFIType.ptr, FFIType.u64_fast],
+    returns: FFIType.ptr
+  },
+  _TestMap: {
+    returns: FFIType.cstring
+  },
+  _Float32ArrayTest: {
+    args: [FFIType.cstring],
+    returns: FFIType.ptr
+  },
+  _Float64ArgTest: {
     args: [FFIType.ptr, FFIType.u64_fast],
     returns: FFIType.ptr
   }
@@ -332,8 +331,8 @@ export class _StructBar {
   }
 
   set Field(val: StructBar["Field"]) {
-    const parsed_val = Buffer.from(val + '/0', "utf8");
-     this._ptr =  _SET_StructBar_Field(this._ptr, ptr(parsed_val));
+    const parsed_val = Buffer.from(val + "\x00", "utf8");
+    _SET_StructBar_Field(this._ptr, ptr(parsed_val));
   }
 
   get FieldWithWeirdJSONTag(): number {
@@ -349,7 +348,7 @@ export class _StructBar {
   }
 
   set FieldThatShouldBeOptional(val: StructBar["FieldThatShouldBeOptional"]) {
-    const parsed_val = Buffer.from(val + '/0', "utf8");
+    const parsed_val = Buffer.from(val + "\x00", "utf8");
     _SET_StructBar_FieldThatShouldBeOptional(this._ptr, ptr(parsed_val));
   }
 
@@ -358,7 +357,7 @@ export class _StructBar {
   }
 
   set FieldThatShouldNotBeOptional(val: StructBar["FieldThatShouldNotBeOptional"]) {
-    const parsed_val = Buffer.from(val + '/0', "utf8");
+    const parsed_val = Buffer.from(val + "\x00", "utf8");
     _SET_StructBar_FieldThatShouldNotBeOptional(this._ptr, ptr(parsed_val));
   }
 
@@ -367,7 +366,7 @@ export class _StructBar {
   }
 
   set FieldThatShouldBeReadonly(val: StructBar["FieldThatShouldBeReadonly"]) {
-    const parsed_val = Buffer.from(val + '/0', "utf8");
+    const parsed_val = Buffer.from(val + "\x00", "utf8");
     _SET_StructBar_FieldThatShouldBeReadonly(this._ptr, ptr(parsed_val));
   }
 
@@ -398,10 +397,10 @@ export class _StructBar {
   static init(struct: StructBar): _StructBar {
     const { Field, FieldWithWeirdJSONTag, FieldThatShouldBeOptional, FieldThatShouldNotBeOptional, FieldThatShouldBeReadonly, StructField } = struct;
     let { ArrayField } = struct;
-    const _Field = Buffer.from(Field + '/0', "utf8");
-    const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + '/0', "utf8");
-    const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + '/0', "utf8");
-    const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + '/0', "utf8");
+    const _Field = Buffer.from(Field + "\x00", "utf8");
+    const _FieldThatShouldBeOptional = Buffer.from(FieldThatShouldBeOptional + "\x00", "utf8");
+    const _FieldThatShouldNotBeOptional = Buffer.from(FieldThatShouldNotBeOptional + "\x00", "utf8");
+    const _FieldThatShouldBeReadonly = Buffer.from(FieldThatShouldBeReadonly + "\x00", "utf8");
     const _StructField = StructField instanceof _DemoStruct ? StructField : _DemoStruct.init(StructField);
     if (!(ArrayField instanceof Float32Array)) ArrayField = new Float32Array(ArrayField);
     return new _StructBar(_INIT_StructBar.native(ptr(_Field), FieldWithWeirdJSONTag, ptr(_FieldThatShouldBeOptional), ptr(_FieldThatShouldNotBeOptional), ptr(_FieldThatShouldBeReadonly), ptr(ArrayField), ArrayField.length, _StructField.ptr));

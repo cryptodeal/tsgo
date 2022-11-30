@@ -271,14 +271,11 @@ func _GET_StructBar_Field(handle C.uintptr_t) *C.char {
 }
 
 //export _SET_StructBar_Field
-func _SET_StructBar_Field(handle C.uintptr_t, _SET_VALUE_Field *C.char) unsafe.Pointer {
+func _SET_StructBar_Field(handle C.uintptr_t, _SET_VALUE_Field *C.char) {
   h := cgo.Handle(handle)
   s := h.Value().(abstract.StructBar)
   temp := abstract.Foo(C.GoString(_SET_VALUE_Field))
   s.Field = temp
-	h.Delete()
-	return C.hackyHandle(C.uintptr_t(cgo.NewHandle(s)))
-
 }
 
 //export _GET_StructBar_FieldWithWeirdJSONTag
