@@ -327,7 +327,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 2)
 				s.WriteString("this._ptr = ptr;\n")
 				g.writeIndent(s, 2)
-				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr });\n")
+				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr }, this);\n")
 				g.writeIndent(s, 1)
 				s.WriteString("}\n\n")
 
@@ -414,7 +414,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 						tempArgs = append(tempArgs, "val")
 					}
 					g.writeIndent(s, 2)
-					s.WriteString(fmt.Sprintf("_SET_%s_%s(this._ptr, ", *c.name, *f.name))
+					s.WriteString(fmt.Sprintf("this._updatePtr(_SET_%s_%s(this._ptr, ", *c.name, *f.name))
 					tempArgLen := len(tempArgs)
 					for i, arg := range tempArgs {
 						s.WriteString(arg)
@@ -422,13 +422,25 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 							s.WriteString(", ")
 						}
 					}
-					s.WriteString(");\n")
+					s.WriteString("));\n")
 					g.writeIndent(s, 1)
 					s.WriteString("}\n\n")
 				}
 
 				// write static method to init new Go Struct
 				g.writeInitMethod(s, c, fmtr)
+
+				// write _updatePtr private class method
+				g.writeIndent(s, 1)
+				s.WriteString("private _updatePtr(ptr: number): void {\n")
+				g.writeIndent(s, 2)
+				s.WriteString("registry.unregister(this);\n")
+				g.writeIndent(s, 2)
+				s.WriteString("this._ptr = ptr;\n")
+				g.writeIndent(s, 2)
+				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr }, this);\n")
+				g.writeIndent(s, 1)
+				s.WriteString("}\n")
 
 				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)
@@ -555,7 +567,9 @@ func (g *PackageGenerator) writeNestedFieldConfig(s *strings.Builder, v *StructA
 			if fa.arrayType != nil && *fa.arrayType != "" {
 				s.WriteString(", FFIType.u64_fast")
 			}
-			s.WriteString("]\n")
+			s.WriteString("],\n")
+			g.writeIndent(s, 2)
+			s.WriteString("returns: FFIType.ptr\n")
 			g.writeIndent(s, 1)
 			s.WriteString("},\n")
 
