@@ -5,8 +5,8 @@
 // source: author.go
 
 export interface IAuthorBookListing {
-  author_name: IIstring;
-  written_books: IIBook[];
+  author_name: Istring;
+  written_books: IBook[];
 }
 
 //////////
@@ -17,20 +17,20 @@ export interface IChapter {
   /**
    * Chapter title
    */
-  title: IIstring;
+  title: Istring;
   /**
    * The amount of words in this chapter
    */
-  number_of_words: Inumber /* uint */;
+  number_of_words: number /* uint */;
 }
 export interface IBook {
-  book_id: Istring; // A line comment about BookID that should be kept.
-  title: IIstring;
+  book_id: string; // A line comment about BookID that should be kept.
+  title: Istring;
   /**
    * ISBN identifier of the book, null if not known.
    */
-  isbn: IIISBN;
+  isbn: IISBN;
   genre: 'novel' | 'crime' | 'fantasy';
-  chapters: IIChapter[];
-  published_at?: Istring /* RFC 3339 formatted */;
+  chapters: IChapter[];
+  published_at?: string /* RFC 3339 formatted */;
 }

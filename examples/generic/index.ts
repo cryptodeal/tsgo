@@ -24,26 +24,26 @@ export type Something = Iany;
 export interface IEmptyStruct {
 }
 export interface IValAndPtr<V extends Iany, PT extends (IV | undefined), Unused extends number /* uint64 */> {
-  Val: IIV;
+  Val: IV;
   /**
    * Comment for ptr field
    */
-  Ptr: IIPT; // ptr line comment
+  Ptr: IPT; // ptr line comment
 }
 export interface IABCD<A extends Istring, B extends Istring, C extends IUnionType, D extends number /* int64 */ | boolean> {
-  a: IIA;
-  b: IIB;
-  c: IIC;
-  d: IID;
+  a: IA;
+  b: IB;
+  c: IC;
+  d: ID;
 }
 export interface IFoo<A extends Istring | number /* uint64 */, B extends (IA | undefined)> {
-  Bar: IIA;
-  Boo: IIB;
+  Bar: IA;
+  Boo: IB;
 }
 export interface IWithFooGenericTypeArg<A extends IFoo<Istring, Istring | undefined>> {
-  some_field: IIA;
+  some_field: IA;
 }
 export interface ISingle<S extends Istring | number /* uint */> {
-  Field: IIS;
+  Field: IS;
 }
 export type SingleSpecific = ISingle<Istring>;

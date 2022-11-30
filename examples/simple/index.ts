@@ -18,19 +18,19 @@ export interface IUserEntry {
    * for uuid.NullUUID in the config file.
    */
   id: string | null;
-  prefs: I{ [key: Istring]: {
-    foo: Inumber /* uint32 */;
+  prefs: { [key: Istring]: {
+    foo: number /* uint32 */;
     /**
      * An unknown type without a `tstype` tag or mapping in the config file
      * uses the `fallback_type`, which defaults to `any`.
      */
-    bar: Iany /* uuid.UUID */;
+    bar: any /* uuid.UUID */;
   }};
-  address?: IIstring;
-  nickname?: IIstring;
-  role: IIUserRole;
-  complex: IIComplexType;
+  address?: Istring;
+  nickname?: Istring;
+  role: IUserRole;
+  complex: IComplexType;
 }
 export interface IListUsersResponse {
-  users: IIUserEntry[];
+  users: IUserEntry[];
 }

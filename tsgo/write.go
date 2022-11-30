@@ -44,7 +44,7 @@ func getIdent(s string) string {
 		"complex64", "complex128":
 		return "number /* " + s + " */"
 	}
-	return fmt.Sprintf("I%s", s)
+	return s
 }
 
 func getByteSize(s string) int {
