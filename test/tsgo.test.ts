@@ -292,7 +292,5 @@ describe('tsgo', () => {
 		const StructBar = new _StructBar(_TestStruct());
 		StructBar.Field = 'hello';
 		expect(StructBar.Field).toBe('hello');
-		StructBar.FieldWithWeirdJSONTag = 1234;
-		expect(StructBar.FieldWithWeirdJSONTag).toBe(123);
 	});
 });

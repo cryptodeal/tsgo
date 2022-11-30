@@ -440,7 +440,7 @@ func (g *PackageGenerator) writeAccessorClasses(s *strings.Builder, class_wrappe
 				g.writeIndent(s, 2)
 				s.WriteString("registry.register(this, { cb: this._gc_dispose, ptr }, this);\n")
 				g.writeIndent(s, 1)
-				s.WriteString("}\n")
+				s.WriteString("}\n\n")
 
 				// write class method that frees `Handle` + CGo mem for struct @ GC
 				g.writeIndent(s, 1)
@@ -667,7 +667,9 @@ func (g *PackageGenerator) writeAccessorFieldConfig(s *strings.Builder, v *FFIFu
 			if fa.arrayType != nil && *fa.arrayType != "" {
 				s.WriteString(", FFIType.u64_fast")
 			}
-			s.WriteString("]\n")
+			s.WriteString("],\n")
+			g.writeIndent(s, 2)
+			s.WriteString("returns: FFIType.ptr\n")
 			g.writeIndent(s, 1)
 			s.WriteString("},\n")
 
