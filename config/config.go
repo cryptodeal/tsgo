@@ -1,8 +1,8 @@
 package config
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/cryptodeal/tsgo/tsgo"
 	"gopkg.in/yaml.v2"
@@ -11,7 +11,7 @@ import (
 const defaultFallbackType = "any"
 
 func ReadFromFilepath(cfgFilepath string) tsgo.Config {
-	b, err := ioutil.ReadFile(cfgFilepath)
+	b, err := os.ReadFile(cfgFilepath)
 	if err != nil {
 		log.Fatalf("Could not read config file from %s: %v", cfgFilepath, err)
 	}
