@@ -42,7 +42,6 @@ func (a *CPPArg) IsPtr() bool {
 }
 
 func parseHeader(path string) map[string]*CPPMethod {
-	methods := map[string]*CPPMethod{}
 	_, filename, _, ok := runtime.Caller(0)
 	if !ok {
 		err := errors.New("unable to get the path to cwd")
@@ -66,6 +65,36 @@ func parseHeader(path string) map[string]*CPPMethod {
 	}
 
 	n := tree.RootNode()
+	methods := parseMethods(n, input)
+	parseClasses(n, input)
+	return methods
+
+}
+
+func parseClasses(n *sitter.Node, input []byte) {
+	//classes := map[string]*CPPMethod{}
+	q, err := sitter.NewQuery([]byte("(class_specifier name: (type_identifier) @class_name)"), cpp.GetLanguage())
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
+	qc := sitter.NewQueryCursor()
+	qc.Exec(q, n)
+
+	for {
+		m, ok := qc.NextMatch()
+		if !ok {
+			break
+		}
+		for _, c := range m.Captures {
+			fmt.Println(c.Node.Content(input))
+		}
+	}
+}
+
+func parseMethods(n *sitter.Node, input []byte) map[string]*CPPMethod {
+	methods := map[string]*CPPMethod{}
 	q, err := sitter.NewQuery([]byte("(declaration type: (type_identifier) @type declarator: (function_declarator) @func)"), cpp.GetLanguage())
 	if err != nil {
 		fmt.Println(err)
@@ -94,28 +123,6 @@ func parseHeader(path string) map[string]*CPPMethod {
 			}
 			methods[*parsed.Identifier] = new_method
 		}
-	}
-
-	for name, v := range methods {
-		fmt.Println("\n----------------------------------------")
-		fmt.Printf("Method: %s\n", name)
-		for i, o := range v.Overloads {
-			fmt.Printf("Overload %d: (", i+1)
-			argLen := len(*o)
-			for j, arg := range *o {
-				fmtStr := ""
-				if j < argLen-1 {
-					fmtStr = ", "
-				}
-				if arg.IsPtr() {
-					fmt.Printf("%s %s %s%s", *arg.TypeQualifier, *arg.Type, *arg.RefDecl, fmtStr)
-				} else {
-					fmt.Printf("%s %s %s%s", *arg.TypeQualifier, *arg.Type, *arg.Identifier, fmtStr)
-				}
-			}
-			fmt.Print(")\n")
-		}
-		fmt.Printf("Returns: %v\n", *v.Returns)
 	}
 	return methods
 }

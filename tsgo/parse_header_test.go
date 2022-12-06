@@ -5,7 +5,7 @@ import (
 )
 
 func TestHeaderParser(t *testing.T) {
-	got := parseHeader("test_files/TensorBase.h")
+	got := parseHeader("fl_test/TensorBase.h")
 	for k, v := range got {
 		if k == "" {
 			t.Errorf("got %q, parsed method requires `Identifier`", k)
