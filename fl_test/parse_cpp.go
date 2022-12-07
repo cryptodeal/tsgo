@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"path/filepath"
 
@@ -22,6 +23,15 @@ type CPPArgDefault struct {
 
 type TemplateArg struct {
 	Identifier *string
+}
+
+type TemplateDeclArg struct {
+	Identifier *string
+	MetaType   *string
+}
+
+type TemplateDecl struct {
+	Args *[]*TemplateDeclArg
 }
 
 type QualifiedIdentifier struct {
@@ -51,11 +61,11 @@ type CPPType struct {
 }
 
 type CPPClass struct {
-	Name          *string
-	FieldDecl     *[]*CPPArg
-	FriendDecl    *[]*CPPFriend
-	Decl          *[]*CPPArg
-	TemplatedDecl *[]*CPPArg
+	Name         *string
+	FieldDecl    *[]*CPPArg
+	FriendDecl   *[]*CPPFriend
+	Decl         *[]*CPPArg
+	TemplateDecl *[]*TemplateMethod
 }
 
 type CPPArg struct {
@@ -70,6 +80,15 @@ type CPPMethod struct {
 	Ident     *string
 	Overloads []*[]*CPPArg
 	Returns   *string
+}
+
+type TemplateMethod struct {
+	TemplateDecl  *TemplateDecl
+	Returns       *string
+	PointerMethod bool
+	Ident         *string
+	Args          *[]*CPPArg
+	TypeQualifier *string
 }
 
 type ParsedMethod struct {
@@ -188,6 +207,95 @@ func parseClassFriend(n *sitter.Node, input []byte) *CPPFriend {
 	return new_friend
 }
 
+func parseClassTemplateMethod(n *sitter.Node, input []byte) *TemplateMethod {
+	template_method := &TemplateMethod{
+		TemplateDecl: &TemplateDecl{},
+	}
+	params := n.ChildByFieldName("parameters")
+
+	if params != nil {
+		param_count := int(params.ChildCount())
+		template_method.TemplateDecl.Args = &[]*TemplateDeclArg{}
+		for i := 0; i < param_count; i++ {
+			param := params.Child(i)
+			paramType := param.Type()
+			if paramType == "type_parameter_declaration" {
+				param_split := strings.Split(param.Content(input), " ")
+				DeclArg := &TemplateDeclArg{
+					Identifier: &param_split[1],
+					MetaType:   &param_split[0],
+				}
+				*template_method.TemplateDecl.Args = append(*template_method.TemplateDecl.Args, DeclArg)
+			}
+		}
+	}
+
+	childCount := int(n.ChildCount())
+	for i := 0; i < childCount; i++ {
+		childType := n.Child(i).Type()
+		if childType == "declaration" {
+			tempChild := n.Child(i)
+			tempType := tempChild.ChildByFieldName("type")
+			if tempType != nil {
+				content := tempType.Content(input)
+				template_method.Returns = &content
+			}
+			declarator := tempChild.ChildByFieldName("declarator")
+			if declarator != nil {
+				declType := declarator.Type()
+				if declType == "pointer_declarator" {
+					template_method.PointerMethod = true
+					decl := declarator.ChildByFieldName("declarator")
+					if decl != nil {
+						declType := decl.Type()
+						if declType == "function_declarator" {
+							template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
+							nameNode := decl.ChildByFieldName("name")
+							if nameNode != nil {
+								name := nameNode.Content(input)
+								template_method.Ident = &name
+							} else {
+								fmt.Printf("unhandled node:\nnode view: %s\nnode type: %s\ncontent: %s\n", decl, declType, decl.Content(input))
+							}
+							decl_child_count := int(decl.ChildCount())
+							for j := 0; j < decl_child_count; j++ {
+								decl_child := decl.Child(j)
+								decl_child_type := decl_child.Type()
+								if decl_child_type == "type_qualifier" {
+									type_qualifier := decl_child.Content(input)
+									template_method.TypeQualifier = &type_qualifier
+								}
+							}
+						}
+					}
+				} else if declType == "function_declarator" {
+					decl := declarator.ChildByFieldName("declarator")
+					if decl != nil {
+						template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
+						nameNode := decl.ChildByFieldName("name")
+						if nameNode != nil {
+							name := nameNode.Content(input)
+							template_method.Ident = &name
+						}
+						decl_child_count := int(decl.ChildCount())
+						for j := 0; j < decl_child_count; j++ {
+							decl_child := decl.Child(j)
+							decl_child_type := decl_child.Type()
+							if decl_child_type == "type_qualifier" {
+								type_qualifier := decl_child.Content(input)
+								template_method.TypeQualifier = &type_qualifier
+							} else {
+								fmt.Printf("unhandled node:\nnode view: %s\nnode type: %s\ncontent: %s\n", decl, declType, decl.Content(input))
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return template_method
+}
+
 func parseClasses(n *sitter.Node, input []byte) map[string]*CPPClass {
 	classes := map[string]*CPPClass{}
 
@@ -227,7 +335,11 @@ func parseClasses(n *sitter.Node, input []byte) map[string]*CPPClass {
 				} else if temp_child.Type() == "declaration" { // TODO: parse class `declaration`
 					// fmt.Println(temp_child.Content(input))
 				} else if temp_child.Type() == "template_declaration" { // TODO: parse class `template_declaration`
-					fmt.Println(temp_child.Content(input))
+					if classes[class_name].TemplateDecl == nil {
+						classes[class_name].TemplateDecl = &[]*TemplateMethod{}
+					}
+					temp_decl := parseClassTemplateMethod(temp_child, input)
+					*classes[class_name].TemplateDecl = append(*classes[class_name].TemplateDecl, temp_decl)
 				}
 			}
 			classes[class_name].FriendDecl = class_friends
@@ -288,6 +400,9 @@ func parseCPPMethod(content []byte, r *sitter.Node, b *sitter.Node) *ParsedMetho
 
 func parseCPPArg(content []byte, arg_list *sitter.Node) *[]*CPPArg {
 	args := []*CPPArg{}
+	if arg_list == nil {
+		return &args
+	}
 	child_count := int(arg_list.ChildCount())
 
 	for i := 0; i < child_count; i++ {
