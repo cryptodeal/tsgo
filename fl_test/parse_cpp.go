@@ -83,12 +83,14 @@ type CPPMethod struct {
 }
 
 type TemplateMethod struct {
-	TemplateDecl  *TemplateDecl
-	Returns       *string
-	PointerMethod bool
-	Ident         *string
-	Args          *[]*CPPArg
-	TypeQualifier *string
+	TemplateDecl          *TemplateDecl
+	Returns               *string
+	PointerMethod         bool
+	StorageClassSpecifier *string
+	RefDecl               *string
+	Ident                 *string
+	Args                  *[]*CPPArg
+	TypeQualifier         *string
 }
 
 type ParsedMethod struct {
@@ -129,9 +131,15 @@ func parseHeader(path string) map[string]*CPPMethod {
 	classFriends := parseClasses(n, input)
 	for _, cf := range classFriends {
 		fmt.Println(cf)
+		if cf.TemplateDecl != nil {
+			for _, td := range *cf.TemplateDecl {
+				if td.Ident != nil {
+					fmt.Println(*td.Ident)
+				}
+			}
+		}
 	}
 	return methods
-
 }
 
 func parseClassFriend(n *sitter.Node, input []byte) *CPPFriend {
@@ -212,88 +220,157 @@ func parseClassTemplateMethod(n *sitter.Node, input []byte) *TemplateMethod {
 		TemplateDecl: &TemplateDecl{},
 	}
 	params := n.ChildByFieldName("parameters")
-
-	if params != nil {
-		param_count := int(params.ChildCount())
-		template_method.TemplateDecl.Args = &[]*TemplateDeclArg{}
-		for i := 0; i < param_count; i++ {
-			param := params.Child(i)
-			paramType := param.Type()
-			if paramType == "type_parameter_declaration" {
-				param_split := strings.Split(param.Content(input), " ")
-				DeclArg := &TemplateDeclArg{
-					Identifier: &param_split[1],
-					MetaType:   &param_split[0],
-				}
-				*template_method.TemplateDecl.Args = append(*template_method.TemplateDecl.Args, DeclArg)
-			}
+	template_method.TemplateDecl.Args = &[]*TemplateDeclArg{}
+	param_count := int(params.ChildCount())
+	for i := 0; i < param_count; i++ {
+		param := params.Child(i)
+		if param.Type() != "type_parameter_declaration" {
+			continue
 		}
+		param_split := strings.Split(param.Content(input), " ")
+		DeclArg := &TemplateDeclArg{
+			Identifier: &param_split[1],
+			MetaType:   &param_split[0],
+		}
+		*template_method.TemplateDecl.Args = append(*template_method.TemplateDecl.Args, DeclArg)
 	}
 
 	childCount := int(n.ChildCount())
 	for i := 0; i < childCount; i++ {
-		childType := n.Child(i).Type()
-		if childType == "declaration" {
-			tempChild := n.Child(i)
-			tempType := tempChild.ChildByFieldName("type")
-			if tempType != nil {
-				content := tempType.Content(input)
-				template_method.Returns = &content
-			}
-			declarator := tempChild.ChildByFieldName("declarator")
-			if declarator != nil {
-				declType := declarator.Type()
-				if declType == "pointer_declarator" {
-					template_method.PointerMethod = true
-					decl := declarator.ChildByFieldName("declarator")
-					if decl != nil {
-						declType := decl.Type()
-						if declType == "function_declarator" {
-							template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
-							nameNode := decl.ChildByFieldName("name")
-							if nameNode != nil {
-								name := nameNode.Content(input)
-								template_method.Ident = &name
-							} else {
-								fmt.Printf("unhandled node:\nnode view: %s\nnode type: %s\ncontent: %s\n", decl, declType, decl.Content(input))
-							}
-							decl_child_count := int(decl.ChildCount())
-							for j := 0; j < decl_child_count; j++ {
-								decl_child := decl.Child(j)
-								decl_child_type := decl_child.Type()
-								if decl_child_type == "type_qualifier" {
-									type_qualifier := decl_child.Content(input)
-									template_method.TypeQualifier = &type_qualifier
+		tempChild := n.Child(i)
+		childType := tempChild.Type()
+		// switch case to handle per node type
+		switch childType {
+		case "declaration":
+			{
+				template_method.Returns = getTypeVal(tempChild, input)
+				declarator := tempChild.ChildByFieldName("declarator")
+				// switch case to handle per node type
+				switch declarator.Type() {
+				case "pointer_declarator":
+					{
+						template_method.PointerMethod = true
+						decl := declarator.ChildByFieldName("declarator")
+						// switch case to handle per node type
+						switch decl.Type() {
+						case "function_declarator":
+							{
+								template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
+								template_method.TypeQualifier = getTypeQualifier(decl, input)
+								nameNode := decl.ChildByFieldName("name")
+								if nameNode != nil {
+									name := nameNode.Content(input)
+									template_method.Ident = &name
+								} else {
+									decl := decl.ChildByFieldName("declarator")
+									if decl != nil {
+										parseTemplateFuncIdent(decl, input, template_method)
+									}
 								}
 							}
-						}
-					}
-				} else if declType == "function_declarator" {
-					decl := declarator.ChildByFieldName("declarator")
-					if decl != nil {
-						template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
-						nameNode := decl.ChildByFieldName("name")
-						if nameNode != nil {
-							name := nameNode.Content(input)
-							template_method.Ident = &name
-						}
-						decl_child_count := int(decl.ChildCount())
-						for j := 0; j < decl_child_count; j++ {
-							decl_child := decl.Child(j)
-							decl_child_type := decl_child.Type()
-							if decl_child_type == "type_qualifier" {
-								type_qualifier := decl_child.Content(input)
-								template_method.TypeQualifier = &type_qualifier
-							} else {
-								fmt.Printf("unhandled node:\nnode view: %s\nnode type: %s\ncontent: %s\n", decl, declType, decl.Content(input))
+						case "function_definition":
+							{
+								parseTemplateFuncDefNode(tempChild, input, template_method)
 							}
 						}
 					}
+				case "function_declarator":
+					{
+						decl := declarator.ChildByFieldName("declarator")
+						template_method.Args = parseCPPArg(input, decl.ChildByFieldName("parameters"))
+						parseTemplateFuncIdent(decl, input, template_method)
+						template_method.TypeQualifier = getTypeQualifier(decl, input)
+					}
 				}
+			}
+		case "function_definition":
+			{
+				parseTemplateFuncDefNode(tempChild, input, template_method)
 			}
 		}
 	}
 	return template_method
+}
+
+func parseTemplateFuncIdent(n *sitter.Node, input []byte, method *TemplateMethod) {
+	nameNode := n.ChildByFieldName("name")
+	if nameNode != nil {
+		name := nameNode.Content(input)
+		method.Ident = &name
+	} else {
+		name := n.Content(input)
+		method.Ident = &name
+	}
+}
+
+func parseTemplateFuncDefNode(n *sitter.Node, input []byte, method *TemplateMethod) {
+	method.StorageClassSpecifier = getStorageClassSpecifier(n, input)
+	method.Returns = getTypeVal(n, input)
+	declarator := n.ChildByFieldName("declarator")
+	if declarator != nil {
+		// switch case to handle per node type
+		switch declarator.Type() {
+		case "function_declarator":
+			{
+				nameNode := declarator.ChildByFieldName("declarator")
+				if nameNode != nil {
+					ident := nameNode.Content(input)
+					method.Ident = &ident
+				}
+				method.Args = parseCPPArg(input, declarator.ChildByFieldName("parameters"))
+			}
+		case "reference_declarator":
+			{
+				funcDecl := findChildNodeByType(declarator, "function_declarator")
+				method.Args = parseCPPArg(input, funcDecl.ChildByFieldName("parameters"))
+				decl := funcDecl.ChildByFieldName("declarator")
+				name := decl.Content(input)
+				refDecl := strings.ReplaceAll(funcDecl.Content(input), name, "")
+				method.RefDecl = &refDecl
+				method.Ident = &name
+			}
+		}
+	}
+
+}
+
+func findChildNodeByType(n *sitter.Node, node_type string) *sitter.Node {
+	child_count := int(n.ChildCount())
+	for i := 0; i < child_count; i++ {
+		tmp := n.Child(i)
+		if tmp.Type() == node_type {
+			return tmp
+		}
+	}
+	return nil
+}
+
+func getTypeVal(n *sitter.Node, input []byte) *string {
+	var res *string
+	tempType := n.ChildByFieldName("type")
+	if tempType != nil {
+		content := tempType.Content(input)
+		res = &content
+	}
+	return res
+}
+
+func getTypeQualifier(n *sitter.Node, input []byte) *string {
+	qualNode := findChildNodeByType(n, "type_qualifier")
+	if qualNode != nil {
+		type_qualifier := qualNode.Content(input)
+		return &type_qualifier
+	}
+	return nil
+}
+
+func getStorageClassSpecifier(n *sitter.Node, input []byte) *string {
+	storageNode := findChildNodeByType(n, "storage_class_specifier")
+	if storageNode != nil {
+		storage := storageNode.Content(input)
+		return &storage
+	}
+	return nil
 }
 
 func parseClasses(n *sitter.Node, input []byte) map[string]*CPPClass {
@@ -325,23 +402,39 @@ func parseClasses(n *sitter.Node, input []byte) map[string]*CPPClass {
 			}
 
 			child_count := int(class_body.ChildCount())
+			matched := 0
 			for i := 0; i < child_count; i++ {
 				temp_child := class_body.Child(i)
-				if temp_child.Type() == "friend_declaration" { // WORKING
-					new_friend := parseClassFriend(temp_child, input)
-					*class_friends = append(*class_friends, new_friend)
-				} else if temp_child.Type() == "field_declaration" { // TODO: parse class `field_declaration`
-					// fmt.Println(temp_child.Content(input))
-				} else if temp_child.Type() == "declaration" { // TODO: parse class `declaration`
-					// fmt.Println(temp_child.Content(input))
-				} else if temp_child.Type() == "template_declaration" { // TODO: parse class `template_declaration`
-					if classes[class_name].TemplateDecl == nil {
-						classes[class_name].TemplateDecl = &[]*TemplateMethod{}
+				// switch case to handle per node type
+				switch temp_child.Type() {
+				case "friend_declaration": // WORKING?? (def needs unit tests lol)
+					{
+						new_friend := parseClassFriend(temp_child, input)
+						*class_friends = append(*class_friends, new_friend)
 					}
-					temp_decl := parseClassTemplateMethod(temp_child, input)
-					*classes[class_name].TemplateDecl = append(*classes[class_name].TemplateDecl, temp_decl)
+				case "template_declaration": // WORKING?? (def needs unit tests lol)
+					{
+						if classes[class_name].TemplateDecl == nil {
+							classes[class_name].TemplateDecl = &[]*TemplateMethod{}
+						}
+						temp_decl := parseClassTemplateMethod(temp_child, input)
+						if temp_decl.Ident == nil {
+							fmt.Println(temp_child.Content(input))
+						}
+						*classes[class_name].TemplateDecl = append(*classes[class_name].TemplateDecl, temp_decl)
+					}
+				case "declaration":
+					{
+						// TODO: parse top level nodes w type `declaration`
+						matched++
+					}
+				case "field_declaration":
+					{
+						// TODO: parse top level nodes w type `field_declaration`
+					}
 				}
 			}
+			fmt.Println("Matched: ", matched)
 			classes[class_name].FriendDecl = class_friends
 		}
 	}
@@ -385,15 +478,13 @@ func parseMethods(n *sitter.Node, input []byte) map[string]*CPPMethod {
 func parseCPPMethod(content []byte, r *sitter.Node, b *sitter.Node) *ParsedMethod {
 	args := parseCPPArg(content, b.ChildByFieldName("parameters"))
 	name := b.ChildByFieldName("declarator").Content(content)
-	var returns *string
+	parsed := &ParsedMethod{
+		Args:  args,
+		Ident: &name,
+	}
 	if r != nil {
 		tempReturns := r.Content(content)
-		returns = &tempReturns
-	}
-	parsed := &ParsedMethod{
-		Args:    args,
-		Ident:   &name,
-		Returns: returns,
+		parsed.Returns = &tempReturns
 	}
 	return parsed
 }
@@ -404,61 +495,44 @@ func parseCPPArg(content []byte, arg_list *sitter.Node) *[]*CPPArg {
 		return &args
 	}
 	child_count := int(arg_list.ChildCount())
-
 	for i := 0; i < child_count; i++ {
 		scoped_arg := arg_list.Child(i)
 		node_type := scoped_arg.Type()
 		if node_type != "parameter_declaration" && node_type != "optional_parameter_declaration" {
 			continue
 		}
-
-		var RefDecl string
-		var Identifier string
-		refDecl := scoped_arg.ChildByFieldName("declarator")
-		refType := refDecl.Type()
-		count := int(refDecl.ChildCount())
-		if refType == "reference_declarator" {
-			RefDecl = refDecl.Content(content)
-			for j := 0; j < count; j++ {
-				child := refDecl.Child(j)
-				if child.Type() != "identifier" {
-					continue
-				}
-				Identifier = child.Content(content)
-			}
-		} else if refType == "identifier" {
-			Identifier = refDecl.Content(content)
-		}
-
-		var TypeQualifier string
-		count = int(scoped_arg.ChildCount())
-		for j := 0; j < count; j++ {
-			child := scoped_arg.Child(j)
-			if child.Type() != "type_qualifier" {
-				continue
-			}
-			TypeQualifier = child.Content(content)
-		}
-
-		var DefaultValue CPPArgDefault
-		if node_type == "optional_parameter_declaration" {
-			tempDefault := scoped_arg.ChildByFieldName("default_value").Content(content)
-			DefaultValue = CPPArgDefault{Val: &tempDefault}
-		}
-
 		argType := scoped_arg.ChildByFieldName("type").Content(content)
-		temp_arg := &CPPArg{
-			Ident:         &Identifier,
+		typeQualifier := getTypeQualifier(scoped_arg, content)
+		parsed_arg := &CPPArg{
 			Type:          &argType,
-			TypeQualifier: &TypeQualifier,
-			DefaultValue:  &DefaultValue,
+			TypeQualifier: typeQualifier,
 		}
 
-		if RefDecl != "" {
-			temp_arg.RefDecl = &RefDecl
+		refNode := scoped_arg.ChildByFieldName("declarator")
+		// switch case to handle per node type
+		switch refNode.Type() {
+		case "reference_declarator":
+			{
+				identNode := findChildNodeByType(refNode, "identifier")
+				if identNode != nil {
+					identStr := identNode.Content(content)
+					parsed_arg.Ident = &identStr
+					refDeclStr := strings.ReplaceAll(refNode.Content(content), identStr, "")
+					parsed_arg.RefDecl = &refDeclStr
+				}
+			}
+		case "identifier":
+			{
+				identStr := refNode.Content(content)
+				parsed_arg.Ident = &identStr
+			}
+		case "optional_parameter_declaration":
+			{
+				tempDefault := scoped_arg.ChildByFieldName("default_value").Content(content)
+				parsed_arg.DefaultValue = &CPPArgDefault{Val: &tempDefault}
+			}
 		}
-
-		args = append(args, temp_arg)
+		args = append(args, parsed_arg)
 	}
 	return &args
 }
